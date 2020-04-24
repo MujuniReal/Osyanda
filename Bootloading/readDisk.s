@@ -41,6 +41,9 @@ ReadSect:
 	push %cx
 	push %bx
 
+/*	xor %cx,%cx
+	mov $0x4,%cx  */
+
 	//Sector
 	xor %bx,%bx
 	xor %dx,%dx
@@ -89,12 +92,14 @@ exitRead:
 		
 .endfunc
 
-
+Root_dirStart: .word 0x0000
+Root_dirSects: .word 0x0000
 
 
 start:
 	//mov the drive number in %dl to thedefined variable reposible to hold it
 	cli
+	mov %dl,LogDrvNo
 	xor %ax,%ax
 	mov %ax,%ss
 	mov %ax,%es
@@ -102,5 +107,32 @@ start:
 	mov $0x7c00,%sp
 	sti
 
-	
-	
+	//rootDirectory Start Sector Calculation
+	mov SectsPFat,%ax
+	mul FatTabs		//multiplication FatTables * SectorsPFat
+	add ResSects,%ax	//Add the reserved sectors
+	add NHiddenSects,%ax	//Add the  hidden sectors	
+	adc NhiddnSectshi,%ax	//Add the hight word of hidden Sects
+	mov %ax,Root_dirStart	//Root_dirStart in LBA format
+
+	//rootDirectory Size in sectors
+	xor %bx,%bx
+	xor %dx,%dx
+	xor %ax,%ax
+	mov NRootDirEs,%ax
+	mov $32,%bx
+	mul %bx			//These are now the total bytes that the root directory spans
+	div ByPSect		//These are now rootdir sectors of span 
+	mov %ax,Root_dirSects
+
+	mov Root_dirStart,%ax	//LBA Format
+	call ReadSect
+
+	lea (%es:%bx),%si
+	lea (fileName),%di
+	repz cmpsb
+	je File_found
+
+
+
+fileName: .ascii "Osyanda.zip"
