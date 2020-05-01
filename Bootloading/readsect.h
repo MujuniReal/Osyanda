@@ -1,17 +1,3 @@
-.code16
-
-.text
-.org 0x00
-
-main:	jmp start
-	nop
-
-//this header file below here is for a 1.4MB floppy disk formatted with FAT
-//Fat formated with MBR not GPT
-
-#include "fatstruct.h"
-#include "printer.h"
-
 .func ReadSect
 /*
   %al - number of sectors to read
@@ -37,15 +23,16 @@ main:	jmp start
 
 */
 ReadSect:
-	push %ax
-	push %cx
-	push %bx
+	//%cx must be saved before calling this function
+	xor %cx,%cx
+        mov $0x4,%cx  	//We wanna read 3 more times before leaving
 
-/*	xor %cx,%cx
-	mov $0x4,%cx  */
+readsect:
+	push %ax	//Contains LBA
+	push %cx	//Contains number of trial times for reading disk
+	push %bx	//Contains adress to store read data
 
 	//Sector
-	xor %bx,%bx
 	xor %dx,%dx
 	mov SectsPTrck,%bx
 	div %bx
@@ -53,8 +40,7 @@ ReadSect:
 	mov %dl,%cl
 
 	//Head
-	xor %dx,%dx	//Since %ax is (LBA/SectsPTrack)
-	xor %bx,%bx	//No need of editing its contents
+	xor %dx,%dx	//Since %ax is (LBA/SectsPTrack) No need of editing its contentsi
 	mov NHeads,%bx	//Remember we have to save bytes because
 	div %bx		//We are limited to 512Bytes
 	xchg %dl,%dh
@@ -67,9 +53,12 @@ ReadSect:
 	mov $0x0201,%ax		//We intend to (read) (one) Sector
 	pop %bx
 	int $0x13
+	//We are getting an invalid function error
 	jc FailedToread
 	lea (SucReadStr),%si
 	call PrintIt
+        pop %cx
+        pop %ax
 	jmp exitRead
 
 
@@ -80,59 +69,13 @@ FailedToread:			//This function attempts to try reading
 	pop %ax			//Put Back LBA in the mighty register
 	dec %cx
 	cmp $0x0,%cx
-	jnz ReadSect		//Totally failed
+	jnz readsect		//Totally failed
 	lea (FailTRStr),%si	//Totally failed to read string
-	call PrintIt
+	call PrintIt		//we need to set ax to an identified value for erroring
+
 
 exitRead:
-	pop %cx
-	pop %ax
 	retw
 
 		
 .endfunc
-
-Root_dirStart: .word 0x0000
-Root_dirSects: .word 0x0000
-
-
-start:
-	//mov the drive number in %dl to thedefined variable reposible to hold it
-	cli
-	mov %dl,LogDrvNo
-	xor %ax,%ax
-	mov %ax,%ss
-	mov %ax,%es
-	mov %ax,%ds
-	mov $0x7c00,%sp
-	sti
-
-	//rootDirectory Start Sector Calculation
-	mov SectsPFat,%ax
-	mul FatTabs		//multiplication FatTables * SectorsPFat
-	add ResSects,%ax	//Add the reserved sectors
-	add NHiddenSects,%ax	//Add the  hidden sectors	
-	adc NhiddnSectshi,%ax	//Add the hight word of hidden Sects
-	mov %ax,Root_dirStart	//Root_dirStart in LBA format
-
-	//rootDirectory Size in sectors
-	xor %bx,%bx
-	xor %dx,%dx
-	xor %ax,%ax
-	mov NRootDirEs,%ax
-	mov $32,%bx
-	mul %bx			//These are now the total bytes that the root directory spans
-	div ByPSect		//These are now rootdir sectors of span 
-	mov %ax,Root_dirSects
-
-	mov Root_dirStart,%ax	//LBA Format
-	call ReadSect
-
-	lea (%es:%bx),%si
-	lea (fileName),%di
-	repz cmpsb
-	je File_found
-
-
-
-fileName: .ascii "Osyanda.zip"
