@@ -53,7 +53,6 @@ readsect:
 	mov $0x0201,%ax		//We intend to (read) (one) Sector
 	pop %bx
 	int $0x13
-	//We are getting an invalid function error
 	jc FailedToread
 	lea (SucReadStr),%si
 	call PrintIt
@@ -62,10 +61,11 @@ readsect:
 	jmp exitRead
 
 
-FailedToread:			//This function attempts to try reading
+FailedToread:		//This function attempts to try reading
 	pop %cx			//the sector 3 more times 3more trials
 	xor %ax,%ax
 	int $0x13		//Reset the disk and we try again
+	//sucessfully resets
 	pop %ax			//Put Back LBA in the mighty register
 	dec %cx
 	cmp $0x0,%cx
