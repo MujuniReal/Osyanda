@@ -70,8 +70,15 @@ FailedToread:		//This function attempts to try reading
 	dec %cx
 	cmp $0x0,%cx
 	jnz readsect		//Totally failed
-	lea (FailTRStr),%si	//Totally failed to read string
-	call PrintIt		//we need to set ax to an identified value for erroring
+	//lea (FailTRStr),%si	//Totally failed to read string
+	//call PrintIt		//we need to set ax to an identified value for erroring
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
 
 
 exitRead:
