@@ -17,14 +17,13 @@ NHeads:		.word 0x0002	//Number of heads 2Bytes, of the disk or required heads th
 NHiddenSects:	.word 0x0000	//Number of hidden sectors 2Bytes we go zero coz we wish not to hide any or naturally there arent any hidden sectors
 NhiddnSectshi:	.word 0x0000	//This is the total number of hidden sectors as a high word of the total number spanning 2Bytes
 TotSectsInFS:   .word 0x0000
-                .byte 0x00      //Total sectors in Filesystem
-
+                      //Total sectors in Filesystem
+		.word 0x00000
 LogDrvNo:	.byte 0x00	//Logical Drive Number 1Byte. This here is tobe initialized at boot time from the %dl register coz the %dl register holds the number of the selected device as seen from the BIOS perspective
 Resrvd:		.byte 0x00	//This here is reserved space 1Byte
 ExtSig:		.byte 0x01	//Well this was the extended signature of this floppy disk 1Byte
 DrvSeriNum:	.word 0xa329
 		.word 0x7091	//This is the drive Serial Number comes with the drive it spans 4Bytescc
-		.byte 0x64
 VolLabel:	.ascii "           "	//Volume Label 11Bytes like a name We just initialized it with spaces in hexadecimal ascii spaces are 0x20
-FSType:		.ascii "FAT12   "	//Filesystem Type This Spans 8Bytes 
+FSType:		.ascii "FAT12   "	//Filesystem Type This Spans 8Bytes
 
