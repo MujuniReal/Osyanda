@@ -34,11 +34,11 @@ start:
 	xor %bx,%bx
 	//rootDirectory Start Sector Calculation
 	mov SectsPFat,%ax
-	mov FatTabs,%bx		//multiplication FatTables * SectorsPFat
+	mov FatTabs,%bl		//multiplication FatTables * SectorsPFat
 	mul %bx
 	add ResSects,%ax	//Add the reserved sectors
 	add NHiddenSects,%ax	//Add the  hidden sectors	
-	adc NhiddnSectshi,%ax	//Add the hight word of hidden Sects
+	add NhiddnSectshi,%ax	//Add the hight word of hidden Sects
 	mov %ax,Root_dirStart	//Root_dirStart in LBA format
 
 	//rootDirectory Size in sectors
@@ -60,24 +60,26 @@ start:
 	mov %ax,%es
 	xor %cx,%cx
 	xor %bx,%bx
+	xor %ax,%ax
+
 
 read_next_sector:
-	//mov Root_dirStart,%ax	//LBA Format
-	mov $19,%ax
+	mov Root_dirStart,%ax	//LBA Format
+	//mov $19,%ax
 	add %cx,%ax
 	push %cx
 	call ReadSect
 	pop %cx
         inc %cx
-        //cmp Root_dirSects,%cx
-	cmp $14,%cx
+        cmp Root_dirSects,%cx
+	//cmp $14,%cx
 	jz file_not_found
 	push %cx
 
 getFilename:
 	mov $0x000b,%cx
-	lea (%bx),%si
-	lea (fileName),%di
+	lea (%bx),%di
+	lea (fileName),%si
 	repz cmpsb
 	je File_Found
 	add $0x20,%bx
@@ -106,7 +108,7 @@ loaDFAT:
 	mov %ax,%es
 	mov ResSects,%ax
 	add NHiddenSects,%ax
-	adc NhiddnSectshi,%ax
+	add NhiddnSectshi,%ax
 	mov SectsPFat,%cx
 	xor %bx,%bx
 	
@@ -124,17 +126,16 @@ read_next_fat_sect:
 	mov $filesegment,%ax
 	mov %ax,%es
 	xor %bx,%bx
-	mov $0x0005,%cx
-	//mov file_start,%cx
+	mov file_start,%cx
 	xor %ax,%ax
 
 
 read_file_nextinline_sector:
 	mov %cx,%ax
-/*	add Root_dirStart,%ax
-	add Root_dirSects,%ax*/
-	add $19,%ax
-	add $14,%ax 
+	add Root_dirStart,%ax
+	add Root_dirSects,%ax
+	//add $19,%ax
+	//add $14,%ax 
 	sub $0x2,%ax
 	push %cx
 	call ReadSect
@@ -167,15 +168,16 @@ continue_to_read:
 FinishProgram:
 	hlt
 
-Root_dirStart: .byte 0x00,0x00  //LBA Location for the start of root dir
-Root_dirSects: .byte 0x00,0x00  //Span of root dir in Sectors
-file_start: .byte 0x00,0x00
 
 fileName: .ascii "VEXER   BIN"
 ffounds: .asciz "File found friend!!!\r\n"
 notf: .asciz "File not found\r\n"
 FailTRStr: .asciz "Failed to read sector\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
+
+Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
+Root_dirSects: .byte 0,0 //Span of root dir in Sectors
+file_start: .byte 0,0
 
 .fill 510-(.-main),1,0
 BootMagic: .word 0xaa55 
