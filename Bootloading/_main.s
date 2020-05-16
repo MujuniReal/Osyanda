@@ -6,14 +6,13 @@
 
 main:
 	jmp start
-
+	nop
 
 //this header file below here is for a 1.4MB floppy disk formatted with FAT
 //Fat formated with MBR not GPT
 
 #include "fatstruct.h"
-#include "printer.h"
-#include "readsect.h"
+
 
 filesegment = 0x1000
 fatsegment = 0x0ee0
@@ -161,17 +160,20 @@ odd_entry:
 continue_to_read:
 	mov %dx,%cx
 	cmp $0xff8,%cx
-	jl read_file_nextinline_sector
-
-
-
+	jl read_file_nextinline_sector	
+	mov $filesegment,%ax
+	mov %ax,%es
+	mov %ax,%ds
+	ljmp $filesegment,$0x0000
 
 FinishProgram:
 	hlt
 
+#include "printer.h"
+#include "readsect.h"
 
-fileName: .ascii "VEXER   BIN"
-ffounds: .asciz "File found friend!!!\r\n"
+fileName: .ascii "STAGE2  BIN"
+ffounds: .asciz "File found!\r\n"
 notf: .asciz "File not found\r\n"
 FailTRStr: .asciz "Failed to read sector\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
