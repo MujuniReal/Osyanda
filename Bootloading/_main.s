@@ -27,7 +27,8 @@ start:
 	mov %ax,%ss
 	mov %ax,%es
 	mov %ax,%ds
-	mov 0x7c00,%sp
+	mov $0x7c00,%ax
+	mov %ax,%sp
 	sti
 
 	xor %bx,%bx
@@ -175,7 +176,7 @@ FinishProgram:
 fileName: .ascii "STAGE2  BIN"
 ffounds: .asciz "File found!\r\n"
 notf: .asciz "File not found\r\n"
-FailTRStr: .asciz "Failed to read sector\r\n"
+FailTRStr: .asciz "Failed to read\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
 Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
