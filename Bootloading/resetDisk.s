@@ -69,6 +69,12 @@ DiskReset:
 	jc FailedReset
 	lea (Sreset),%si
 	call PrintIt
+	lea (SReset),%si
+	call PrintIt
+        .byte 0xea
+        .word 0x0000
+        .word 0xffff
+
 	hlt
 	
 	
