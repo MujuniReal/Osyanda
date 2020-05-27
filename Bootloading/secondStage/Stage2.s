@@ -63,8 +63,38 @@ A20_pincheck:
 LOADGDT_IDT:
 	lea (Proced),%si
 	call PrintIt
-
+//initialize the GDT and IDT into memory
 #include "g_idts.s"
+
+	lgdt GDT		//The CPU now knows the location of the descriptors
+	lidt IDT
+
+/* This part here below is of control Registers especially th cr0 register
+   Bit with index zero or the first bit is the one whereby if its 1 then it shows
+   that we are in protected mode,, bitname PE Protected mode Enabled
+   %cr0 is a 32bit register/it is as heavy as 32bits
+*/
+	xor %eax,%eax
+	mov %cr0,%eax
+	or $0x1,%eax
+	mov %eax,%cr0
+
+/* one more step left too enter 32bit protected mode that is cllearing the
+   prefetch Queue,, the 16bits would have been fetched instructions to go away from
+   the CPU 
+*/
+	jmp clear_the_fetchqueue
+	nop
+	nop
+	nop
+clear_the_fetchqueue:
+
+/* Cool now make the Jump to the kernel 
+   In oeder to make this jump the jump is a 32bit instruction and
+   Our compiler and 16bit assembler didnt have it,, so we just gonna hand code
+   The encoded 32bit instructions for the 32bit jump
+*/
+
 
 
 hang:
