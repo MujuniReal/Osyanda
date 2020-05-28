@@ -1,0 +1,15 @@
+INCLUDE
+
+
+SRC
+directories:
+	fat12
+	fat16
+	fat32
+	ext2
+	ext3
+	ext4
+	ntfs
+	etc
+
+inside these directories we put in both 1st and second stage bootloaders

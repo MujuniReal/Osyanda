@@ -1,11 +1,11 @@
 
 #PWD = `$$HOME`
-TOPDIR = /home/box/Osyanda/Bootloading/			#Soon we will fetch this from the main Makefile present in the Topdirectory
+TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
 IMG = /home/box/blank_floppy.img
 MOUNTDIR = /home/box/mount/
 
 CC = gcc
-CPP = cpp -nostdinc -I /home/box/Osyanda/Bootloading -I /home/box/Osyanda/Bootloading/secondStage
+CPP = cpp -nostdinc -I /home/box/Osyanda/CraneBootloader/include
 
 
 AS = as
@@ -15,8 +15,8 @@ LDFLAGS = --oformat binary
 
 all: Stage2.bin
 
-powder:
-	ls $(TOPDIR)
+stage1:
+	$(MAKE) -C firststage
 
 stage2: Stage2.bin
 
@@ -31,7 +31,8 @@ Stage2.bin: Stage2.o
 Stage2.o: Stage2.S
 	$(AS)  Stage2.S -o $@
 
-Stage2.S: Stage2.s check_a20.s  g_idts.s
+Stage2.S: Stage2.s /home/box/Osyanda/CraneBootloader/include/check_a20.s  /home/box/Osyanda/CraneBootloader/include/g_idts.s
+	# the above will too need to benefit from TOPDIR stuff 
 	$(CPP)  Stage2.s -o $@
 
 

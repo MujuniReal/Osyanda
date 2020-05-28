@@ -11,7 +11,7 @@ main:
 //this header file below here is for a 1.4MB floppy disk formatted with FAT
 //Fat formated with MBR not GPT
 
-#include "fatstruct.h"
+#include <fat/fat12mbr>
 
 
 filesegment = 0x1000
@@ -130,7 +130,7 @@ read_next_fat_sect:
 	mov file_start,%cx
 	xor %ax,%ax
 
-
+/* this below here is filesystem specific */
 read_file_nextinline_sector:
 	mov %cx,%ax
 	add Root_dirStart,%ax
@@ -161,7 +161,9 @@ odd_entry:
 continue_to_read:
 	mov %dx,%cx
 	cmp $0xff8,%cx
-	jl read_file_nextinline_sector	
+	jl read_file_nextinline_sector
+/* Upto here is file system specific */
+	
 	mov $filesegment,%ax
 	mov %ax,%es
 	mov %ax,%ds
@@ -170,8 +172,8 @@ continue_to_read:
 FinishProgram:
 	hlt
 
-#include "printer.h"
-#include "readsect.h"
+#include <printer.h>
+#include <readsect.h>
 
 fileName: .ascii "STAGE2  BIN"
 ffounds: .asciz "File found!\r\n"
