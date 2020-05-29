@@ -1,35 +1,30 @@
 .code16
-
 .text
-.org 0x00
-.global main
-
-main:
-	jmp start
-	nop
+.org 0x0
+.global main_mbr2
 
 //this header file below here is for a 1.4MB floppy disk formatted with FAT
 //Fat formated with MBR not GPT
 
-#include <fat/fat12mbr.h>
-
-
-filesegment = 0x0b20
-fatsegment = 0x0a00
-tmprootdirseg = 0x0800
-
-
-start:
-	//mov the drive number in %dl to thedefined variable reposible to hold it
+main_mbr2:
 	cli
-	mov %dl,LogDrvNo
-	mov %cs,%ax
-	mov %ax,%ss
-	mov %ax,%es
-	mov %ax,%ds
-	mov $0x7c00,%ax
-	mov %ax,%sp
+
+#include <fat/fat16mbr.h>
+
+
+filesegment = 0x1000
+fatsegment = 0x0ee0
+tmprootdirseg = 0x1000
+
+start_mbr2:
 	sti
+
+	mov ByPSect,%ax
+	xor %bx,%bx
+	mov SectPClust,%bl
+	mul %bx
+	mov %ax,ByPClust
+
 
 	xor %bx,%bx
 	//rootDirectory Start Sector Calculation
@@ -51,6 +46,16 @@ start:
 	div %bx
 	mov %ax,Root_dirSects	//Root directory span sectors
 
+	//rootDirectory Size in Clusters
+	xor %bx,%bx
+	xor %dx,%dx
+	mov NRootDirEs,%ax
+	mov $0x20,%bx		//max root directory entries 32 in base16
+	mul %bx			//These are now the total bytes that the root directory spans
+	mov ByPClust,%bx	
+	div %bx
+	mov %ax,Root_dirClusts	//Root directory span
+
 /* ************************************************************* */
 /*           FROM NOW ON ALWAYS START FROM BELOW HERE           */
 /* *********************************************************** */
@@ -62,16 +67,14 @@ start:
 	xor %ax,%ax
 
 
-read_next_sector:
+read_next_rdir_clust:
 	mov Root_dirStart,%ax	//LBA Format
-	//mov $19,%ax
 	add %cx,%ax
 	push %cx
 	call ReadSect
 	pop %cx
     inc %cx
-    cmp Root_dirSects,%cx
-	//cmp $14,%cx
+    cmp Root_dirClusts,%cx
 	jz file_not_found
 
 getFilename:
@@ -83,8 +86,8 @@ getFilename:
 	je File_Found
 	pop %cx
 	add $0x20,%bx
-	cmp ByPSect,%bx
-	jz read_next_sector
+	cmp ByPClust,%bx
+	jz read_next_rdir_clust
 	jmp getFilename
 
 
@@ -109,16 +112,23 @@ loaDFAT:
 	mov ResSects,%ax
 	add NHiddenSects,%ax
 	add NhiddnSectshi,%ax
-	mov SectsPFat,%cx
+
+	push %ax
+	mov SectsPFat,%ax
+	xor %bx,%bx
+	mov SectPClust,%bl
+	div %bx
+	pop %ax
+	mov %ax,%cx			/*Clusters Per FAT */
 	xor %bx,%bx
 	
-read_next_fat_sect:
+read_next_fat_clust:
 	push %cx
 	call ReadSect
 	pop %cx
-	inc %ax
-	add ByPSect,%bx
-	loopnz read_next_fat_sect
+	add SectPClust,%ax
+	add ByPClust,%bx
+	loopnz read_next_fat_clust
 
 /* WOOOOOOOOOOOOOOOO THE FAT TABLE HAS BEEN LOADED INTO MEMORY
    NOW LETS SEE SOME ACTION FRIENDS			*/	
@@ -130,39 +140,31 @@ read_next_fat_sect:
 	xor %ax,%ax
 
 /* this below here is filesystem specific */
-read_file_nextinline_sector:
+initiate_read:
 	mov %cx,%ax
 	add Root_dirStart,%ax
 	add Root_dirSects,%ax
-	//add $19,%ax
-	//add $14,%ax 
 	sub $0x2,%ax
 	push %cx
 	call ReadSect
 	pop %cx
-	add ByPSect,%bx
 	push %ds
-    mov $fatsegment,%dx
-    //ds:si
-    mov %dx,%ds
-	mov %cx,%dx
+	mov $fatsegment,%dx
+	mov %dx,%ds
 	mov %cx,%si
-	shr %dx
-	add %dx,%si
-	mov %ds:(%si),%dx
+	add %cx,%si			//final location of fat entry in memory
+	movw %ds:(%si),%dx
 	pop %ds
-	test $0x1,%cx
-	jnz odd_entry
-	and $0x0fff,%dx
-	jmp continue_to_read
-odd_entry:
-	shr $0x4,%dx
-continue_to_read:
+	cmp $0xffff,%dx
+	je done_readingfile
+read_next_file_cluster:
 	mov %dx,%cx
-	cmp $0xff8,%cx
-	jl read_file_nextinline_sector
+	add ByPClust,%bx /* this is actually wrong we need bytes per cluster calculated */
+	/*bytes per cluster is whats needed to increament %bx even up there where we load root dir and fatsegment dont forget */
+	jmp initiate_read
 /* Upto here is file system specific */
-	
+/*We have to improve our readsect to read sects per cluster */
+done_readingfile:
 	mov $filesegment,%ax
 	mov %ax,%es
 	mov %ax,%ds
@@ -180,9 +182,8 @@ notf: .asciz "File not found\r\n"
 FailTRStr: .asciz "Failed to read\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
+ByPClust: .word 0x00,0x00
 Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
 Root_dirSects: .byte 0,0 //Span of root dir in Sectors
+Root_dirClusts: .byte 0,0
 file_start: .byte 0,0
-
-.fill 510-(.-main),1,0
-BootMagic: .word 0xaa55 

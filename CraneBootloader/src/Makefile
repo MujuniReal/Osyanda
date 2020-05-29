@@ -13,6 +13,9 @@ LD = ld
 
 LDFLAGS = --oformat binary
 
+HFILES = /home/box/Osyanda/CraneBootloader/include/check_a20.s \
+/home/box/Osyanda/CraneBootloader/include/g_idts.s
+
 all: Stage2.bin
 
 stage1:
@@ -31,7 +34,7 @@ Stage2.bin: Stage2.o
 Stage2.o: Stage2.S
 	$(AS)  Stage2.S -o $@
 
-Stage2.S: Stage2.s /home/box/Osyanda/CraneBootloader/include/check_a20.s  /home/box/Osyanda/CraneBootloader/include/g_idts.s
+Stage2.S: Stage2.s $(HFILES)
 	# the above will too need to benefit from TOPDIR stuff 
 	$(CPP)  Stage2.s -o $@
 

@@ -16,9 +16,9 @@ SectsPTrck:	.word 0x0012	//Sectors Per Track 2Bytes. for this floppy they are 18
 NHeads:		.word 0x0002	//Number of heads 2Bytes, of the disk or required heads thats if the disk doesnt have the physical heads
 NHiddenSects:	.word 0x0000	//Number of hidden sectors 2Bytes we go zero coz we wish not to hide any or naturally there arent any hidden sectors
 NhiddnSectshi:	.word 0x0000	//This is the total number of hidden sectors as a high word of the total number spanning 2Bytes
-TotSectsInFS:   .word 0x0000
-                      //Total sectors in Filesystem
-		.word 0x00000
+TotSectsInFS:   .word 0x0000	//Total sectors in Filesystem
+		.word 0x0000
+
 LogDrvNo:	.byte 0x00	//Logical Drive Number 1Byte. This here is tobe initialized at boot time from the %dl register coz the %dl register holds the number of the selected device as seen from the BIOS perspective  0x0 for a drive disk, hardisks start at 0x80
 Resrvd:		.byte 0x00	//This here is reserved space 1Byte it means current head in use probably
 ExtSig:		.byte 0x01	//Well this was the extended signature of this floppy disk 1Byte

@@ -50,14 +50,15 @@ readsect:
 
 	//finalyy
 	mov LogDrvNo,%dl
-	mov $0x0201,%ax		//We intend to (read) (one) Sector
+	mov $0x02,%ah
+	mov SectPClust,%al
 	pop %bx
 	int $0x13
 	jc FailedToread
 	lea (SucReadStr),%si
 	call PrintIt
-        pop %cx
-        pop %ax
+    pop %cx
+    pop %ax
 	jmp exitRead
 
 
