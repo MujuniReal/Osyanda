@@ -45,7 +45,7 @@ start:
 	xor %bx,%bx
 	xor %dx,%dx
 	mov NRootDirEs,%ax
-	mov $0x20,%bx		//max root directory entries 32 in base16
+	mov $0x20,%bx		//size of one root directory entry is 32Bytes in base16
 	mul %bx			//These are now the total bytes that the root directory spans
 	mov ByPSect,%bx	
 	div %bx

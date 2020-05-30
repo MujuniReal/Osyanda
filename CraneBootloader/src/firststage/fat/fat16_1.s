@@ -13,7 +13,8 @@ main:
 
 #include <fat/fat16mbr.h>
 
-New_MBR_Segment = 0x0021 /*we have to plan for this segment in the book */
+New_MBR_Segment = 0x0900 /*we have to plan for this segment in the book */
+//New_MBR_Segment = 0x0ee0
 CLI_instruction = 1  /*Size of the cli instruction is one byte in 16bit assembly this instruction is for security*/
 OEM_Size = 8		/* OEM manufacturer string 8bytes */	
 BIOS_PB = 25		/* The first 26bytes of the BIOS parameter block next to it is the Logical drive number*/
@@ -34,8 +35,7 @@ start:
 	mov $0x7c00,%ax
 	mov %ax,%sp
 	sti
-
-	xor %ax,%ax
+	
 	mov $New_MBR_Segment,%ax
 	mov %ax,%es
 	xor %ax,%ax
@@ -46,14 +46,15 @@ start:
 0 is missing coz the BIOS had automatically loaded it, so take caution that one more extra
 Sector that belongs to the FAT has been loaded too basing on how our readsect function has
 worked in FAT16 mode */
-
-	call ReadSect
-	cmp $0x0,%cx
-	jz FailedToRead
+	xor %cx,%cx
+	mov SectPClust,%cl
+	sub $0x1,%cx		/* Minus one because the bios had already loaded the first sector */
+	call ReadMulti
 
 	/* Save the Logical drive number we have earned after booting to the new loaded MBR*/
 	xor %dx,%dx
 	mov LogDrvNo,%dl
+	xor %bx,%bx			/*Make %bx point back to home */
 	movb %dl,%es:LogDrvNo_New(%bx)
 
 /* Prepare registers and jump */
@@ -68,18 +69,16 @@ FailedToRead:
 	call RebootBIOS /*this code can never go below here unless otherwise */
 
 	
-
-
-
 stopMBR:
 	hlt	
 
 #include <readsect.h>
+#include <readmultis.h>
 #include <printer.h>
 #include <reboot.h>
 
-FReadStr: .asciz "Failed to read Sector\r\n"
-RebootStr: .asciz "Press Any Key to Reboot..........\r\n"
+FReadStr: .asciz "Totally Failed to read Sector\r\n"
+RebootStr: .asciz "Press Any Key to Reboot.\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
 .fill 510-(.-main),1,0

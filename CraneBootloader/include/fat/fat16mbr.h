@@ -13,7 +13,7 @@ TotSects:	.word 0x0000	//Total number of sectors on the floppy 2Bytes
 MedDescr:	.byte 0xf8	//The media descriptor of a floppy disk 1Byte for any floppy disk 0xf0 for removable, f8 for fixed media eg hardisk
 SectsPFat:	.word 0x0100	//The number of sectors per FAT 2Bytes each FAT table spans 9 sectors
 SectsPTrck:	.word 0x003d	//Sectors Per Track 2Bytes. for this floppy they are 18 sectors per track
-NHeads:		.word 0x0011	//Number of heads 2Bytes, of the disk or required heads thats if the disk doesnt have the physical heads
+NHeads:		.word 0x0010	//Number of heads 2Bytes, of the disk or required heads thats if the disk doesnt have the physical heads
 NHiddenSects:	.word 0x0000	//Number of hidden sectors 2Bytes we go zero coz we wish not to hide any or naturally there arent any hidden sectors
 NhiddnSectshi:	.word 0x0000	//This is the total number of hidden sectors as a high word of the total number spanning 2Bytes
 TotSectsInFS:   .word 0xff00	//Total sectors in Filesystem

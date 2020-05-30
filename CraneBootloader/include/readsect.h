@@ -22,6 +22,10 @@
   This function expects LBA put in %ax register
 
 */
+
+/* Take note that real systems can actually read any number of sectors that you specify in
+the %al register but bochs here can only read one sector at a time bambi */
+
 ReadSect:
 	//%cx must be saved before calling this function
 	xor %cx,%cx
@@ -50,8 +54,7 @@ readsect:
 
 	//finalyy
 	mov LogDrvNo,%dl
-	mov $0x02,%ah
-	mov SectPClust,%al
+	mov $0x0201,%ax
 	pop %bx
 	int $0x13
 	jc FailedToread

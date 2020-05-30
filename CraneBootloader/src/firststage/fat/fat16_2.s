@@ -19,6 +19,9 @@ tmprootdirseg = 0x1000
 start_mbr2:
 	sti
 
+	lea (WelcomeNote),%si
+	call PrintIt
+
 	mov ByPSect,%ax
 	xor %bx,%bx
 	mov SectPClust,%bl
@@ -40,13 +43,13 @@ start_mbr2:
 	xor %bx,%bx
 	xor %dx,%dx
 	mov NRootDirEs,%ax
-	mov $0x20,%bx		//max root directory entries 32 in base16
+	mov $0x20,%bx		//size of one root directory entry is 32Bytes in base16
 	mul %bx			//These are now the total bytes that the root directory spans
 	mov ByPSect,%bx	
 	div %bx
 	mov %ax,Root_dirSects	//Root directory span sectors
 
-	//rootDirectory Size in Clusters
+	//rootDirectory Size in Clusters irrelevant
 	xor %bx,%bx
 	xor %dx,%dx
 	mov NRootDirEs,%ax
@@ -56,9 +59,7 @@ start_mbr2:
 	div %bx
 	mov %ax,Root_dirClusts	//Root directory span
 
-/* ************************************************************* */
-/*           FROM NOW ON ALWAYS START FROM BELOW HERE           */
-/* *********************************************************** */
+
 	//preparing to read the root directory
 	mov $tmprootdirseg,%ax
 	mov %ax,%es
@@ -67,27 +68,27 @@ start_mbr2:
 	xor %ax,%ax
 
 
-read_next_rdir_clust:
+read_next_rdir_sect:
 	mov Root_dirStart,%ax	//LBA Format
 	add %cx,%ax
 	push %cx
 	call ReadSect
 	pop %cx
     inc %cx
-    cmp Root_dirClusts,%cx
+    cmp Root_dirSects,%cx
 	jz file_not_found
 
 getFilename:
 	push %cx
-	mov $0x000b,%cx
+	mov $0x000b,%cx			/* fat12 and 16 support only filenames of 11Bytes */
 	lea (%bx),%di
-	lea (fileName),%si
+	lea (fileName),%si		/* compare %es:%di and %ds:%si */
 	repz cmpsb
 	je File_Found
 	pop %cx
 	add $0x20,%bx
-	cmp ByPClust,%bx
-	jz read_next_rdir_clust
+	cmp ByPSect,%bx
+	jz read_next_rdir_sect
 	jmp getFilename
 
 
@@ -103,32 +104,20 @@ File_Found:
 	lea (ffounds),%si
 	call PrintIt
 	mov %es:0x1a(%bx),%ax
-	mov %ax,file_start
+	mov %ax,file_start			/*file start Cluster */
 
 
 loaDFAT:
 	mov $fatsegment,%ax
 	mov %ax,%es
+
 	mov ResSects,%ax
 	add NHiddenSects,%ax
 	add NhiddnSectshi,%ax
-
-	push %ax
-	mov SectsPFat,%ax
 	xor %bx,%bx
-	mov SectPClust,%bl
-	div %bx
-	pop %ax
-	mov %ax,%cx			/*Clusters Per FAT */
-	xor %bx,%bx
-	
-read_next_fat_clust:
-	push %cx
-	call ReadSect
-	pop %cx
-	add SectPClust,%ax
-	add ByPClust,%bx
-	loopnz read_next_fat_clust
+	mov SectsPFat,%cx
+	call ReadMulti
+	xor %bx,%bx			/* Put back %bx to point home */
 
 /* WOOOOOOOOOOOOOOOO THE FAT TABLE HAS BEEN LOADED INTO MEMORY
    NOW LETS SEE SOME ACTION FRIENDS			*/	
@@ -142,45 +131,61 @@ read_next_fat_clust:
 /* this below here is filesystem specific */
 initiate_read:
 	mov %cx,%ax
+	sub $0x2,%ax
+	mulb SectPClust
 	add Root_dirStart,%ax
 	add Root_dirSects,%ax
-	sub $0x2,%ax
 	push %cx
-	call ReadSect
+	xor %cx,%cx
+	movb SectPClust,%cl		/* this function has helped to increament %bx for us */
+	call ReadMulti			/* read cluster containing file */
 	pop %cx
 	push %ds
 	mov $fatsegment,%dx
 	mov %dx,%ds
 	mov %cx,%si
-	add %cx,%si			//final location of fat entry in memory
+	add %cx,%si			/* final location of fat entry in memory */
 	movw %ds:(%si),%dx
 	pop %ds
-	cmp $0xffff,%dx
-	je done_readingfile
+	cmp $0xfff8,%dx
+	jge done_readingfile
 read_next_file_cluster:
 	mov %dx,%cx
-	add ByPClust,%bx /* this is actually wrong we need bytes per cluster calculated */
 	/*bytes per cluster is whats needed to increament %bx even up there where we load root dir and fatsegment dont forget */
 	jmp initiate_read
 /* Upto here is file system specific */
 /*We have to improve our readsect to read sects per cluster */
 done_readingfile:
+	lea (wooing),%si
+	call PrintIt
 	mov $filesegment,%ax
 	mov %ax,%es
 	mov %ax,%ds
 	ljmp $filesegment,$0x0000
+
+FailedToRead:
+	lea (FReadStr),%si
+	call PrintIt
+	call RebootBIOS /*this code can never go below here unless otherwise */
+
 
 FinishProgram:
 	hlt
 
 #include <printer.h>
 #include <readsect.h>
+#include <readmultis.h>
+#include <reboot.h>
 
+wooing: .asciz "Woooo the nani,, the file has totally been read into memory\r\n"
+FReadStr: .asciz "Totally Failed to read Sector\r\n"
+RebootStr: .asciz "Press Any Key to Reboot.\r\n"
 fileName: .ascii "STAGE2  BIN"
 ffounds: .asciz "File found!\r\n"
 notf: .asciz "File not found\r\n"
 FailTRStr: .asciz "Failed to read\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
+WelcomeNote: .asciz "Hey hello, the second mbr is up\r\n"
 
 ByPClust: .word 0x00,0x00
 Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
