@@ -14,7 +14,6 @@ main:
 #include <fat/fat16mbr.h>
 
 New_MBR_Segment = 0x0900 /*we have to plan for this segment in the book */
-//New_MBR_Segment = 0x0ee0
 CLI_instruction = 1  /*Size of the cli instruction is one byte in 16bit assembly this instruction is for security*/
 OEM_Size = 8		/* OEM manufacturer string 8bytes */	
 BIOS_PB = 25		/* The first 26bytes of the BIOS parameter block next to it is the Logical drive number*/

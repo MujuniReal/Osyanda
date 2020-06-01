@@ -1,45 +1,21 @@
-
-#PWD = `$$HOME`
-TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
-IMG = /home/box/Desktop/disk.img
-MOUNTDIR = /home/box/mount/
-
-CC = gcc
-CPP = cpp -nostdinc -I /home/box/Osyanda/CraneBootloader/include
+INCLUDE_DIR = /home/box/Osyanda/CraneBootloader/include
 
 
-AS = as
-LD = ld
+CC = gcc -m32 -Wall
+CFLAGS = -I $(INCLUDE_DIR)
 
-LDFLAGS = --oformat binary
 
-HFILES = /home/box/Osyanda/CraneBootloader/include/check_a20.s \
-/home/box/Osyanda/CraneBootloader/include/g_idts.s
+all: crane
 
-all: Stage2.bin
 
-stage1:
-	$(MAKE) -C firststage
+crane: main.o crane_prep-disk.o
+	$(CC) $^ -o $@
 
-stage2: Stage2.bin
+main.o: main.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-disk: Stage2.bin
-	mount -o rw $(IMG) $(MOUNTDIR)
-	cp Stage2.bin $(MOUNTDIR)
-	umount $(MOUNTDIR)
-
-Stage2.bin: Stage2.o
-	$(LD) $(LDFLAGS) -e mainSecond -Ttext 0x0 Stage2.o -o $@
-
-Stage2.o: Stage2.S
-	$(AS)  Stage2.S -o $@
-
-Stage2.S: Stage2.s $(HFILES)
-	# the above will too need to benefit from TOPDIR stuff 
-	$(CPP)  Stage2.s -o $@
-
+crane_prep-disk.o: crane_prep-disk.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm *.o
-	rm *.bin
-	rm *.S
