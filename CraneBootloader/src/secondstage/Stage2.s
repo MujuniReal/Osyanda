@@ -14,6 +14,14 @@ mainSecond:
 	jmp _start
 	nop
 
+#include <fat/fat12mbr.h>
+
+Root_dirSects: .word 0x0000
+Root_dirStart: .word 0x0000
+
+
+tmprootdirsegment = 0x2000
+fatsegment = 0x0a00
 
 _start:
 
@@ -23,6 +31,94 @@ Welcome_Note:
 	xor %si,%si
 	lea (Welcom_str),%si
 	call PrintIt
+
+
+	/* Looking for and loading the kernel file into memory */
+	xor %dx,%dx
+
+	movb LogDrvNo,%dl
+
+	xor %ax,%ax
+	int $0x13		//Reset the disk and we try again
+	
+
+	mov $tmprootdirsegment,%ax
+	mov %ax,%es
+	xor %cx,%cx
+	xor %bx,%bx
+	xor %ax,%ax
+
+read_next_sector:
+	mov Root_dirStart,%ax	//LBA Format
+	//mov $19,%ax
+	add %cx,%ax
+	push %cx
+	call ReadSect
+	pop %cx
+    inc %cx
+    cmp Root_dirSects,%cx
+	//cmp $14,%cx
+	jz file_not_found
+
+getFilename:
+	push %cx
+	mov $0x000b,%cx
+	lea (%bx),%di
+	lea (kernelfilename),%si
+	repz cmpsb
+	je File_Found
+	pop %cx
+	add $0x20,%bx
+	cmp ByPSect,%bx
+	jz read_next_sector
+	jmp getFilename
+
+
+	
+file_not_found:
+	lea (notf),%si
+	call PrintIt
+	jmp hang
+
+	
+File_Found:
+	pop %cx
+	lea (ffounds),%si
+	call PrintIt
+	mov %es:0x1a(%bx),%ax
+	mov %ax,file_start
+
+read_file_nextinline_sector:
+	mov %cx,%ax
+	add Root_dirStart,%ax
+	add Root_dirSects,%ax
+	//add $19,%ax
+	//add $14,%ax 
+	sub $0x2,%ax
+	push %cx
+	call ReadSect
+	pop %cx
+	add ByPSect,%bx
+	push %ds
+    mov $fatsegment,%dx
+    //ds:si
+    mov %dx,%ds
+	mov %cx,%dx
+	mov %cx,%si
+	shr %dx
+	add %dx,%si
+	mov %ds:(%si),%dx
+	pop %ds
+	test $0x1,%cx
+	jnz odd_entry
+	and $0x0fff,%dx
+	jmp continue_to_read
+odd_entry:
+	shr $0x4,%dx
+continue_to_read:
+	mov %dx,%cx
+	cmp $0xff8,%cx
+	jl read_file_nextinline_sector
 
 /*
 	IN ORDER TO GET THIS SYSTEM IN PROTECTED MODE eg. 32BIT
@@ -121,6 +217,7 @@ hang:
 
 #include <check_a20.s>
 #include <printer.h>
+#include <readsect.h>
 
 /* #include "activate_a20.s" 
 #include <readsect.h>
@@ -140,6 +237,7 @@ IDT:
 	.word 2048	//Limit or size of IDT
 	.int 0x0	//Base location of IDT
 
+kernelfilename: .ascii  "IMPALA  IMG"
 PRamStat: .asciz "Ram A20 pin Active\r\n"
 NRamStat: .asciz "Overlapped memory,,, Ram A20 pin not active\r\n"
 LogoString: .asciz "\t\t\t\tCrane Bootloader\r\n"
@@ -147,8 +245,14 @@ Welcom_str: .asciz "\t\t\t\tWelcome......\r\n"
 Enabld: .asciz "The a20 line function exists here and its working\r\n"
 NotEn: .asciz "No bro that function maybe errored or it doesnt exist in this BIOS\r\n"
 Proced: .asciz "Proceeding to Loading the Descriptors/Selectors\r\n"
+notf: .asciz "File not Found.\r\n"
+ffounds: .asciz "File Found !!!!\r\n"
+SucReadStr: .asciz "Successfully read the disk\r\n"
 
 /* THIS BELOW HERE IS THE .BSS SECTION KEEP CALM */
+//Root_dirStart: .byte 0,0
+//Root_dirSects: Root_dirSects: .byte 0,0
+file_start: .byte 0,0
 
 /*	Copy the old bytes of the Fat Structure of the old MBR,
 	this is done to help catch the variables that were updates, overwriting,

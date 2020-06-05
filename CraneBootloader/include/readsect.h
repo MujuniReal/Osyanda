@@ -58,8 +58,8 @@ readsect:
 	pop %bx
 	int $0x13
 	jc FailedToread
-	lea (SucReadStr),%si
-	call PrintIt
+	/* lea (SucReadStr),%si
+	call PrintIt */
     pop %cx
     pop %ax
 	jmp exitRead

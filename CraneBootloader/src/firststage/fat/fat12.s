@@ -162,7 +162,18 @@ continue_to_read:
 	cmp $0xff8,%cx
 	jl read_file_nextinline_sector
 /* Upto here is file system specific */
-	
+
+/* Save the acquired variables */
+	xor %bx,%bx
+	xor %dx,%dx
+	movb LogDrvNo,%dl
+	mov %dl,%es:0x24(%bx)	
+	mov Root_dirSects,%ax
+	mov %ax,%es:0x3e(%bx)
+	mov Root_dirStart,%ax
+	mov %ax,%es:0x40(%bx)
+
+/* prepare for loading the second stage bootloader */
 	mov $filesegment,%ax
 	mov %ax,%es
 	mov %ax,%ds
@@ -175,10 +186,10 @@ FinishProgram:
 #include <readsect.h>
 
 fileName: .ascii "STAGE2  BIN"
-ffounds: .asciz "File found!\r\n"
-notf: .asciz "File not found\r\n"
-FailTRStr: .asciz "Failed to read\r\n"
-SucReadStr: .asciz "Successfully read the disk\r\n"
+ffounds: .asciz "Filefound\r\n"
+notf: .asciz "Filenotfound\r\n"
+FailTRStr: .asciz "Failedtoread\r\n"
+//SucReadStr: .asciz "Sucesfuly read the disk\r\n"
 
 Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
 Root_dirSects: .byte 0,0 //Span of root dir in Sectors

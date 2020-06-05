@@ -28,4 +28,4 @@ clean:
 	rm *.S
 	rm *.o
 	rm *.img
-    rm *.bin
+	rm *.bin

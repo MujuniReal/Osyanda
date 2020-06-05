@@ -158,6 +158,18 @@ read_next_file_cluster:
 done_readingfile:
 	lea (wooing),%si
 	call PrintIt
+
+/* Save the acquired variables */
+	xor %bx,%bx
+	xor %dx,%dx
+	movb LogDrvNo,%dl
+	mov %dl,%es:0x24(%bx)	
+	mov Root_dirSects,%ax
+	mov %ax,%es:0x3e(%bx)
+	mov Root_dirStart,%ax
+	mov %ax,%es:0x40(%bx)
+
+
 	mov $filesegment,%ax
 	mov %ax,%es
 	mov %ax,%ds
