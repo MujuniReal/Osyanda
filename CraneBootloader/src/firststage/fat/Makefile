@@ -10,7 +10,7 @@ LDFLAGS = -m elf_i386 --oformat binary 	#some of the things are gonna come autom
 
 HFILES = /home/box/Osyanda/CraneBootloader/include/fat/fat16mbr.h \
 /home/box/Osyanda/CraneBootloader/include/printer.h \
-/home/box/Osyanda/CraneBootloader/include/readsect.h
+/home/box/Osyanda/CraneBootloader/include/sreadsect.h
 
 all: Stage1.img
 

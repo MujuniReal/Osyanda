@@ -53,7 +53,7 @@ worked in FAT16 mode */
 	/* Save the Logical drive number we have earned after booting to the new loaded MBR*/
 	xor %dx,%dx
 	mov LogDrvNo,%dl
-	xor %bx,%bx			/*Make %bx point back to home */
+	xor %bx,%bx			/* Make %bx point back to home */
 	movb %dl,%es:LogDrvNo_New(%bx)
 
 /* Prepare registers and jump */
@@ -71,7 +71,7 @@ FailedToRead:
 stopMBR:
 	hlt	
 
-#include <readsect.h>
+#include <sreadsect.h>
 #include <readmultis.h>
 #include <printer.h>
 #include <reboot.h>

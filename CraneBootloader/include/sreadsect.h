@@ -1,7 +1,9 @@
+/* sreadsect.h ->   short read sector for 16bit clusters */
+
 .func ReadSect
 /*
   %al - number of sectors to read
-  %ah - SubFunction 2 from BIO interrupts
+  %ah - SubFunction 2 for 16bit reads from BIOS interrupts
   %ch - Low 8bits of Cylinder
   %cl - High 2bits of cylinder, 6bits for sector
   %dh - Head Number

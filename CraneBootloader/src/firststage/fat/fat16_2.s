@@ -185,7 +185,7 @@ FinishProgram:
 	hlt
 
 #include <printer.h>
-#include <readsect.h>
+#include <sreadsect.h>
 #include <readmultis.h>
 #include <reboot.h>
 

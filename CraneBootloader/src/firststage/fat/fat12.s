@@ -183,7 +183,7 @@ FinishProgram:
 	hlt
 
 #include <printer.h>
-#include <readsect.h>
+#include <sreadsect.h>
 
 fileName: .ascii "STAGE2  BIN"
 ffounds: .asciz "Filefound\r\n"

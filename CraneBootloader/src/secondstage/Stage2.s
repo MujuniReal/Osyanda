@@ -18,8 +18,9 @@ mainSecond:
 
 Root_dirSects: .word 0x0000
 Root_dirStart: .word 0x0000
+FS_Flag: .byte 0x00				/* 1 is set if filestytem is fat */
 
-
+impalasseg = 0x2000
 tmprootdirsegment = 0x2000
 fatsegment = 0x0a00
 
@@ -87,6 +88,11 @@ File_Found:
 	call PrintIt
 	mov %es:0x1a(%bx),%ax
 	mov %ax,file_start
+
+	xor %bx,%bx
+	mov $impalasseg,%ax
+	mov %ax,%es
+	mov file_start,%cx
 
 read_file_nextinline_sector:
 	mov %cx,%ax
@@ -217,10 +223,10 @@ hang:
 
 #include <check_a20.s>
 #include <printer.h>
-#include <readsect.h>
+#include <sreadsect.h>
 
 /* #include "activate_a20.s" 
-#include <readsect.h>
+#include <sreadsect.h>
 #include
 
 /*

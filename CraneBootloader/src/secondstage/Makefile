@@ -1,7 +1,7 @@
 
 #PWD = `$$HOME`
 TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
-IMG = /home/box/Desktop/floppy.img
+IMG = /home/box/Desktop/floppy2.img
 MOUNTDIR = /home/box/mount/
 
 CC = gcc
