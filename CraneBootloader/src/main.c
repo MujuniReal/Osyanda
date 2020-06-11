@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-
+#define MAXFATBPBSIZE 90
 #include <bpbsize.h>
 /* this is the main caller of the bootloader loggedin user interface view */
 /*How program is called -> crane prep-disk
@@ -14,20 +14,30 @@ this program has to read the file made from the crane mkconfig program
 
 */
 /* this program shd be able to detect other operating systems on disks ie reading partitions too */
-int fat1216prep_disk(char*);
+int initiate_fatprep(void*);
 
 
 int main(int argc,char **argv){
     
-    char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
+    char *Fatbpb = (char*)malloc(MAXFATBPBSIZE);
 
     FILE *diskmbrPTR;
-    diskmbrPTR = fopen(argv[1],"r");
+    diskmbrPTR = fopen(argv[1],"rb");
 
-    fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
+    fread(Fatbpb,1,MAXFATBPBSIZE,diskmbrPTR);
     fclose(diskmbrPTR);
 
-    fat1216prep_disk(Fatbpb);
+    char* tmpf = "FAT";
+    if(strncmp(tmpf,(Fatbpb+(MAXFATBPBSIZE - 8)),3)){
+        initiate_fatprep(Fatbpb);
+    }
+    else if (strncmp(tmpf,(Fatbpb+(62 - 8)),3) ){ /*62 is the maximum that is bpb + jump instruction + nop + devOEM(8)  one for fat12 and 16 */
+        initiate_fatprep(Fatbpb);
+        }
+    
+/*    else{
+         not fat 
+    }*/
 
 
     free(Fatbpb);

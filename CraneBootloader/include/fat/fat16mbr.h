@@ -1,5 +1,5 @@
 #define FAT_STRUCT
-//the following file is for a floppy disk of 1.4MBs
+//the following file is for a floppy disk of 512MBs
 
 FATstruct:
 

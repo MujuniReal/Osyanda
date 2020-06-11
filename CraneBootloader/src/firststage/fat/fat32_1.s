@@ -17,7 +17,7 @@ New_MBR_Segment = 0x0900 /*we have to plan for this segment in the book */
 New_MBR_Segment_withcode = 0x0920	/* New_MBR_Segment + 512 bytes because of fat32 */
 CLI_instruction = 1  /*Size of the cli instruction is one byte in 16bit assembly this instruction is for security*/
 OEM_Size = 8		/* OEM manufacturer string 8bytes */	
-BIOS_PB = 25		/* The first 26bytes of the BIOS parameter block next to it is the Logical drive number*/
+BIOS_PB = 53		/* The first 53bytes of the BIOS parameter block next to it is the Logical drive number*/
 ExtendedBIOS_PB = 26 /* Size of Extended BIOS parameter block Definately after this is our code of the _start function */
 Code_Offset = (CLI_instruction + OEM_Size + BIOS_PB + ExtendedBIOS_PB) - 1 /* this is where the actual code lives minus 1 since we start counting from zero debugging required here*/
 
@@ -60,7 +60,7 @@ worked in FAT16 mode */
 	movb %dl,%es:LogDrvNo_New(%bx)	/* this location has to change coz of the location in fat32 */
 
 /* Prepare registers and jump */
-	mov $New_MBR_Segment,%ax
+	mov $New_MBR_Segment_withcode,%ax
 	mov %ax,%es
 	mov %ax,%ds
 	ljmp $New_MBR_Segment_withcode,$Code_Offset
@@ -85,3 +85,14 @@ SucReadStr: .asciz "Successfully read the disk\r\n"
 
 .fill 510-(.-main),1,0
 BootMagic: .word 0xaa55
+/* ************************************************************************ 
+*             															  *
+*					VERY VERY VERY IMPORTANT, IMPORTANTER				  *
+*																		  *
+***************************************************************************
+
+
+DONT FORGET TO COPY THE MBR IN THE 7TH SECTOR WHICH HAS ADDRESS 6 PLUS 
+ALL ITS CONTER PARTS THAT IS THAT SECOND SECTOR WHIC HAS ARRAS 
+SOME SHIT LIKE THAT														*/
+

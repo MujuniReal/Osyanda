@@ -21,7 +21,7 @@
   4 3 more trys for disk reading
   from the ax,bx,cx,dx function calling style i think
   that this function is like so readSect(No_sects,*ptrSrc,*ptrDst)
-  This function expects LBA put in %ax register
+  This function expects LBA put in %dx:%ax 32bit register pair
 
 */
 
@@ -31,17 +31,17 @@ the %al register but bochs here can only read one sector at a time bambi */
 ReadSect:
 	//%cx must be saved before calling this function
 	xor %cx,%cx
-        mov $0x4,%cx  	//We wanna read 3 more times before leaving
+    mov $0x4,%cx  	//We wanna read 3 more times before leaving
 
 readsect:
-	push %ax	//Contains LBA
+	push %dx
+	push %ax	/* %dx:%ax contain 32bit LBA */
 	push %cx	//Contains number of trial times for reading disk
 	push %bx	//Contains adress to store read data
 
 	//Sector
-	xor %dx,%dx
 	mov SectsPTrck,%bx
-	div %bx
+	div %bx		/* divide LBA which is in the 32bit pair %dx:%ax */
 	inc %dx
 	mov %dl,%cl
 
@@ -56,7 +56,7 @@ readsect:
 
 	//finalyy
 	mov LogDrvNo,%dl
-	mov $0x0201,%ax
+	mov $0x0a01,%ax
 	pop %bx
 	int $0x13
 	jc FailedToread
@@ -64,6 +64,7 @@ readsect:
 	call PrintIt */
     pop %cx
     pop %ax
+	pop %dx
 	jmp exitRead
 
 
@@ -73,6 +74,7 @@ FailedToread:		//This function attempts to try reading
 	int $0x13		//Reset the disk and we try again
 	//sucessfully resets
 	pop %ax			//Put Back LBA in the mighty register
+	pop %dx
 	dec %cx
 	cmp $0x0,%cx
 	jnz readsect		//Totally failed

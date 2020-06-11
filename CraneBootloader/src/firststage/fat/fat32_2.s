@@ -28,70 +28,106 @@ start_mbr2:
 	mul %bx
 	mov %ax,ByPClust
 
-
+	
 	xor %bx,%bx
 	//rootDirectory Start Sector Calculation
 	mov SectsPFat,%ax
 	mov FatTabs,%bl		//multiplication FatTables * SectorsPFat
 	mul %bx
 	add ResSects,%ax	//Add the reserved sectors
-	add NHiddenSects,%ax	//Add the  hidden sectors	
+	add NHiddenSects,%ax	//Add the  hidden sectors	 
 	add NhiddnSectshi,%ax	//Add the hight word of hidden Sects
 	mov %ax,Root_dirStart	//Root_dirStart in LBA format
 
-	//rootDirectory Size in sectors
-	xor %bx,%bx
 	xor %dx,%dx
-	mov NRootDirEs,%ax
-	mov $0x20,%bx		//size of one root directory entry is 32Bytes in base16
-	mul %bx			//These are now the total bytes that the root directory spans
-	mov ByPSect,%bx	
-	div %bx
-	mov %ax,Root_dirSects	//Root directory span sectors
+	movw SectsPFathi,%dx
+	test $0xffff,%dx
+	jnz FAT_is32		/* check whether the size of sectors in fat span 32bits */
 
-	//rootDirectory Size in Clusters irrelevant
-	xor %bx,%bx
-	xor %dx,%dx
-	mov NRootDirEs,%ax
-	mov $0x20,%bx		//max root directory entries 32 in base16
-	mul %bx			//These are now the total bytes that the root directory spans
-	mov ByPClust,%bx	
-	div %bx
-	mov %ax,Root_dirClusts	//Root directory span
-
-
-	//preparing to read the root directory
-	mov $tmprootdirseg,%ax
-	mov %ax,%es
-	xor %cx,%cx
-	xor %bx,%bx
 	xor %ax,%ax
 
+load_fat:
+	mov $fatsegment,%ax
+	mov %ax,%es
 
-read_next_rdir_sect:
-	mov Root_dirStart,%ax	//LBA Format
+	mov ResSects,%ax
+	add NHiddenSects,%ax		/*acquiring the location of the fat */
+	mov NhiddnSectshi,%dx
+	test $0xffff,%dx
+	jnz FAT_is32
+
+	xor %bx,%bx
+	xor %cx,%cx
+	mov SectPClust,%cl			/* we need to give this a fail safe incase it has still not found the file from this available few fat sectors */
+	call ReadMulti				/* we will load one cluster of FAT at a time */
+	
+	xor %dx,%dx
+	mov LogDrvNo,%dl
+	xor %ax,%ax
+	int $0x13
+	
+prepare_to_load_root_dir:
+	mov Root_dirStartClustlo,%cx
+
+load_rootdir:
+	mov $tmprootdirseg,%ax
+	mov %ax,%es
+
+	xor %bx,%bx
+	xor %dx,%dx
+	mov SectsPFat,%ax
+	mov FatTabs,%bl
+	mul %bx
+	add ResSects,%ax
+	mov Root_dirStartClusthi,%dx
+	test $0xffff,%dx
+	jnz FAT_is32
+	xor %bx,%bx
+
 	add %cx,%ax
+	//sub $0x2,%ax
 	push %cx
-	call ReadSect
+	xor %cx,%cx
+	movb SectPClust,%cl
+	call ReadMulti			/* load the first cluster of the root directory */
 	pop %cx
-    inc %cx
-    cmp Root_dirSects,%cx
-	jz file_not_found
+	xor %bx,%bx
 
-getFilename:
+lookthru_rootdir:
 	push %cx
-	mov $0x000b,%cx			/* fat12 and 16 support only filenames of 11Bytes */
+	mov $0x000b,%cx
 	lea (%bx),%di
-	lea (fileName),%si		/* compare %es:%di and %ds:%si */
+	lea (fileName),%si
 	repz cmpsb
 	je File_Found
 	pop %cx
 	add $0x20,%bx
-	cmp ByPSect,%bx
-	jz read_next_rdir_sect
-	jmp getFilename
+	cmp ByPClust,%bx
+	jz check_ifnext_rootdirclust
+	jmp lookthru_rootdir
 
-
+check_ifnext_rootdirclust:
+	push %ds
+	mov $fatsegment,%dx
+	mov %dx,%ds
+	xor %bx,%bx				/* prepare registers for multiplication */
+	xor %dx,%dx		
+	mov $0x4,%bx			/* displacement of location of fat entry */
+	mov %cx,%ax
+	mul %bx
+	test $0xffff,%dx
+	jz FAT_is32
+	mov %ax,%si
+	movw %ds:(%si),%ax		/* low word of next cluster */
+	movw %ds:0x2(%si),%dx	/* high word of next cluster */
+	cmp $0xfff8,%ax
+	jge file_not_found
+	cmp $0xffff,%dx
+	jz Bad_Clust
+	/* else part is we leave %dx as it is coz its gonna make sense in the pair of %dx:%ax for the read long sector */
+	mov %ax,%cx
+	pop %ds
+	jmp load_rootdir
 	
 file_not_found:
 	lea (notf),%si
@@ -105,61 +141,13 @@ File_Found:
 	call PrintIt
 	mov %es:0x1a(%bx),%ax
 	mov %ax,file_start			/*file start Cluster */
-
-
-loaDFAT:
-	mov $fatsegment,%ax
-	mov %ax,%es
-
-	mov ResSects,%ax
-	add NHiddenSects,%ax
-	add NhiddnSectshi,%ax
-	xor %bx,%bx
-	mov SectsPFat,%cx
-	call ReadMulti
-	xor %bx,%bx			/* Put back %bx to point home */
-
-/* WOOOOOOOOOOOOOOOO THE FAT TABLE HAS BEEN LOADED INTO MEMORY
-   NOW LETS SEE SOME ACTION FRIENDS			*/	
-
-	mov $filesegment,%ax
-	mov %ax,%es
-	xor %bx,%bx
-	mov file_start,%cx
-	xor %ax,%ax
-
-/* this below here is filesystem specific */
-initiate_read:
-	mov %cx,%ax
-	sub $0x2,%ax
-	mulb SectPClust
-	add Root_dirStart,%ax
-	add Root_dirSects,%ax
-	push %cx
-	xor %cx,%cx
-	movb SectPClust,%cl		/* this function has helped to increament %bx for us */
-	call ReadMulti			/* read cluster containing file */
-	pop %cx
-	push %ds
-	mov $fatsegment,%dx
-	mov %dx,%ds
-	mov %cx,%si
-	add %cx,%si			/* final location of fat entry in memory */
-	movw %ds:(%si),%dx
-	pop %ds
-	cmp $0xfff8,%dx
-	jge done_readingfile
-read_next_file_cluster:
-	mov %dx,%cx
-	/*bytes per cluster is whats needed to increament %bx even up there where we load root dir and fatsegment dont forget */
-	jmp initiate_read
-/* Upto here is file system specific */
-/*We have to improve our readsect to read sects per cluster */
-done_readingfile:
-	lea (wooing),%si
+	lea (well),%si
 	call PrintIt
 
-/* Save the acquired variables */
+
+
+	
+/* Save the acquired variables 
 	xor %bx,%bx
 	xor %dx,%dx
 	movb LogDrvNo,%dl
@@ -174,15 +162,26 @@ done_readingfile:
 	mov %ax,%es
 	mov %ax,%ds
 	ljmp $filesegment,$0x0000
+	*/
+
+FinishProgram:
+	jmp FinishProgram
+
+FAT_is32:
+	lea (Fatspan32str),%si
+	call PrintIt
+	call RebootBIOS
+
+Bad_Clust:
+	lea (badcstr),%si
+	call PrintIt
+	call RebootBIOS
 
 FailedToRead:
 	lea (FReadStr),%si
 	call PrintIt
 	call RebootBIOS /*this code can never go below here unless otherwise */
 
-
-FinishProgram:
-	hlt
 
 #include <printer.h>
 #include <sreadsect.h>
@@ -198,6 +197,9 @@ notf: .asciz "File not found\r\n"
 FailTRStr: .asciz "Failed to read\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 WelcomeNote: .asciz "Hey hello, the second mbr is up\r\n"
+Fatspan32str: .asciz "The span of sectors in one fat table is a 32bit value\r\n"
+badcstr: .asciz "Bad cluster sister/brother\r\n"
+well: .asciz "Well, everything has worked out just fine upto this point\r\n"
 
 ByPClust: .word 0x00,0x00
 Root_dirStart: .byte 0,0  //LBA Location for the start of root dir

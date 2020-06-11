@@ -1,7 +1,7 @@
 INCLUDE_DIR = /home/box/Osyanda/CraneBootloader/include
 
 
-CC = gcc -m32 -Wall
+CC = gcc -Wall -ggdb
 CFLAGS = -I $(INCLUDE_DIR)
 
 
@@ -9,7 +9,7 @@ all: crane
 
 
 crane: main.o crane_prep-disk.o
-	$(CC) $^ -o $@
+	$(CC)  $^ -o $@
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c $< -o $@

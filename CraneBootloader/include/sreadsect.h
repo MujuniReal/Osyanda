@@ -31,7 +31,7 @@ the %al register but bochs here can only read one sector at a time bambi */
 ReadSect:
 	//%cx must be saved before calling this function
 	xor %cx,%cx
-        mov $0x4,%cx  	//We wanna read 3 more times before leaving
+    mov $0x4,%cx  	//We wanna read 3 more times before leaving
 
 readsect:
 	push %ax	//Contains LBA
@@ -60,7 +60,7 @@ readsect:
 	pop %bx
 	int $0x13
 	jc FailedToread
-	/* lea (SucReadStr),%si
+	/*lea (SucReadStr),%si
 	call PrintIt */
     pop %cx
     pop %ax
