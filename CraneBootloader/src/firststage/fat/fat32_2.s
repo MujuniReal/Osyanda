@@ -15,12 +15,54 @@ main_mbr2:
 filesegment = 0x1000
 fatsegment = 0x0ee0
 tmprootdirseg = 0x1000
+//fatpackloc = 0xee0
+/*
+fatpacket:
+		.byte 0x10
+		.byte 0x00
+		.word 0x8		 we are going to load the first cluster of the fat table 
+		.int 0xee0			 fat segment:offset organised in little indian 
+		.int 0x20
+		.int 0x00	*/
 
 start_mbr2:
 	sti
 
 	lea (WelcomeNote),%si
 	call PrintIt
+
+
+/*initialize hardisk controller */
+	xor %ax,%ax
+	xor %dx,%dx
+	mov $0x80,%dl
+	mov $0x9,%ah
+	int $0x13
+	nop
+
+
+
+/* Query for disk parameters */
+	xor %ax,%ax
+	xor %bx,%bx
+	xor %cx,%cx
+	xor %dx,%dx
+
+
+	mov $0x8,%ah
+	mov $0x80,%dl
+	int $0x13
+
+	nop
+
+	and $0x3f,%cl
+	xor %ch,%ch
+	mov %cx,SectsPTrck
+
+	xor %dl,%dl
+	xchg %dh,%dl
+	mov %dx,NHeads	
+
 
 	mov ByPSect,%ax
 	xor %bx,%bx
@@ -44,54 +86,57 @@ start_mbr2:
 	test $0xffff,%dx
 	jnz FAT_is32		/* check whether the size of sectors in fat span 32bits */
 
+	/* enable extended functions */
 	xor %ax,%ax
+	xor %bx,%bx
+	xor %dx,%dx
+
+	mov $0x41,%ah
+	mov $0x55aa,%bx
+	mov $0x80,%dl
+	int $0x13
+
+
 
 load_fat:
-	mov $fatsegment,%ax
+	xor %ax,%ax
+	mov $0x1000,%ax
 	mov %ax,%es
 
-	mov ResSects,%ax
-	add NHiddenSects,%ax		/*acquiring the location of the fat */
-	mov NhiddnSectshi,%dx
-	test $0xffff,%dx
-	jnz FAT_is32
+	
+/*
+	push %ds
+	mov $fatpackloc,%ax
+	mov %ax,%ds
+	xor %si,%si
+	movb $0x10,%ds:(%si)
+	movb $0x00,%ds:0x1(%si)
+	movw $0x007f,%ds:0x2(%si)
 
-	xor %bx,%bx
-	xor %cx,%cx
-	mov SectPClust,%cl			/* we need to give this a fail safe incase it has still not found the file from this available few fat sectors */
-	call ReadMulti				/* we will load one cluster of FAT at a time */
-	
-	xor %dx,%dx
-	mov LogDrvNo,%dl
+	movw $0x0000,%ds:0x4(%si)							 1000:0000  00000010 
+	movw $0x1000,%ds:0x6(%si)
+								 1000 ->  
+	movw $0x0000,%ds:0x8(%si)
+	movw $0x0020,%ds:0xa(%si)
+
+	movw $0x0000,%ds:0xc(%si)
+	movw $0x0000,%ds:0xe(%si)
+*/
+	xor %si,%si
+	lea (fatpacket),%si
 	xor %ax,%ax
+	xor %dx,%dx
+	mov $0x42,%ah
+	mov $0x80,%dl
 	int $0x13
-	
+	nop
+
+
 prepare_to_load_root_dir:
-	mov Root_dirStartClustlo,%cx
+	
 
 load_rootdir:
-	mov $tmprootdirseg,%ax
-	mov %ax,%es
 
-	xor %bx,%bx
-	xor %dx,%dx
-	mov SectsPFat,%ax
-	mov FatTabs,%bl
-	mul %bx
-	add ResSects,%ax
-	mov Root_dirStartClusthi,%dx
-	test $0xffff,%dx
-	jnz FAT_is32
-	xor %bx,%bx
-
-	add %cx,%ax
-	//sub $0x2,%ax
-	push %cx
-	xor %cx,%cx
-	movb SectPClust,%cl
-	call ReadMulti			/* load the first cluster of the root directory */
-	pop %cx
-	xor %bx,%bx
 
 lookthru_rootdir:
 	push %cx
@@ -186,7 +231,18 @@ FailedToRead:
 #include <printer.h>
 #include <sreadsect.h>
 #include <readmultis.h>
+#include <lreadsect.h>
 #include <reboot.h>
+
+fatpacket:
+	.byte 0x10
+	.byte 0x00
+	.word 0x0008
+	.int 0x10000000
+	.int 0x20
+	.int 0x00
+	
+
 
 wooing: .asciz "Woooo the nani,, the file has totally been read into memory\r\n"
 FReadStr: .asciz "Totally Failed to read Sector\r\n"

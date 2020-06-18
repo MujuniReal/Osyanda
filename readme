@@ -1,0 +1,6 @@
+with floppy drives, you will have to trust the FAT BPB
+but with hard disks, you will have to call for BIOS calls
+to get the real CHS values please dont forget to use the BIOS
+int 0x13 with 8 inside %ah coz thats the subfunction number
+
+we need bios extended functions to read heavy boys of about 8GB
