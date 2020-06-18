@@ -100,28 +100,9 @@ start_mbr2:
 
 load_fat:
 	xor %ax,%ax
-	mov $0x1000,%ax
+	mov $fatsegment,%ax
 	mov %ax,%es
 
-	
-/*
-	push %ds
-	mov $fatpackloc,%ax
-	mov %ax,%ds
-	xor %si,%si
-	movb $0x10,%ds:(%si)
-	movb $0x00,%ds:0x1(%si)
-	movw $0x007f,%ds:0x2(%si)
-
-	movw $0x0000,%ds:0x4(%si)							 1000:0000  00000010 
-	movw $0x1000,%ds:0x6(%si)
-								 1000 ->  
-	movw $0x0000,%ds:0x8(%si)
-	movw $0x0020,%ds:0xa(%si)
-
-	movw $0x0000,%ds:0xc(%si)
-	movw $0x0000,%ds:0xe(%si)
-*/
 	xor %si,%si
 	lea (fatpacket),%si
 	xor %ax,%ax
@@ -129,23 +110,28 @@ load_fat:
 	mov $0x42,%ah
 	mov $0x80,%dl
 	int $0x13
-	nop
 
 
-prepare_to_load_root_dir:
-	
+	xor %ax,%ax
+prepare_to_load_root_dir:	
+	mov $tmprootdirseg,%ax
+	mov %ax,%es
+	xor %bx,%bx
 
 load_rootdir:
-
+	xor %ax,%ax
+	xor %si,%si
+	lea (rootdpacket),%si
+	mov $0x42,%ah
+	mov $0x80,%dl
+	int $0x13
 
 lookthru_rootdir:
-	push %cx
 	mov $0x000b,%cx
-	lea (%bx),%di
+	lea %es:(%bx),%di
 	lea (fileName),%si
 	repz cmpsb
 	je File_Found
-	pop %cx
 	add $0x20,%bx
 	cmp ByPClust,%bx
 	jz check_ifnext_rootdirclust
@@ -238,10 +224,17 @@ fatpacket:
 	.byte 0x10
 	.byte 0x00
 	.word 0x0008
-	.int 0x10000000
+	.int 0x0ee00000			/* segment:offset -> 0x0ee0:0x0000 -> 0x0ee00000 */
 	.int 0x20
 	.int 0x00
 	
+rootdpacket:
+	.byte 0x10
+	.byte 0x00
+	.word 0x0008
+	.int 0x10000000			/* segment:offset -> 0x1000:0x0000 -> 0x10000000 */
+	.int 0x7fe0
+	.int 0x00
 
 
 wooing: .asciz "Woooo the nani,, the file has totally been read into memory\r\n"
