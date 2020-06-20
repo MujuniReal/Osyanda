@@ -27,6 +27,12 @@ fatpacket:
 
 start_mbr2:
 	sti
+/* Set text mode with monochrome colors */
+	xor %ax,%ax
+    mov $0x00,%ah
+    mov $0x07,%al    /* 0x7 for text mode with monochrome colors */
+    int $0x10
+
 
 	lea (WelcomeNote),%si
 	call PrintIt
@@ -35,7 +41,7 @@ start_mbr2:
 /*initialize hardisk controller */
 	xor %ax,%ax
 	xor %dx,%dx
-	mov $0x80,%dl
+	movb LogDrvNo,%dl
 	mov $0x9,%ah
 	int $0x13
 	nop
@@ -50,7 +56,7 @@ start_mbr2:
 
 
 	mov $0x8,%ah
-	mov $0x80,%dl
+	movb LogDrvNo,%dl
 	int $0x13
 
 	nop
@@ -82,33 +88,32 @@ start_mbr2:
 	mov %ax,Root_dirStart	//Root_dirStart in LBA format
 
 	xor %dx,%dx
-	movw SectsPFathi,%dx
+	//movw SectsPFathi,%dx
 	test $0xffff,%dx
 	jnz FAT_is32		/* check whether the size of sectors in fat span 32bits */
 
 	/* enable extended functions */
 	xor %ax,%ax
-	xor %bx,%bx
 	xor %dx,%dx
 
 	mov $0x41,%ah
 	mov $0x55aa,%bx
-	mov $0x80,%dl
+	movb LogDrvNo,%dl
 	int $0x13
 
 
 
 load_fat:
+	xor %si,%si
 	xor %ax,%ax
+	lea (fatpacket),%si
 	mov $fatsegment,%ax
 	mov %ax,%es
-
-	xor %si,%si
-	lea (fatpacket),%si
+	
 	xor %ax,%ax
 	xor %dx,%dx
 	mov $0x42,%ah
-	mov $0x80,%dl
+	movb LogDrvNo,%dl
 	int $0x13
 
 
@@ -123,13 +128,13 @@ load_rootdir:
 	xor %si,%si
 	lea (rootdpacket),%si
 	mov $0x42,%ah
-	mov $0x80,%dl
+	movb LogDrvNo,%dl
 	int $0x13
 
 lookthru_rootdir:
 	mov $0x000b,%cx
-	lea %es:(%bx),%di
-	lea (fileName),%si
+	lea (%bx),%di
+	lea (fileName),%si 
 	repz cmpsb
 	je File_Found
 	add $0x20,%bx
@@ -146,6 +151,7 @@ check_ifnext_rootdirclust:
 	mov $0x4,%bx			/* displacement of location of fat entry */
 	mov %cx,%ax
 	mul %bx
+
 	test $0xffff,%dx
 	jz FAT_is32
 	mov %ax,%si
@@ -220,13 +226,15 @@ FailedToRead:
 #include <lreadsect.h>
 #include <reboot.h>
 
+
 fatpacket:
 	.byte 0x10
 	.byte 0x00
 	.word 0x0008
-	.int 0x0ee00000			/* segment:offset -> 0x0ee0:0x0000 -> 0x0ee00000 */
+	.int 0x0ee00000			 /* segment:offset -> 0x0ee0:0x0000 -> 0x0ee00000 */
 	.int 0x20
 	.int 0x00
+
 	
 rootdpacket:
 	.byte 0x10
@@ -255,3 +263,11 @@ Root_dirStart: .byte 0,0  //LBA Location for the start of root dir
 Root_dirSects: .byte 0,0 //Span of root dir in Sectors
 Root_dirClusts: .byte 0,0
 file_start: .byte 0,0
+
+diskaddrpkt:
+	.byte 0x00
+	.byte 0x00
+	.word 0x0000
+	.int 0x00000000
+	.int 0x00000000
+	.int 0x00000000

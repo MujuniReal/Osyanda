@@ -15,6 +15,7 @@ fat12:
 
 
 clean:
-	rm *.o
-	rm *.bin
-	rm *.S
+	rm -f *.S
+	rm -f *.o
+	rm -f *.bin
+	

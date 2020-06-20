@@ -1,21 +1,32 @@
-INCLUDE_DIR = /home/box/Osyanda/CraneBootloader/include
+
+TOPDIR = $(PWD)
+INCLUDE_DIR = $(TOPDIR)/include
+
 
 
 CC = gcc -Wall -ggdb
 CFLAGS = -I $(INCLUDE_DIR)
 
 
-all: crane
+all: initdirs crane
 
 
-crane: main.o crane_prep-disk.o
+crane: main.o crane_partitiontble.o crane_prep-disk.o
 	$(CC)  $^ -o $@
 
 main.o: main.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+crane_partitiontble.o: crane_partitiontble.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 crane_prep-disk.o: crane_prep-disk.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+initdirs:
+
 clean:
-	rm *.o
+	rm -f *.o
+	rm -f crane
+
+

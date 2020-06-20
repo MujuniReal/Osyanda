@@ -2,7 +2,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-#include <bpbsize.h>
+//#include <bpbsize.h>
 
 #define MAXFATBPBSIZE 90
 
@@ -39,7 +39,7 @@ typedef struct fat_12_6{
         char VolLabel[11];
         char FSType[8];
 
-}__attribute__((packed)) fat_126;
+}__attribute__((packed)) fat_126hdr;
 typedef struct fat_32{
         unsigned short int jmpcode;
         unsigned char nopinstr;
@@ -71,20 +71,20 @@ typedef struct fat_32{
         char VolLabel[11];
         char FSType[8];
 
-}__attribute__((packed)) fat_32;
+}__attribute__((packed)) fat_32hdr;
 /* this will be code coming from the prep-disk arguement */
 /* so this is a library or a function coming from a library */
 /* it doesnt deserve tobe with a main function but for now lets just give it we will remove it */
 /* another alternative is prep-disk disk */
 /* in preparing disk involves many things this is one of them,, making a header file with disk layout */
 
-int fat1216prep_disk(void *fatbpb){
+int fat1216prep_disk_header(void *fatbpb){
 
     /*we will replace these inside the arguements to disk labels received from main program */
     //*strncpy((&devOEM+), const char *src, size_t n);
     /*cater for if memory was not initialised with zeros in these variables we are using */
 
-   fat_126 *MBRdat = (fat_126*)fatbpb;
+   fat_126hdr *MBRdat = (fat_126hdr*)fatbpb;
 
     /* cater for strings */
     char tmp_devOEM[9];
@@ -139,9 +139,9 @@ int fat1216prep_disk(void *fatbpb){
     return 0;
 }
 
-int fat32prep_disk(void *fatbpb){
+int fat32prep_disk_header(void *fatbpb){
     
-    fat_32 *MBRdat = (fat_32*)fatbpb;
+    fat_32hdr *MBRdat = (fat_32hdr*)fatbpb;
     
     //FILE *Fathdrfile;
     //Fathdrfile = fopen("./fatstruct.h","w");
@@ -196,7 +196,6 @@ int fat32prep_disk(void *fatbpb){
     printf("VolLabel:\t\t\t.ascii  \"%s\"\n",tmp_VolLabel);
     printf("FSType:\t\t\t.ascii  \"%s\"\n",tmp_FSType);
 
-
     //fclose(Fathdrfile);
     return 0;
 }
@@ -204,10 +203,10 @@ int fat32prep_disk(void *fatbpb){
 int initiate_fatprep(void *fatbpb){
     char *tmpfat = "FAT32";
     if( strncmp(tmpfat,(fatbpb+(MAXFATBPBSIZE - 8)),5) == 0 ){
-        fat32prep_disk(fatbpb);
+        fat32prep_disk_header(fatbpb);
     }
     else{ /*62 is the maximum that is bpb + jump instruction + nop + devOEM(8)  one for fat12 and 16 */
-        fat1216prep_disk(fatbpb);
+        fat1216prep_disk_header(fatbpb);
         }
 
     return 0;

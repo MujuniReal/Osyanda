@@ -1,4 +1,8 @@
+
+#INCLUDE_DIR = $(TOPDIR)/include
+
 CC = gcc
+
 CPP = cpp -nostdinc -I /home/box/Osyanda/CraneBootloader/include
 AS = as
 
@@ -44,8 +48,8 @@ mbr2.S: fat32_2.s $(HFILES)
 	$(CPP) $< -o $@
 	
 clean:
-	rm *.S
-	rm *.o
-	rm *.bin
-	rm *.img
-	rm fat32reserved
+	rm -f *.S
+	rm -f *.o
+	rm -f *.bin
+	rm -f *.img
+	rm -f fat32reserved

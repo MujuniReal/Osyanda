@@ -40,6 +40,7 @@ Stage2.S: Stage2.s $(HFILES)
 
 
 clean:
-	rm *.o
-	rm *.bin
-	rm *.S
+	rm -f *.S
+	rm -f *.o
+	rm -f *.bin
+	

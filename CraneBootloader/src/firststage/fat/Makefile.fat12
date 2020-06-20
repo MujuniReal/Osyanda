@@ -25,7 +25,7 @@ Stage1.S: fat12.s $(HFILES)
 
 	
 clean:
-	rm *.S
-	rm *.o
-	rm *.img
-	rm *.bin
+	rm -f *.S
+	rm -f *.o
+	rm -f *.img
+	rm -f *.bin
