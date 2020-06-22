@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* this code inside here could be a scenario of after creating disk headers */
 typedef struct mbr_partitiontble{
     unsigned char Boot_signature;
     unsigned char Start_head;
@@ -77,5 +78,26 @@ int initiate_partitiontblehdr(void *Partitble){
     printf("Sectors_before_partition4:\t.int 0x%x\n",MBRprtbl4->Sectors_before_partition);
     printf("Sectors_in_partition4:\t.int 0x%x\n\n",MBRprtbl4->Sectors_in_partition);
 
-    return 0;
+    if ( MBRprtbl1->Start_sector != 0 ){        /* it has partition one */
+        if ( MBRprtbl2->Start_sector == 0 ){
+            return 1;   /* return disk has one partition */
+        }
+
+        /* at this point the hardisk has two partitions */
+        else if ( MBRprtbl3->Start_sector == 0 ){
+            return 2;    /* return disk has two partitions */
+        }
+
+        /* at this point the hardisk has 3 partitions */
+        else if( MBRprtbl4->Start_sector == 0 ) {
+            return 3;   /* return disk has 3 partitions */
+        }
+        else{
+            return 4;   /* if code reaches here then our hardisk has 4 partitions which is the maximum */
+        }
+    }
+    else{
+        return 0;
+    }
 }
+

@@ -83,8 +83,11 @@ FReadStr: .asciz "Totally Failed to read Sector\r\n"
 RebootStr: .asciz "Press Any Key to Reboot.\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
-.fill 510-(.-main),1,0
-BootMagic: .word 0xaa55
+.fill 446-(.-main),1,0
+Partitiontable:
+#include <partble.h>
+
+BootMagic: .word 0xaa55	
 /* ************************************************************************ 
 *             															  *
 *					VERY VERY VERY IMPORTANT, IMPORTANTER				  *
