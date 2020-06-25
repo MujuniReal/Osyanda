@@ -10,6 +10,7 @@ main:
 
 LogDrvNo: .byte 0x00
 
+stage1_segment = 0x50
 
 start:
     mov %dl,LogDrvNo
@@ -17,8 +18,8 @@ start:
     mov %ax,%ds
     mov %ax,%ss
     mov %ax,%es
-    mov $0x7c00,%ax
-    mov %ax,%sp
+/*    mov $0x7c00,%ax   we may ignore to setup the stack as per now
+    mov %ax,%sp     */
 
 /* since we now know that we have 1MB for our first stages,, hehhehehe owedde gwe */
 /* 1 check for hard disk extended functions */
