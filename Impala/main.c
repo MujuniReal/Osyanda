@@ -19,9 +19,6 @@ void Impalas_run(){
     struct verdict rehomba;
 
 
-    __asm__("mov %0,%%eax"::"r" (&modore));
-    __asm__("nop");
-    __asm__("mov %0,%%eax"::"r"(&rehomba));
     __asm__("nop");
     __asm__("xchg %ebx,%ebx");
 }

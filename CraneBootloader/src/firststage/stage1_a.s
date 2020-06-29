@@ -64,9 +64,25 @@ start:
 	mov $0x42,%ah
 	movb LogDrvNo,%dl
 	int $0x13
+/* set BIOS text mode */
+	xor %ax,%ax
+	xor %ah,%ah
+	mov $0x07,%al
+	int $0x10
+	
+	lea (loadstr),%si
+	call PrintIt
+
+	xor %ax,%ax
+	mov $stage1_segment,%ax
+	mov %ax,%es
+	mov %ax,%ds
+
+	ljmp $stage1_segment,$0x0000
+
 
 finish:
-	hlt
+	jmp finish
 
 failed_to_read:
 	lea (extddnot),%si
@@ -84,6 +100,7 @@ diskpacket:
 	.int 0x00
 
 extddnot: .asciz "The disk controller doesnt support HDD extended functions\r\n"
+loadstr: .asciz "Loading...\r\n"
 
 .fill 446-(.-main),1,0
 

@@ -10,8 +10,16 @@ LDFLAGS = -m elf_i386 --oformat binary -e main -Ttext 0x7c00 	#some of the thing
 
 all: Stage1.img
 
-Stage1.img: stage1_a.o stage1_b.o
+Stage1.img: stage1_a.bin stage1_b.bin
+	cat stage1_a.bin > $@
+	cat stage1_b.bin >> $@
+
+stage1_a.bin: stage1_a.o
 	ld --oformat binary -e main -Ttext 0x7c00 $^ -o $@
+
+stage1_b.bin: stage1_b.o
+	ld --oformat binary -e _main -Ttext 0x00 $^ -o $@
+
 
 stage1_a.o: stage1_a.S
 	as $^ -o $@
