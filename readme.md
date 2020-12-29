@@ -9,12 +9,12 @@ we need bios extended functions to read heavy boys of about 8GB
 
 	LBA = (C * TH * SPT) + (H * SPT) + (S - 1)
 
-## now listen here, heres the plan;
+## Now Listen Here, Heres The Plan;
 	use the ext2 on vin.img to store your OS files period
 	that includes designing algorithms to read the ext2 filesystem
 
 
-## where we stopped:
+## Where We Stopped:
 	make a filesystem for your OS
 		ext and the rest suck coz we didnt make them and they arent for Impala
 	assembly port interactions (serial / parallel)
