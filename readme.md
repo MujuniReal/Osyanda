@@ -7,7 +7,7 @@ int 0x13 with 8 inside %ah coz thats the subfunction number
 
 we need bios extended functions to read heavy boys of about 8GB
 
-LBA = (C * TH * SPT) + (H * SPT) + (S - 1)
+	LBA = (C * TH * SPT) + (H * SPT) + (S - 1)
 
 ## now listen here, heres the plan;
 	use the ext2 on vin.img to store your OS files period
