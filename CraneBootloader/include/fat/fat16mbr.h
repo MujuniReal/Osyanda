@@ -8,7 +8,7 @@ TotSects:	.word 0x0
 MedDescr:	.byte 0xf8
 SectsPFat:	.word 0x100
 SectsPTrck:	.word 0x20
-NHeads:	.word 0x40
+NHeads:	.word 0x10
 NHiddenSects:	.word 0x0
 NhiddnSectshi:	.word 0x0
 TotSectsInFS:	.int 0xfff00
