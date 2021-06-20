@@ -96,7 +96,8 @@ getFilename:
 file_not_found:
 	lea (notf),%si
 	call PrintIt
-	jmp FinishProgram
+FinishProgram:
+	hlt
 
 	
 File_Found:
@@ -181,9 +182,6 @@ FailedToRead:
 	call RebootBIOS /*this code can never go below here unless otherwise */
 
 
-FinishProgram:
-	hlt
-
 #include <printer.h>
 #include <sreadsect.h>
 #include <readmultis.h>
@@ -193,8 +191,8 @@ wooing: .asciz "Woooo the nani,, the file has totally been read into memory\r\n"
 FReadStr: .asciz "Totally Failed to read Sector\r\n"
 RebootStr: .asciz "Press Any Key to Reboot.\r\n"
 fileName: .ascii "STAGE2  BIN"
-ffounds: .asciz "File found!\r\n"
-notf: .asciz "File not found\r\n"
+ffounds: .asciz "Bootloader Found\r\n"
+notf: .asciz "Bootloader Not found\r\n"
 FailTRStr: .asciz "Failed to read\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 WelcomeNote: .asciz "Hey hello, the second mbr is up\r\n"

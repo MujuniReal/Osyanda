@@ -14,15 +14,15 @@ mainSecond:
 	jmp _start
 	nop
 
-#include <fat/fat12mbr.h>
+#include <fat/fat16mbr.h>
 
 Root_dirSects: .word 0x0000
 Root_dirStart: .word 0x0000
 FS_Flag: .byte 0x00				/* 1 is set if filestytem is fat */
 
-impalasseg = 0x2000
-tmprootdirsegment = 0x2000
-fatsegment = 0x0a00
+impalaseg = 0x6000
+tmprootdirsegment = 0x5000
+fatsegment = 0x2000
 
 _start:
 
@@ -35,43 +35,43 @@ Welcome_Note:
 
 
 	/* Looking for and loading the kernel file into memory */
-	xor %dx,%dx
+	//xor %dx,%dx
 
-	movb LogDrvNo,%dl
+	//movb LogDrvNo,%dl
 
-	xor %ax,%ax
-	int $0x13		//Reset the disk and we try again
+	//xor %ax,%ax
+	//int $0x13		//Reset the disk and we try again
 	
 
 	mov $tmprootdirsegment,%ax
 	mov %ax,%es
 	xor %cx,%cx
 	xor %bx,%bx
-	xor %ax,%ax
 
-read_next_sector:
+
+read_next_rdir_sect:
+
+	cmp Root_dirSects,%cx
+	jz file_not_found
+	xor %ax,%ax
 	mov Root_dirStart,%ax	//LBA Format
-	//mov $19,%ax
 	add %cx,%ax
 	push %cx
 	call ReadSect
 	pop %cx
-    inc %cx
-    cmp Root_dirSects,%cx
-	//cmp $14,%cx
-	jz file_not_found
+	inc %cx
 
 getFilename:
 	push %cx
-	mov $0x000b,%cx
+	mov $0x000b,%cx			/* fat12 and 16 support only filenames of 11Bytes */
 	lea (%bx),%di
-	lea (kernelfilename),%si
+	lea (kernelfilename),%si		/* compare %es:%di and %ds:%si */
 	repz cmpsb
 	je File_Found
 	pop %cx
 	add $0x20,%bx
 	cmp ByPSect,%bx
-	jz read_next_sector
+	jz read_next_rdir_sect
 	jmp getFilename
 
 
@@ -89,43 +89,53 @@ File_Found:
 	mov %es:0x1a(%bx),%ax
 	mov %ax,file_start
 
+loaDFAT:
+	mov $fatsegment,%ax
+	mov %ax,%es
+
+	mov ResSects,%ax
+	add NHiddenSects,%ax
+	add NhiddnSectshi,%ax
 	xor %bx,%bx
-	mov $impalasseg,%ax
+	mov SectsPFat,%cx
+	call ReadMulti
+
+
+	xor %bx,%bx
+	mov $impalaseg,%ax
 	mov %ax,%es
 	mov file_start,%cx
 
 read_file_nextinline_sector:
+	//todo: this below will work as loading dots
+	lea (read_times),%si
+	call PrintIt
+
 	mov %cx,%ax
+	sub $0x2,%ax
+	mulb SectPClust
 	add Root_dirStart,%ax
 	add Root_dirSects,%ax
-	//add $19,%ax
-	//add $14,%ax 
-	sub $0x2,%ax
 	push %cx
-	call ReadSect
+	xor %cx,%cx
+	movb SectPClust,%cl		/* this function has helped to increament %bx for us */
+	call ReadMulti			/* read cluster containing file */
 	pop %cx
-	add ByPSect,%bx
 	push %ds
-    mov $fatsegment,%dx
-    //ds:si
-    mov %dx,%ds
-	mov %cx,%dx
+	mov $fatsegment,%dx
+	mov %dx,%ds
 	mov %cx,%si
-	shr %dx
-	add %dx,%si
-	mov %ds:(%si),%dx
+	add %cx,%si			/* final location of fat entry in memory */
+	movw %ds:(%si),%dx
 	pop %ds
-	test $0x1,%cx
-	jnz odd_entry
-	and $0x0fff,%dx
-	jmp continue_to_read
-odd_entry:
-	shr $0x4,%dx
-continue_to_read:
+	cmp $0xfff8,%dx
+	jge done_readingkernel
+read_next_file_cluster:
 	mov %dx,%cx
-	cmp $0xff8,%cx
-	jl read_file_nextinline_sector
+	/*bytes per cluster is whats needed to increament %bx even up there where we load root dir and fatsegment dont forget */
+	jmp read_file_nextinline_sector
 
+done_readingkernel:
 /*
 	IN ORDER TO GET THIS SYSTEM IN PROTECTED MODE eg. 32BIT
 		   WE ARE GOING TO DO THE FOLLOWING
@@ -214,16 +224,19 @@ clear_the_fetchqueue:
 
 	.byte 0x66
 	.byte 0xea		/* 32bit jump instruction */
-	.int 0x20000		/* segment where kernel is loaded */
+	.int 0x60000		/* segment where kernel is loaded */
 	.word 0x0008 		/* Code Selector from gdt */
+
+FailedToRead:
+	lea (FReadStr),%si
+	call PrintIt
+	 /*this code can never go below here unless otherwise */
 
 hang:
 	jmp hang
 /* Ive decided to put the reusable functions below here */
 
 #include <check_a20.s>
-#include <printer.h>
-#include <sreadsect.h>
 
 /* #include "activate_a20.s" 
 #include <sreadsect.h>
@@ -243,16 +256,22 @@ IDT:
 	.word 2048	//Limit or size of IDT
 	.int 0x0	//Base location of IDT
 
+#include <printer.h>
+#include <sreadsect.h>
+#include <readmultis.h>
 kernelfilename: .ascii  "IMPALA  IMG"
+
+read_times: .asciz "Loading kernel progres\r\n"
 PRamStat: .asciz "Ram A20 pin Active\r\n"
 NRamStat: .asciz "Overlapped memory,,, Ram A20 pin not active\r\n"
+FReadStr: .asciz "Failed to read kernel Sector\r\n"
 LogoString: .asciz "\t\t\t\tCrane Bootloader\r\n"
 Welcom_str: .asciz "\t\t\t\tWelcome......\r\n"
 Enabld: .asciz "The a20 line function exists here and its working\r\n"
 NotEn: .asciz "No bro that function maybe errored or it doesnt exist in this BIOS\r\n"
 Proced: .asciz "Proceeding to Loading the Descriptors/Selectors\r\n"
-notf: .asciz "File not Found.\r\n"
-ffounds: .asciz "File Found !!!!\r\n"
+notf: .asciz "Kernel not Found.\r\n"
+ffounds: .asciz "Kernel Found !!!!!!!!!!!!!!!!!!!!!!!!!!!!\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
 /* THIS BELOW HERE IS THE .BSS SECTION KEEP CALM */

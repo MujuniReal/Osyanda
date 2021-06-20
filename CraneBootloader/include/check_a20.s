@@ -18,6 +18,8 @@ TestA20pin:
 	mov $0x0510,%si
 	movb $0xe6,%ds:(%si)
 	xor %ax,%ax
+
+	/* old values %es:(%di)*/
 	movb %es:(%di),%al
 
         pop %es
