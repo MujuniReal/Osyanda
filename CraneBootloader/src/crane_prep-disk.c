@@ -1,10 +1,9 @@
 #include <stdio.h>
-#include <string.h>
+
 #include <sys/types.h>
 
-//#include <bpbsize.h>
+#include <bpbsize.h>
 
-#define MAXFATBPBSIZE 90
 
 /*#define JMPCODE_NOP_SIZE 3
 #define DEVOEM_STRSIZE 8
@@ -15,199 +14,110 @@
 //#define VOL_LABEL_LOCATION ((JMPCODE_NOP_SIZE + DEVOEM_STRSIZE + FAT1216_BPBSIZE + FAT1216_EXTENDEDBPBSIZE + ) - (VOL_LABEL_STR_SIZE + FILESYSTEM_ID_STR_SIZE))
 /* this content below here is for the header file of the organiser program */
 
-typedef struct fat_12_6{
-        unsigned short int jmpcode;
-        unsigned char nopinstr;
-        char devOEM[8];
-        unsigned short int ByPSect;             //Bytes per sector
-        char SectPClust;                        //Sectors per cluster
-        unsigned short int ResSects;            //Reserved Sectors
-        char FatTabs;                           //Number of Fat tables
-        unsigned short int NRootDirEs;          //No of root dir entries
-        unsigned short int TotSects;            //Total number of sectors
-        unsigned char MedDescr;                         //The media descriptor
-        unsigned short int SectsPFat;           //Sects per fat
-        unsigned short SectsPTrck;              //Sectors Per Track
-        unsigned short int NHeads;              //Number of heads
-        unsigned short int NHiddenSects;        //Hidden sects low
-        unsigned short int NhiddnSectshi;       //Hidden sects high
-        unsigned int TotSectsInFS;              //Total Sects in FS
-        char LogDrvNo;                          //Logical Drive Number
-        char Resrvd;                            //Reserved
-        char ExtSig;                            //Extended signature
-        unsigned int DrvSeriNum;                                //This is the drive Serial Number
-        char VolLabel[11];
-        char FSType[8];
+char devOEM[9];
+short int ByPSect;
+unsigned char SectPClust;
+short int ResSects;
+char FatTabs;
+short int NRootDirEs;
+short int TotSects;
+unsigned char MedDescr;
+short int SectsPFat;
+short int SectsPTrck;
+short int NHeads;	
+short int NHiddenSects;
+short int NhiddnSectshi;
+int TotSectsInFS;
+unsigned char LogDrvNo;
+unsigned char Resrvd;
+unsigned char ExtSig;
+int DrvSeriNum;
+char VolLabel[12];
+char FSType[9];
 
-}__attribute__((packed)) fat_126hdr;
-typedef struct fat_32{
-        unsigned short int jmpcode;
-        unsigned char nopinstr;
-        char devOEM[8];
-        unsigned short int ByPSect;             //Bytes per sector
-        char SectPClust;                        //Sectors per cluster
-        unsigned short int ResSects;            //Reserved Sectors
-        char FatTabs;                           //Number of Fat tables
-        unsigned short int NRootDirEs;          //No of root dir entries
-        unsigned short int TotSects;            //Total number of sectors
-        unsigned char MedDescr;                         //The media descriptor
-        unsigned short Reserved1;
-        unsigned short SectsPTrck;              //Sectors Per Track
-        unsigned short int NHeads;              //Number of heads
-        unsigned short int NHiddenSects;        //Hidden sects low
-        unsigned short int NhiddnSectshi;       //Hidden sects high
-        unsigned int TotSectsInFS;              //Total Sects in FS
-        unsigned int SectsPFat;           //Sects per fat
-        unsigned short int FATmirroring;
-        unsigned short int Himirroring;
-        unsigned int Root_dirStart;
-        unsigned short int FSInfo;
-        unsigned short int MBRCopyLocation;
-        char Reserved2[12];
-        char LogDrvNo;                          //Logical Drive Number
-        char Resrvd3;                            //Reserved
-        char ExtSig;                            //Extended signature
-        unsigned int DrvSeriNum;                                //This is the drive Serial Number
-        char VolLabel[11];
-        char FSType[8];
 
-}__attribute__((packed)) fat_32hdr;
+
 /* this will be code coming from the prep-disk arguement */
 /* so this is a library or a function coming from a library */
 /* it doesnt deserve tobe with a main function but for now lets just give it we will remove it */
 /* another alternative is prep-disk disk */
 /* in preparing disk involves many things this is one of them,, making a header file with disk layout */
 
-int fat1216prep_disk_header(void *fatbpb){
+int fat1216prep_disk(char *fatbpb){
 
     /*we will replace these inside the arguements to disk labels received from main program */
     //*strncpy((&devOEM+), const char *src, size_t n);
     /*cater for if memory was not initialised with zeros in these variables we are using */
 
-   fat_126hdr *MBRdat = (fat_126hdr*)fatbpb;
+   
+    __asm__("mov %0,%%esi"::"r" (fatbpb+3));    /*because we are using them here */
+    __asm__("mov %0,%%edi"::"r" (&devOEM));
+    __asm__(
+	"movl $0x8,%ecx;"
+	"rep movsb;"
+		    );      /* after this code the %esi is increamented automatically */
+    __asm__("movw (%%esi),%0":"=r" (ByPSect));
+    __asm__("movb 0x2(%%esi),%0":"=r" (SectPClust));
+    __asm__("movw 0x3(%%esi),%0":"=r" (ResSects));
+    __asm__("movb 0x5(%%esi),%0":"=r" (FatTabs));
+    __asm__("movw 0x6(%%esi),%0":"=r" (NRootDirEs));
+    __asm__("movw 0x8(%%esi),%0":"=r" (TotSects));
+    __asm__("movb 0xa(%%esi),%0":"=r" (MedDescr));
+    __asm__("movw 0xb(%%esi),%0":"=r" (SectsPFat));
+    __asm__("movw 0xd(%%esi),%0":"=r" (SectsPTrck));
+    __asm__("movw 0xf(%%esi),%0":"=r" (NHeads));
+    __asm__("movw 0x11(%%esi),%0":"=r" (NHiddenSects));
+    __asm__("movw 0x13(%%esi),%0":"=r" (NhiddnSectshi));
+    __asm__("movl 0x15(%%esi),%0":"=r" (TotSectsInFS));
+    __asm__("movb 0x19(%%esi),%0":"=r" (LogDrvNo));
+    __asm__("movb 0x1a(%%esi),%0":"=r" (Resrvd));
+    __asm__("movb 0x1b(%%esi),%0":"=r" (ExtSig));
+    __asm__("movl 0x1c(%%esi),%0":"=r" (DrvSeriNum));
+    /* the location of the volume system name is 0x1d after the above */
+    /*strings below here */
 
-    /* cater for strings */
-    char tmp_devOEM[9];
-    char tmp_VolLabel[12];
-    char tmp_FSType[9];
-    /* initialize variable buffers with zeros */
-    memset(tmp_devOEM,'\0',sizeof(tmp_devOEM)); 
-    memset(tmp_VolLabel,'\0',sizeof(tmp_VolLabel));
-    memset(tmp_FSType,'\0',sizeof(tmp_FSType));
+    __asm__("movl %0,%%esi"::"r" (fatbpb+VOLUMELABEL_STRLOCATION));
+    __asm__("mov %0,%%edi;"::"r" (&VolLabel));
+    __asm__(
+        "movl $0xb,%ecx;"
+        "rep movsb;"
+        );
+    __asm__("movl %0,%%esi"::"r" (fatbpb+FSNAME_STRLOCATION));
+    __asm__("mov %0,%%edi;"::"r" (&FSType));
+    __asm__(
+        "movl $0x8,%ecx;"
+        "rep movsb;"
+        );
+    FILE *Fathdrfile;
+    Fathdrfile = fopen("./fatstruct.h","w");
 
-    strncpy(tmp_devOEM,MBRdat->devOEM,8);
-    strncpy(tmp_VolLabel,MBRdat->VolLabel,11);
-    strncpy(tmp_FSType,MBRdat->FSType,8);
+    //__asm__("movw (%%esi),%0":"=r" (FSType));
+    //printf("jumpcode:\t.word 0x%x",jumpcode);
+    fprintf(Fathdrfile,"devOEM:\t.asciz \"%s\"\n",devOEM);
+    fprintf(Fathdrfile,"ByPSect:\t.word 0x%x\n",ByPSect);
+    fprintf(Fathdrfile,"SectPClust:\t.byte 0x%x\n",SectPClust);
+    fprintf(Fathdrfile,"ResSects:\t.word 0x%x\n",ResSects);
+    fprintf(Fathdrfile,"FatTabs:\t.byte 0x%x\n",FatTabs);
+    fprintf(Fathdrfile,"NRootDirEs:\t.word 0x%x\n",NRootDirEs);
+    fprintf(Fathdrfile,"TotSects:\t.word 0x%x\n",TotSects);
+    fprintf(Fathdrfile,"MedDescr:\t.byte 0x%x\n",MedDescr);
+    fprintf(Fathdrfile,"SectsPFat:\t.word 0x%x\n",SectsPFat);
+    fprintf(Fathdrfile,"SectsPTrck:\t.word 0x%x\n",SectsPTrck);
+    fprintf(Fathdrfile,"NHeads:\t.word 0x%x\n",NHeads);
+    fprintf(Fathdrfile,"NHiddenSects:\t.word 0x%x\n",NHiddenSects);
+    fprintf(Fathdrfile,"NhiddnSectshi:\t.word 0x%x\n",NhiddnSectshi);
+    fprintf(Fathdrfile,"TotSectsInFS:\t.int 0x%x\n",TotSectsInFS);
+    fprintf(Fathdrfile,"LogDrvNo:\t.byte 0x%x\n",LogDrvNo);
+    fprintf(Fathdrfile,"Resrvd:\t.byte 0x%x\n",Resrvd);
+    fprintf(Fathdrfile,"ExtSig:\t.byte 0x%x\n",ExtSig);
+    fprintf(Fathdrfile,"DrvSeriNum:\t.int 0x%x\n",DrvSeriNum);
+    fprintf(Fathdrfile,"VolLabel:\t.ascii \"%s\"\n",VolLabel);
+    fprintf(Fathdrfile,"FSType:\t.ascii \"%s\"\n",FSType);
 
-    //FILE *Fathdrfile;
-    //Fathdrfile = fopen("./fatstruct.h","w");
+
+    //printf("ByPsect = %d\n",ByPSect);
+
+    fclose(Fathdrfile);
     
-    
-    printf("FATstruct:\n\n");
-
-    /* this if statement is to cater for the last character in the device OEM name */
-    if(strlen(tmp_devOEM) == 8){
-        printf("devOEM:\t\t\t.ascii  \"%s\"\n",tmp_devOEM);
-    }
-    else{
-        printf("devOEM:\t\t\t.asciz  \"%s\"\n",tmp_devOEM);
-    }
-    printf("ByPSect:\t.word 0x%x\n",MBRdat->ByPSect);
-    printf("SectPClust:\t.byte 0x%x\n",MBRdat->SectPClust);
-    printf("ResSects:\t.word 0x%x\n",MBRdat->ResSects);
-    printf("FatTabs:\t.byte 0x%x\n",MBRdat->FatTabs);
-    printf("NRootDirEs:\t.word 0x%x\n",MBRdat->NRootDirEs);
-    printf("TotSects:\t.word 0x%x\n",MBRdat->TotSects);
-    printf("MedDescr:\t.byte 0x%x\n",MBRdat->MedDescr);
-    printf("SectsPFat:\t.word 0x%x\n",MBRdat->SectsPFat);
-    printf("SectsPTrck:\t.word 0x%x\n",MBRdat->SectsPTrck);
-    printf("NHeads:\t.word 0x%x\n",MBRdat->NHeads);
-    printf("NHiddenSects:\t.word 0x%x\n",MBRdat->NHiddenSects);
-    printf("NhiddnSectshi:\t.word 0x%x\n",MBRdat->NhiddnSectshi);
-    printf("TotSectsInFS:\t.int 0x%x\n",MBRdat->TotSectsInFS);
-    printf("LogDrvNo:\t.byte 0x%x\n",MBRdat->LogDrvNo);
-    printf("Resrvd:\t.byte 0x%x\n",MBRdat->Resrvd);
-    printf("ExtSig:\t.byte 0x%x\n",MBRdat->ExtSig);
-    printf("DrvSeriNum:\t.int 0x%x\n",MBRdat->DrvSeriNum);
-    printf("VolLabel:\t.ascii \"%s\"\n",tmp_VolLabel);
-    printf("FSType:\t.ascii \"%s\"\n",tmp_FSType);
-
-
-
-    //fclose(Fathdrfile);
-    
-    return 0;
-}
-
-int fat32prep_disk_header(void *fatbpb){
-    
-    fat_32hdr *MBRdat = (fat_32hdr*)fatbpb;
-    
-    //FILE *Fathdrfile;
-    //Fathdrfile = fopen("./fatstruct.h","w");
-
-    /* cater for strings */
-    char tmp_devOEM[9];
-    char tmp_VolLabel[12];
-    char tmp_FSType[9];
-    /* initialize variable buffers with zeros */
-    memset(tmp_devOEM,'\0',sizeof(tmp_devOEM));
-    memset(tmp_VolLabel,'\0',sizeof(tmp_VolLabel));
-    memset(tmp_FSType,'\0',sizeof(tmp_FSType));
-
-    strncpy(tmp_devOEM,MBRdat->devOEM,8);
-    strncpy(tmp_VolLabel,MBRdat->VolLabel,11);
-    strncpy(tmp_FSType,MBRdat->FSType,8);
-
-    printf("FATstruct:\n\n");
-
-    /* this if statement is to cater for the last character in the device OEM name */
-    if(strlen(tmp_devOEM) == 8){
-        printf("devOEM:\t\t\t.ascii  \"%s\"\n",tmp_devOEM);
-    }
-    else{
-        printf("devOEM:\t\t\t.asciz  \"%s\"\n",tmp_devOEM);
-    }
-
-    printf("ByPSect:\t\t\t.word  0x%x\n",MBRdat->ByPSect);             
-    printf("SectPClust:\t\t\t.word  0x%x\n",MBRdat->SectPClust);                        
-    printf("ResSects:\t\t\t.word  0x%x\n",MBRdat->ResSects);            
-    printf("FatTabs:\t\t\t.word  0x%x\n",MBRdat->FatTabs);                           
-    printf("NRootDirEs:\t\t\t.word  0x%x\n",MBRdat->NRootDirEs);          
-    printf("TotSects:\t\t\t.word  0x%x\n",MBRdat->TotSects);            
-    printf("MedDescr:\t\t\t.word  0x%x\n",MBRdat->MedDescr);                         
-    printf("Reserved1:\t\t\t.word  0x%x\n",MBRdat->Reserved1);
-    printf("SectsPTrck:\t\t\t.word  0x%x\n",MBRdat->SectsPTrck);              
-    printf("NHeads:\t\t\t.word  0x%x\n",MBRdat->NHeads);              
-    printf("NHiddenSects:\t\t\t.word  0x%x\n",MBRdat->NHiddenSects);        
-    printf("NhiddnSectshi:\t\t\t.word  0x%x\n",MBRdat->NhiddnSectshi);       
-    printf("TotSectsInFS:\t\t\t.word  0x%x\n",MBRdat->TotSectsInFS);              
-    printf("SectsPFat:\t\t\t.word  0x%x\n",MBRdat->SectsPFat);           
-    printf("FATmirroring:\t\t\t.word  0x%x\n",MBRdat->FATmirroring);
-    printf("Himirroring:\t\t\t.word  0x%x\n",MBRdat->Himirroring);
-    printf("Root_dirStart:\t\t\t.word  0x%x\n",MBRdat->Root_dirStart);
-    printf("FSInfo:\t\t\t.word  0x%x\n",MBRdat->FSInfo);
-    printf("MBRCopyLocation:\t\t\t.word  0x%x\n",MBRdat->MBRCopyLocation);
-    //printf("Reserved2:\t\t\t.word  0x%x\n",MBRdat->Reserved2);
-    printf("LogDrvNo:\t\t\t.word  0x%x\n",MBRdat->LogDrvNo);                          
-    printf("Resrvd3:\t\t\t.word  0x%x\n",MBRdat->Resrvd3);                            
-    printf("ExtSig:\t\t\t.word  0x%x\n",MBRdat->ExtSig);                            
-    printf("DrvSeriNum:\t\t\t.word  0x%x\n",MBRdat->DrvSeriNum);                                
-    printf("VolLabel:\t\t\t.ascii  \"%s\"\n",tmp_VolLabel);
-    printf("FSType:\t\t\t.ascii  \"%s\"\n",tmp_FSType);
-
-    //fclose(Fathdrfile);
-    return 0;
-}
-
-int initiate_fatprep(void *fatbpb){
-    char *tmpfat = "FAT32";
-    if( strncmp(tmpfat,(fatbpb+(MAXFATBPBSIZE - 8)),5) == 0 ){
-        fat32prep_disk_header(fatbpb);
-    }
-    else{ /*62 is the maximum that is bpb + jump instruction + nop + devOEM(8)  one for fat12 and 16 */
-        fat1216prep_disk_header(fatbpb);
-        }
-
     return 0;
 }

@@ -1,0 +1,5 @@
+actually here since we are gonna be having lots of file systems lets
+make manny makefiles so dat the main makefile will select which makefile to
+include in its runtime there is an algol that this makefile here the main
+one will be told make fat16 then it will include the fat16 makefile in its body for final
+sketching

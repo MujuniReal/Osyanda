@@ -1,6 +1,6 @@
 /* lreadsect.h ->   long read sector for 32bit clusters */
 
-.func LReadSect
+.func ReadSect
 /*
   %al - number of sectors to read
   %ah - SubFunction 0a for 32bit reads, from BIOS interrupts
@@ -21,27 +21,27 @@
   4 3 more trys for disk reading
   from the ax,bx,cx,dx function calling style i think
   that this function is like so readSect(No_sects,*ptrSrc,*ptrDst)
-  This function expects LBA put in %dx:%ax 32bit register pair
+  This function expects LBA put in %ax register
 
 */
 
 /* Take note that real systems can actually read any number of sectors that you specify in
 the %al register but bochs here can only read one sector at a time bambi */
 
-LReadSect:
+ReadSect:
 	//%cx must be saved before calling this function
 	xor %cx,%cx
-    mov $0x4,%cx  	//We wanna read 3 more times before leaving
+        mov $0x4,%cx  	//We wanna read 3 more times before leaving
 
-lreadsect:
-	push %dx
-	push %ax	/* %dx:%ax contain 32bit LBA */
+readsect:
+	push %ax	//Contains LBA
 	push %cx	//Contains number of trial times for reading disk
 	push %bx	//Contains adress to store read data
 
 	//Sector
+	xor %dx,%dx
 	mov SectsPTrck,%bx
-	div %bx		/* divide LBA which is in the 32bit pair %dx:%ax */
+	div %bx
 	inc %dx
 	mov %dl,%cl
 
@@ -56,32 +56,30 @@ lreadsect:
 
 	//finalyy
 	mov LogDrvNo,%dl
-	mov $0x0a01,%ax
+	mov $0x0201,%ax
 	pop %bx
 	int $0x13
-	jc lFailedToread
+	jc FailedToread
 	/* lea (SucReadStr),%si
 	call PrintIt */
     pop %cx
     pop %ax
-	pop %dx
-	jmp lexitRead
+	jmp exitRead
 
 
-lFailedToread:		//This function attempts to try reading
+FailedToread:		//This function attempts to try reading
 	pop %cx			//the sector 3 more times 3more trials
 	xor %ax,%ax
 	int $0x13		//Reset the disk and we try again
 	//sucessfully resets
 	pop %ax			//Put Back LBA in the mighty register
-	pop %dx
 	dec %cx
 	cmp $0x0,%cx
-	jnz lreadsect		//Totally failed
+	jnz readsect		//Totally failed
 	//lea (FailTRStr),%si	//Totally failed to read string
 	//call PrintIt
 
-lexitRead:
+exitRead:
 	retw
 
 		

@@ -1,11 +1,11 @@
 
 #PWD = `$$HOME`
-TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
+#TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
 IMG = /home/box/Desktop/floppy2.img
 MOUNTDIR = /home/box/mount/
 
 CC = gcc
-CPP = cpp -nostdinc -I /home/box/Osyanda/CraneBootloader/include
+CPP = cpp -nostdinc -I $(PWD)/../../include
 
 
 AS = as
@@ -40,7 +40,6 @@ Stage2.S: Stage2.s $(HFILES)
 
 
 clean:
-	rm -f *.S
-	rm -f *.o
-	rm -f *.bin
-	
+	rm *.o
+	rm *.bin
+	rm *.S
