@@ -4,8 +4,8 @@
 .text
 
 .global impala_start
-.global Impalas_run
+.global run_impala
 
 impala_start:
     nop
-	call Impalas_run
+	call run_impala
