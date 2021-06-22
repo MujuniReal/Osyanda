@@ -18,4 +18,6 @@ where we stopped:
 	assembly port interactions (serial / parallel)
 		may also involve microcontroller interaction with assembly language
 	interrupt handling the above point and this one to help out on bootloader design
+
+
 	
