@@ -3,13 +3,17 @@
 void run_impala(){
     __asm__("cli");
 
-    __asm__("sti");
+    
 
     setup_idt();
+    install_exception_handlers();
+
+
+    __asm__("sti");
 
 
 
 
 hang:
-    goto hang
+    goto hang;
 }

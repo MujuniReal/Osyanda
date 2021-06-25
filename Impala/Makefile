@@ -1,0 +1,44 @@
+
+CPP = cpp 
+
+objs = kernel.o main.o idt.o except_handlers.o except_handls.o 
+
+LINKSCRIPT = linkscript.ld
+
+CFLAGS = -m32 -nostdinc -I include/ -c
+
+LD = ld
+AS = as --32
+CC = gcc
+
+LDFLAGS = -m elf_i386 --oformat binary -T$(LINKSCRIPT) -e _start
+
+LIBDIR = ./lib
+
+all: impala.img
+
+
+impala.img: $(objs) $(LINKSCRIPT)
+	$(LD) $(LDFLAGS)  $(objs) -o $@
+
+
+except_handls.o: except_handls.s
+	$(AS) except_handls.s -o $@
+
+except_handlers.o: except_handlers.c include/types.h include/system.h include/idt_exceptions.h
+	$(CC) $(CFLAGS) except_handlers.c -o $@
+
+idt.o: idt.c include/system.h
+	$(CC) $(CFLAGS) idt.c -o $@
+
+main.o: main.c include/system.h
+	$(CC) $(CFLAGS) main.c -o $@
+
+kernel.o: kernel.s
+	$(AS) kernel.s -o $@
+
+
+clean:
+	rm -f *.o
+	rm -f *.i
+	$(MAKE) -C $(LIBDIR) clean
