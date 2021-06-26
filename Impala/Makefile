@@ -5,20 +5,20 @@ objs = kernel.o main.o idt.o except_handlers.o except_handls.o
 
 LINKSCRIPT = linkscript.ld
 
-CFLAGS = -m32 -nostdinc -I include/ -c
+CFLAGS = -nostdinc -I include/ -c
 
 LD = ld
-AS = as --32
+AS = as 
 CC = gcc
 
-LDFLAGS = -m elf_i386 --oformat binary -T$(LINKSCRIPT) -e _start
+LDFLAGS =  --oformat binary -e _start -Ttext 0x60000
 
 LIBDIR = ./lib
 
 all: impala.img
 
 
-impala.img: $(objs) $(LINKSCRIPT)
+impala.img: $(objs)
 	$(LD) $(LDFLAGS)  $(objs) -o $@
 
 
@@ -41,4 +41,5 @@ kernel.o: kernel.s
 clean:
 	rm -f *.o
 	rm -f *.i
-	$(MAKE) -C $(LIBDIR) clean
+	rm -f *.img
+	# $(MAKE) -C $(LIBDIR) clean
