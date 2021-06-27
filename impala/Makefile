@@ -1,7 +1,7 @@
 
 CPP = cpp 
 
-objs = kernel.o main.o idt.o isr.o isr_s.o lib/mem.o
+objs = kernel.o main.o idt.o isr.o isr_s.o irq.o irq_s.o lib/mem.o
 
 LINKSCRIPT = linkscript.ld
 
@@ -24,6 +24,14 @@ impala.img: $(objs)
 
 lib/mem.o: $(LIBDIR)/mem.s
 	$(MAKE) -C $(LIBDIR)
+
+irq_s.o: irq_s.s
+	$(AS) irq_s.s -o $@
+
+
+irq.o: irq.c 
+	$(CC) $(CFLAGS) irq.c -o $@
+
 
 isr_s.o: isr_s.s
 	$(AS) isr_s.s -o $@

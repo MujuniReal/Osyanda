@@ -44,7 +44,7 @@ void install_irqs(){
 void *interrupt_handlers[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 };
 
 void install_interrupt_handler(uint8 irq, void (*interrupthandler)(GP_REGISTERS *gpregs)){
-    interrupt_handlers[irq] = handler;
+    interrupt_handlers[irq] = interrupthandler;
 }
 
 void interrupt_handler(GP_REGISTERS *gpregs){
