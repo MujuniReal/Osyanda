@@ -1,5 +1,5 @@
 #include "include/system.h"
-
+#include "include/irq.h"
 
 
 void run_impala(){
@@ -7,6 +7,7 @@ void run_impala(){
 
     setup_idt();
     install_exception_handlers();
+    install_irqs();
 
     __asm__("sti");
 

@@ -1,7 +1,7 @@
 
 CPP = cpp 
 
-objs = kernel.o main.o idt.o except_handlers.o except_handls.o lib/mem.o
+objs = kernel.o main.o idt.o isr.o isr_s.o lib/mem.o
 
 LINKSCRIPT = linkscript.ld
 
@@ -25,11 +25,11 @@ impala.img: $(objs)
 lib/mem.o: $(LIBDIR)/mem.s
 	$(MAKE) -C $(LIBDIR)
 
-except_handls.o: except_handls.s
-	$(AS) except_handls.s -o $@
+isr_s.o: isr_s.s
+	$(AS) isr_s.s -o $@
 
-except_handlers.o: except_handlers.c include/types.h include/system.h include/idt_exceptions.h
-	$(CC) $(CFLAGS) except_handlers.c -o $@
+isr.o: isr.c include/types.h include/system.h include/idt.h
+	$(CC) $(CFLAGS) isr.c -o $@
 
 idt.o: idt.c include/system.h
 	$(CC) $(CFLAGS) idt.c -o $@
