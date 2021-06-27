@@ -15,7 +15,7 @@ install idt, install exceptions handler
 memset, puts
 */
 
-//uint32* memset(uint32* dest, uint8 const_val, uint32 const_size);
+extern uint8 *memset(uint8 *dest, uint8 *c, uint32 size_t);
 
 extern void setup_idt();
 extern void install_exception_handlers();

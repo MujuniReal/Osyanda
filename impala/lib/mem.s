@@ -23,6 +23,7 @@ _memset:
 
     repnz stosb
 
+    /* return value */
     mov 0x4(%esp),%eax
     ret
 

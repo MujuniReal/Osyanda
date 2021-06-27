@@ -36,8 +36,6 @@ void set_idt_interrupt_gate(uint16 interrupt_no, uint32 interrupt_handler){
 
 
 
-
-
 //#define IDT_INTERRUPT_GATE 0x8e
 #define IDT_INTERRUPT_TASKGATE 0x8f
 
@@ -53,7 +51,7 @@ void setup_idt(){
     idtp.idt_location = (uint32) &idt;
 
     /* Do the memset function here to load the idt with zeros */
-    //memset((uint32*)&idt, 0, sizeof(idt));
+    memset((uint8*)&idt, '\0', sizeof(IDTENTRY) * 256 );
 
     /* Design the memset function from scratch C or assembly fingers crossed */
 
