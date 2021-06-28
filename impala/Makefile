@@ -1,7 +1,8 @@
 
 CPP = cpp 
 
-objs = kernel.o main.o idt.o isr.o isr_s.o irq.o irq_s.o lib/mem.o
+objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
+libs = lib/port.o lib/mem.o
 
 LINKSCRIPT = linkscript.ld
 
@@ -18,20 +19,21 @@ LIBDIR = lib/
 all: impala.img
 
 
-impala.img: $(objs)
-	$(LD) $(LDFLAGS)  $(objs) -o $@
+impala.img: $(objs) $(libs)
+	$(LD) $(LDFLAGS)  $(objs) $(libs) -o $@
 
 
-lib/mem.o: $(LIBDIR)/mem.s
+$(libs):
 	$(MAKE) -C $(LIBDIR)
+
+io.o: io.c
+	$(CC) $(CFLAGS) io.c -o $@
 
 irq_s.o: irq_s.s
 	$(AS) irq_s.s -o $@
 
-
 irq.o: irq.c 
 	$(CC) $(CFLAGS) irq.c -o $@
-
 
 isr_s.o: isr_s.s
 	$(AS) isr_s.s -o $@

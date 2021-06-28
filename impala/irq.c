@@ -1,5 +1,21 @@
 #include "include/idt.h"
 
+
+
+/* programmable interrupt controller command and data ports, interrupts defined by the kernel */
+#define PRIMARY_PIC_CMDPORT 0x20
+#define PRIMARY_PIC_DATAPORT 0x21
+
+#define SECONDARY_PIC_CMDPORT 0xa0
+#define SECONDARY_PIC_DATAPORT 0xa1
+
+
+
+extern uint8 inportb(uint16);
+extern void outportb(uint8,uint16);
+//extern void iowait();
+
+
 extern void irq0();
 extern void irq1();
 extern void irq2();
@@ -17,9 +33,48 @@ extern void irq13();
 extern void irq14();
 extern void irq15();
 
+static inline void iowait(){
+
+    /* volatile goes with inline in my opinion */
+    __asm__ __volatile__("outb %%al, $0x80"::"a"(0));       /* send junk to the delay port, POST port */
+}
+
+
+void setmap_PIC(){
+    /* inform the primary and secondary PICs of incoming data */
+    /* basically initialize them send 0x11*/
+    /* we will wait after each transaction so that we ensure a perfect transaction inline function perfect for that */
+    outportb(0x11, PRIMARY_PIC_CMDPORT);
+    iowait();
+    outportb(0x11, SECONDARY_PIC_CMDPORT);
+    iowait();
+
+    /* set offsets to our kernel defined interrupts which start from 32 to 40 */
+    outportb(0x20, PRIMARY_PIC_DATAPORT);
+    iowait();
+    /* secondary PIC gets them interrupts from 40 - */
+    outportb(0x28, SECONDARY_PIC_DATAPORT);
+    iowait();
+
+    outportb(0x4, PRIMARY_PIC_DATAPORT);  /* tell primary PIC that theres a secondary PIC bit mask 0000 0100 */
+    iowait();
+    outportb(0x2, SECONDARY_PIC_DATAPORT); /* tell secondary PIC that its other identity is 2 0000 0010 */
+    iowait();
+
+    outportb(0x1, PRIMARY_PIC_DATAPORT);      /* set primary PIC to intel operation mode 8086 */
+    iowait();
+    outportb(0x1, SECONDARY_PIC_DATAPORT);    /* set primary PIC to intel operation mode 8086 */
+    iowait();
+
+    /* finish up  just like terminating with null*/
+    outportb(0x0, PRIMARY_PIC_DATAPORT);
+    outportb(0x0, SECONDARY_PIC_DATAPORT);
+}
 
 
 void install_irqs(){
+
+    setmap_PIC();
 
     set_idt_interrupt_gate(32, (unsigned)irq0);
     set_idt_interrupt_gate(33, (unsigned)irq1);
