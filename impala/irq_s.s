@@ -20,7 +20,7 @@
 
 
 .macro irquest num
-    push 0x0
+    push $0x0
     push $\num
     jmp prepregs_irq
 

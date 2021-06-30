@@ -16,6 +16,7 @@ memset, puts
 */
 
 extern uint8 *memset(uint8 *dest, uint8 *c, uint32 size_t);
+extern uint16 *memsetw(uint16 *dest, uint16 *c, uint32 size_t);
 
 extern void setup_idt();
 extern void install_exception_handlers();

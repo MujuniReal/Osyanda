@@ -3,6 +3,7 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
 libs = lib/port.o lib/mem.o
+drivers = drivers/monitor.o
 
 LINKSCRIPT = linkscript.ld
 
@@ -15,16 +16,20 @@ CC = gcc
 LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000
 
 LIBDIR = lib/
+DRV_DIR = drivers/
 
 all: impala.img
 
 
-impala.img: $(objs) $(libs)
-	$(LD) $(LDFLAGS)  $(objs) $(libs) -o $@
+impala.img: $(objs) $(libs) $(drivers)
+	$(LD) $(LDFLAGS)  $(objs) $(libs) $(drivers) -o $@
 
 
 $(libs):
 	$(MAKE) -C $(LIBDIR)
+
+$(drivers):
+	$(MAKE) -C $(DRV_DIR)
 
 io.o: io.c
 	$(CC) $(CFLAGS) io.c -o $@
@@ -56,3 +61,4 @@ clean:
 	rm -f *.i
 	rm -f *.img
 	$(MAKE) -C $(LIBDIR) clean
+	$(MAKE) -C $(DRV_DIR) clean
