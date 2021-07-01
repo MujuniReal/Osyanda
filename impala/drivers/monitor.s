@@ -7,6 +7,8 @@
 #define DEFAULT_ATTRIBUTE 0x0f      /* white on black, ie higher 4bits->background, lower 4bits-> text/cursor color */
 #define SPACEBAR 0x20
 #define ATTRIB_SPACE 0x0f20         /* attribute and character 2bytes */
+#define CURSOROFFSET_HI 14
+#define CURSOROFFSET_LO 15
 .code32
 .text
 .global clears
@@ -17,22 +19,33 @@ clears:
     xor %eax,%eax
     push $TOTAL_PIXEL
     movw $ATTRIB_SPACE,%ax   /* fill screen with spaces spaces is 0x20 thus clearing screen*/                       
-    push %eax  
+    push %eax 
     push $VGA_ADDRESS
     call memsetw
     add $0xc,%esp
 
     movw $0x0000,(cursr_pos)               /* After clearing screen, set cursor to 0,0 top left */
     call setcursor
-    pop
     ret
 
 //void setcursor();
 setcursor:
-    movw cursr_pos,%ax
-    out %ah,$VIDEO_CMD_PORT         /* high byte for cursor location */
-    out %al,$VIDEO_DATA_PORT        /* low byte for cursor location */
-    ret                                /* cursor location y = overall location / 80, x = overall location mod 80 */
+    movb $CURSOROFFSET_HI,%al
+    movw $VIDEO_CMD_PORT,%dx
+    outb %al,(%dx)
+    movw (cursr_pos),%ax		   
+    xchg %ah,%ah
+    movw $VIDEO_DATA_PORT,%dx
+    outb %al,(%dx)			  /* high byte for cursor location */
+
+    movb $CURSOROFFSET_LO,%al
+    movw $VIDEO_CMD_PORT,%dx
+    outb %al,(%dx)
+    movw (cursr_pos),%ax
+    movw $VIDEO_DATA_PORT,%dx		 
+    outb %al,(%dx)			  /* low byte for cursor location */
+/* cursor location y = overall location / 80, x = overall location mod 80 */
+    ret
 
 
 
