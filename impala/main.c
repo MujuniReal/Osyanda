@@ -16,7 +16,10 @@ void run_impala(){
 
     clears();
 //    putc('c');
-    puts("We are Osyanda the revolution");
+    puts("We are Osyanda the revolution\n");
+    puts("Revolution\tFor Life\n");
+    
+
 
 hang:
     goto hang;

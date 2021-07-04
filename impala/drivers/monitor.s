@@ -103,7 +103,17 @@ puts:
 							/* some more checks for the character inserted
 		   						like we would want tab to leave 4 spaces, newline to take you to a new y axis
 		   					enter/ carriage return to take you to a new y axis
+							   all those special functions are to set/control the cursor
+							   so they will be in need of the setcursor function
 							*/
+		cmp $0x1f,%al						/* Following the ascii table All the special characters of tab,delete,return,new line are below 0x1f */
+		jg cont_puts
+		push %eax
+		call handle_special_chars			/* Those special ones that control the cursor are below 0x1f in the ascii */
+		pop %eax
+		jmp next_char						/* Load next character in the string */
+
+	cont_puts:
 		push %eax
 		call putc
 		pop %eax
@@ -111,7 +121,46 @@ puts:
 
 	endputs:
 		ret
+
+handle_special_chars:
+	/* will handle whether putting four spaces for tab will handle for both cursor or VGA tube */
+	movb 0x4(%esp),%al
+
+	tab_char:
+		cmp $0x09,%al			/* for horizontal tab '\t' */
+		jnz newline_char		/* jump to check for newline character */
+		add $0x4,(cursr_pos)	/* move cursor to four spaces ahead */
+		call setcursor
+		ret						/* exits function */
+
+	newline_char:
+		cmp $0x0a,%al				/* for newline '\n' */
+		jnz endspchr
+		xor %eax,%eax
+		xor %ebx,%ebx
+		xor %edx,%edx
 		
+		movw (cursr_pos),%ax
+		movb $MAX_COLUMNS,%bl		/* we get the y axis from the x axis from the columns,, a complete column represents one complete row */
+		divw %bx					/* remember %ax:%dx %ax-quotient %dx - remainder */
+
+		push %edx
+		inc %ax
+		mulw %bx
+		pop %edx
+		movw %ax,(cursr_pos)
+		call setcursor
+
+
+		/* this ones increaments the y axis how to get y axis is cursr_pos / 80 */
+		/* the quotient is y axis and remainder is x axis,, */
+		/* plan is  increment quotient by one, multiply quotient with 80 and add the initial remainder from the first division and set new cursor position */
+
+
+
+	
+	endspchr:
+		ret
 
 .data
 
