@@ -2,6 +2,7 @@
 #include "include/irq.h"
 
 extern void clears();
+extern uint8 putc(uint8);
 
 void run_impala(){
     __asm__("cli");
@@ -12,13 +13,8 @@ void run_impala(){
 
     __asm__("sti");
 
-    memsetw((uint16*)0xb8000,(uint16)0x720,80*25);
-
-    //clears();
-    outportb(14,0x3d4);
-    outportb(0x0,0x3d5);
-    outportb(15,0x3d4);
-    outportb(0x0,0x3d5);
+    clears();
+    putc('c');
 
 hang:
     goto hang;
