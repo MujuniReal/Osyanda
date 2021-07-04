@@ -2,7 +2,7 @@
 CC = gcc -m32 -nostdinc -c 
 AS = as --32 
 
-CFLAGS = -nostdinc -m32 -I ../include/ -c
+CFLAGS = -nostdinc -m32 -I ../include/ -fno-PIC -c 
 
 
 all: mem.o port.o

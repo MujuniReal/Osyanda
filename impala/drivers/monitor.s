@@ -13,7 +13,7 @@
 .text
 .global clears
 .global putc
-	
+.global puts
 	//memsetw(uint16*, )
 	//void clears(void);   clearscreen
 	//function(3,2,1) -- calling convention
@@ -64,10 +64,25 @@ putc:
 	jnz printc
 	call clears
 
-	printc:	
+	printc:
+		/* Prepare registers for multiplication result for multiplication %edx:%eax */
+		xor %eax,%eax
+		xor %ebx,%ebx
+		xor %edx,%edx
+		movw $VGA_ADDRESS,%di
+
+		/* find cursor location in VGA remember in vga 2 bytes are stored for each character */
+		movw $0x2,%bx
+		movw (cursr_pos),%ax
+		mulw %bx
+
+		add %ax,%di 						/* Cursor position in VGA */
+		
+		xor %ax,%ax
 		movb 0x4(%esp),%al
 		movb $DEFAULT_ATTRIBUTE,%ah
-		movw %ax,(VGA_ADDRESS)			/* Print the character */
+		stosw								/* Print the character */
+		//movw %ax,(VGA_ADDRESS)			/* Print the character */
 	
 	setcursor_next:	
 	/* after priting anything we set the cursor to the next place */
@@ -77,10 +92,26 @@ putc:
 	
 
 puts:
-	/* cater for length of the string which will deal with our looping counter ecx*/
-	lea 0x4(%esp),%esi
-	movb (%esi),%al
-	push %eax
+	/* cater for length of the string which will deal with our looping counter ecx */
+	xor %eax,%eax
+	mov 0x4(%esp),%esi
+
+	next_char:
+		lodsb
+		cmp $0x0,%al
+		jz endputs
+							/* some more checks for the character inserted
+		   						like we would want tab to leave 4 spaces, newline to take you to a new y axis
+		   					enter/ carriage return to take you to a new y axis
+							*/
+		push %eax
+		call putc
+		pop %eax
+		jmp next_char
+
+	endputs:
+		ret
+		
 
 .data
 

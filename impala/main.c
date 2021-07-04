@@ -3,6 +3,7 @@
 
 extern void clears();
 extern uint8 putc(uint8);
+extern void puts(uint32*);
 
 void run_impala(){
     __asm__("cli");
@@ -14,7 +15,8 @@ void run_impala(){
     __asm__("sti");
 
     clears();
-    putc('c');
+//    putc('c');
+    puts("We are Osyanda the revolution");
 
 hang:
     goto hang;

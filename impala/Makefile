@@ -7,7 +7,7 @@ drivers = drivers/monitor.o
 
 LINKSCRIPT = linkscript.ld
 
-CFLAGS = -nostdinc -m32 -I include/ -c
+CFLAGS = -nostdinc -m32 -I include/ -fno-PIC -c
 
 LD = ld
 AS = as --32 
