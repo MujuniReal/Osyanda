@@ -76,6 +76,11 @@ putc:
 	ret
 	
 
+puts:
+	/* cater for length of the string which will deal with our looping counter ecx*/
+	lea 0x4(%esp),%esi
+	movb (%esi),%al
+	push %eax
 
 .data
 
