@@ -42,9 +42,11 @@ Building the software;
 Make a disk image of appropriately 512MBs using the disk creation tool
 
 On GNU/Linux;
-With the fallocate program installed, open terminal and run "fallocate -l 512M osyanda.img"
+* With the fallocate program installed, open terminal and run "fallocate -l 512M osyanda.img"
 This will create a disk image called "osyanda.img", this in a realtime environment represents
 a storage device HDD/flash drive
+* Next format the disk image to FAT16, by running "mkfs.fat -F 16 -I osyanda.img", This is a very
+important step as the FAT16 filesystem has been greatly used in the project.
 
 On Windows;
 Disk Image creation tool that comes with bochs
