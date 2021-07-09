@@ -1,5 +1,11 @@
-CRANEMBR_DIR = $(PWD)
-CRANE_INCLUDEDIR = $(CRANEMBR_DIR)/../../include
+ifeq (config.txt, $(wildcard config.txt))
+include config.txt
+else
+CONFIGURE = config
+CRANE_STAGE1DIR = `pwd`
+CRANE_ROOT = $(CRANE_STAGE1DIR)/../
+CRANE_INCLUDEDIR = $(CRANE_ROOT)/include/
+endif
 
 
 CC = gcc
@@ -16,10 +22,10 @@ HFILES = $(CRANE_INCLUDEDIR)/fat/fat16mbr.h \
 $(CRANE_INCLUDEDIR)/printer.h \
 $(CRANE_INCLUDEDIR)/sreadsect.h
 
-all: Stage1.img
+all: $(CONFIGURE) stage1.img
 
 
-Stage1.img: mbr1.bin mbr2.bin
+stage1.img: mbr1.bin mbr2.bin
 	cat mbr1.bin > $@
 	cat mbr2.bin >> $@
 
@@ -36,14 +42,21 @@ mbr1.o: mbr1.S
 mbr2.o: mbr2.S
 	$(AS) $(ASFLAGS) $< -o $@
 
-mbr1.S: fat16_1.s $(HFILES)
+mbr1.S: fat16_1.s
 	$(CPP) $< -o $@
 
-mbr2.S: fat16_2.s $(HFILES)
+mbr2.S: fat16_2.s
 	$(CPP) $< -o $@
-	
+
+config:
+	echo "CRANE_STAGE1DIR="$(CRANE_STAGE1DIR) > config.txt
+	echo "CRANE_ROOT="$(CRANE_ROOT) >> config.txt
+	echo "CRANE_INCLUDEDIR="$(CRANE_INCLUDEDIR) >> config.txt
+
 clean:
-	rm *.S
-	rm *.o
-	rm *.bin
-	rm *.img
+	rm -f *.S
+	rm -f *.o
+	rm -f *.bin
+	rm -f *.img
+	rm -f config*
+

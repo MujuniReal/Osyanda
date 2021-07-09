@@ -190,7 +190,7 @@ FailedToRead:
 wooing: .asciz "Woooo the nani,, the file has totally been read into memory\r\n"
 FReadStr: .asciz "Totally Failed to read Sector\r\n"
 RebootStr: .asciz "Press Any Key to Reboot.\r\n"
-fileName: .ascii "STAGE2  BIN"
+fileName: .ascii "CRANEBL IMG"
 ffounds: .asciz "Bootloader Found\r\n"
 notf: .asciz "Bootloader Not found\r\n"
 FailTRStr: .asciz "Failed to read\r\n"
