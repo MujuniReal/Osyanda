@@ -35,7 +35,7 @@ extern void isr29();
 extern void isr30();
 extern void isr31();
 
-
+extern void puts(uint32*);
 /* Install interrupt exception handlers */
 
 void install_exception_handlers(){
@@ -115,9 +115,13 @@ char *exception_msgs[] =
 
 void fault_checker(GP_REGISTERS *regs){
     if(regs->interrupt_no < 32){
-        //puts(exception_msgs[regs->interrupt_no]);   //look thru array of exception messages using the index of the exception got print exception
-        //puts("System Halted !\n");
+        puts(exception_msgs[regs->interrupt_no]);   //look thru array of exception messages using the index of the exception got print exception
+        puts("System Halted !\n");
+        goto hang;
         /* make system hang */
         /* In future we will think of what to do */
     }
+    
+    hang:
+        goto hang;
 }

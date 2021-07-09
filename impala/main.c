@@ -18,6 +18,7 @@ void run_impala(){
 //    putc('c');
     puts("We are Osyanda the revolution\n");
     puts("Revolution\tFor Life\n");
+    __asm__("int $0x1");
     
 
 

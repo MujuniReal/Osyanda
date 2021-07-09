@@ -1,6 +1,6 @@
 
 #PWD = `$$HOME`
-#TOPDIR = /home/box/Osyanda/CraneBootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
+#TOPDIR = /home/box/Osyanda/cranebootloader/			#Soon we will fetch this from the main Makefile present in the Topdirectory
 IMG = /home/box/Desktop/floppy2.img
 MOUNTDIR = /home/box/mount/
 
@@ -13,8 +13,8 @@ LD = ld
 
 LDFLAGS = --oformat binary
 
-HFILES = /home/box/Osyanda/CraneBootloader/include/check_a20.s \
-/home/box/Osyanda/CraneBootloader/include/g_idts.s
+HFILES = /home/box/Osyanda/cranebootloader/include/check_a20.s \
+/home/box/Osyanda/cranebootloader/include/g_idts.s
 
 all: Stage2.bin
 

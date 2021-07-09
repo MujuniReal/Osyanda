@@ -1,3 +1,8 @@
+IMPALA_ROOT = $(PWD)
+IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include/
+IMPALA_LIBDIR = $(IMPALA_ROOT)/lib/
+IMPALA_DRIVERDIR = $(IMPALA_ROOT)/drivers/
+
 
 CPP = cpp 
 
@@ -7,7 +12,7 @@ drivers = drivers/monitor.o
 
 LINKSCRIPT = linkscript.ld
 
-CFLAGS = -nostdinc -m32 -I include/ -fno-PIC -c
+CFLAGS = -nostdinc -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
 
 LD = ld
 AS = as --32 
@@ -15,10 +20,8 @@ CC = gcc
 
 LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000
 
-LIBDIR = lib/
-DRV_DIR = drivers/
 
-all: impala.img
+all: config impala.img
 
 
 impala.img: $(objs) $(libs) $(drivers)
@@ -26,10 +29,10 @@ impala.img: $(objs) $(libs) $(drivers)
 
 
 $(libs):
-	$(MAKE) -C $(LIBDIR)
+	$(MAKE) -C $(IMPALA_LIBDIR)
 
 $(drivers):
-	$(MAKE) -C $(DRV_DIR)
+	$(MAKE) -C $(IMPALA_DRIVERDIR)
 
 io.o: io.c
 	$(CC) $(CFLAGS) io.c -o $@
@@ -44,6 +47,8 @@ isr_s.o: isr_s.s
 	$(AS) isr_s.s -o $@
 
 isr.o: isr.c include/types.h include/system.h include/idt.h
+	#$(CPP) isr.s -o isr.S
+	#$(AS) isr.S -o $@
 	$(CC) $(CFLAGS) isr.c -o $@
 
 idt.o: idt.c include/system.h
@@ -56,9 +61,16 @@ kernel.o: kernel.s
 	$(AS) kernel.s -o $@
 
 
+config:
+	echo $(IMPALA_ROOT) >> config.txt
+	echo $(IMPALA_INCLUDEDIR) >> config.txt
+	echo $(IMPALA_LIBDIR) >> config.txt
+	echo $(IMPALA_DRIVERDIR) >> config.txt
+
 clean:
 	rm -f *.o
 	rm -f *.i
 	rm -f *.img
-	$(MAKE) -C $(LIBDIR) clean
-	$(MAKE) -C $(DRV_DIR) clean
+	rm -f *.S
+	$(MAKE) -C $(IMPALA_LIBDIR) clean
+	$(MAKE) -C $(IMPALA_DRIVERDIR) clean
