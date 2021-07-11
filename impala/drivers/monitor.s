@@ -33,6 +33,7 @@ clears:
 	//void setcursor();
 
 setcursor:
+	xor %eax,%eax
 	movb $CURSOROFFSET_HI,%al
 	movw $VIDEO_CMD_PORT,%dx
 	outb %al,(%dx)
@@ -53,6 +54,37 @@ setcursor:
 
 getcursor:
 
+
+scroll:
+	/* This function here adds us one row below our final row, ie moving everything already printed one row up */
+	/* Since the VGA memory holds 2 bytes per printed character, we are going to drop a movsw */
+	xor %eax,%eax
+	xor %ecx,%ecx
+	push %esi
+	push %edi
+
+	
+	lea VGA_ADDRESS,%edi
+	lea VGA_ADDRESS,%esi
+	add $160,%esi
+	movw $TOTAL_PIXEL,%ax
+	sub $MAX_COLUMNS,%ax
+	mov %ax,%cx
+	//mov $MAX_COLUMNS,%ecx		/* since we are adding one row down,, it might as well be adding one full line of empty columns,just line a new line */
+	repnz movsw
+
+	/* clear the whole row possesing left out characters from previous print */
+	movw $80,%cx			/* clear the whole row, at this point, %edi is pointing to the current byte after the above string action */
+	movw $ATTRIB_SPACE,%ax
+	repnz stosw
+	
+	movw $1920,(cursr_pos)
+	call setcursor
+
+	
+	pop %edi
+	pop %esi
+	ret
 	
 putc:
 	/* procedure for putc,
@@ -62,7 +94,7 @@ putc:
 	movw $TOTAL_PIXEL,%dx
 	cmp (cursr_pos),%dx
 	jnz printc
-	call clears
+	call scroll
 
 	printc:
 		/* Prepare registers for multiplication result for multiplication %edx:%eax */

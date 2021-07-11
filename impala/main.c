@@ -17,8 +17,31 @@ void run_impala(){
     clears();
 //    putc('c');
     puts("We are Osyanda the revolution\n");
-    puts("Revolution\tFor Life\n");
-    __asm__("int $0x1");
+    puts("Revolution\tFor LIFE\n");
+   puts("We are Osyanda the revolution\n");
+   puts("pat\n");
+    puts("Grace\n");
+    puts("abel\n");
+    puts("mujuni\n");
+    puts("Commodore\n");
+    puts("Joramos\n");
+    puts("Patrick\n");
+    puts("Veridis\n");
+    puts("DaftPunk\n");
+    puts("CJ\n");
+    puts("Musisire\n");
+    puts("Bryo brian\n");
+    puts("feriionsf\n");
+    puts("Bambooooo\n");
+    puts("Lets get ouutta here\n");
+    puts("Find me in\n");
+    puts("Soldier boy\n");
+    puts("Vamonos\n");
+puts("codium\n");
+    puts("Neels\n");
+    puts("Here wiht  edsd\n");
+    puts("Revolution !!!!!!!!!\n");
+    puts("Revolution Scrolled\n");
     
 
 
