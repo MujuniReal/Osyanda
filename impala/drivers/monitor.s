@@ -1,15 +1,17 @@
-#define VGA_ADDRESS 0xb8000
-#define VIDEO_CMD_PORT 0x3d4
-#define VIDEO_DATA_PORT 0x3d5
-#define MAX_COLUMNS 80              /* maximum number of columns is 80 x axis */
-#define MAX_ROWS 25                 /* maximum number of rows 25 y axis */
-#define TOTAL_PIXEL 2000	    /* MAX_ROWS * MAX_COLUMNS */
-#define DEFAULT_ATTRIBUTE 0x0f      /* white on black, ie higher 4bits->background, lower 4bits-> text/cursor color */
-#define SPACEBAR 0x20
-#define ATTRIB_SPACE 0x0f20         /* attribute and character for this case spaces for clear screen 2bytes */
-#define CURSOROFFSET_HI 14
-#define CURSOROFFSET_LO 15
 .code32
+
+VGA_ADDRESS = 0xb8000
+VIDEO_CMD_PORT = 0x3d4
+VIDEO_DATA_PORT = 0x3d5
+MAX_COLUMNS = 80              /* maximum number of columns is 80 x axis */
+MAX_ROWS = 25                 /* maximum number of rows 25 y axis */
+TOTAL_PIXEL = 2000	    /* MAX_ROWS * MAX_COLUMNS */
+DEFAULT_ATTRIBUTE = 0x0f      /* white on black, ie higher 4bits->background, lower 4bits-> text/cursor color */
+SPACEBAR = 0x20
+ATTRIB_SPACE = 0x0f20         /* attribute and character for this case spaces for clear screen 2bytes */
+CURSOROFFSET_HI = 14
+CURSOROFFSET_LO = 15
+
 .text
 .global clears
 .global putc

@@ -7,18 +7,21 @@ IMPALA_ROOT = $(IMPALA_DRIVERDIR)/../
 IMPALA_INCLUDEDIR = IMPALA_ROOT/include
 endif
 
-AS = as --32
-CPP = cpp -nostdinc 
+AS = as --32 -I $(IMPALA_INCLUDEDIR)
 
 
-all: $(CONFIGURE) monitor.o
+all: $(CONFIGURE) monitor.o ps2.o keyboard.o 
 
 
-monitor.o: monitor.S
-	$(AS) monitor.S -o $@
 
-monitor.S: monitor.s
-	$(CPP) monitor.s -o $@
+ps2.o: ps2.s
+	$(AS) $< -o $@
+
+keyboard.o: keyboard.s
+	$(AS) $< -o $@
+
+monitor.o: monitor.s
+	$(AS) $< -o $@
 
 config:
 	echo "IMPALA_DRIVERDIR="$(IMPALA_DRIVERDIR) > config.txt

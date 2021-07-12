@@ -13,17 +13,17 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
 libs = lib/port.o lib/mem.o
-drivers = drivers/monitor.o
+drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard.o
 
 LINKSCRIPT = linkscript.ld
 
 CFLAGS = -nostdinc -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
 
 LD = ld
-AS = as --32 
+AS = as --32 -I $(IMPALA_INCLUDEDIR)
 CC = gcc 
 
-LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000
+LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000 -Map=System.map
 
 
 all: $(CONFIGURE) impala.img
@@ -80,5 +80,6 @@ clean:
 	rm -f *.img
 	rm -f *.S
 	rm -f config*
+	rm -f *.map
 	$(MAKE) -C $(IMPALA_LIBDIR) clean
 	$(MAKE) -C $(IMPALA_DRIVERDIR) clean
