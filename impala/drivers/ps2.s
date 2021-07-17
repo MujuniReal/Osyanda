@@ -23,18 +23,18 @@ _initps2:
 	/* 2 Flush the output buffer */
 	/* keep on polling bit 0 from the status register of the PS2 controller */
 	/* drop a while loop that keeps asking for data from the data port 0x60 as you check the status register until bit 0 of status is set to 0 */
-	check_ps2outbuff:	
-		inportb PS2_DATAPORT			/* get useless data that might have remained in the output buffer */
-		inportb PS2_STATUSPORT			/* querry status byte into %al register */
-		test $0x1,%al				/* check whether bit zero is set to zero */
-		jnz check_ps2outbuff
+check_ps2outbuff:	
+	inportb PS2_DATAPORT			/* get useless data that might have remained in the output buffer */
+	inportb PS2_STATUSPORT			/* querry status byte into %al register */
+	test $0x1,%al				/* check whether bit zero is set to zero */
+	jnz check_ps2outbuff
 
 	/* we proceed with getting, and later or setting the ps2 controller configuration byte */
 	outportb 0x20 PS2_CMDPORT
-	getps2stat:	
-		inportb PS2_STATUSPORT
-		test $0x1,%al				/* check whether data has arrived on PS2_DATAPORT data port */
-		jz getps2stat
+getps2stat:	
+	inportb PS2_STATUSPORT
+	test $0x1,%al				/* check whether data has arrived on PS2_DATAPORT data port */
+	jz getps2stat
 	
 	/* theres data on the PS2_DATAPORT tobe fetched */
 	/* check whether bit 5 is enabled in the ps2 configuration*/
@@ -42,14 +42,14 @@ _initps2:
 	test $0x10,%al
 	jz onechannel			/* the code upon this jump means that the ps2 has only one channel ie supports one device on either keyboard or mouse for our system here it was set */
 	/* the code below here means that the PS2 controller has 2 channels ie keyboard and mouse */
-	onechannel:	
+onechannel:	
 		
-	/* next step is performing self controller test  send comand 0xaa, see if it returns 0x55 on sucess, 0xfc on fail*/
+/* next step is performing self controller test  send comand 0xaa, see if it returns 0x55 on sucess, 0xfc on fail*/
 	outportb 0xaa PS2_CMDPORT
-	checkbuffstat:	
-		inportb PS2_STATUSPORT
-		test $0x1,%al
-		jz  checkbuffstat
+checkbuffstat:	
+	inportb PS2_STATUSPORT
+	test $0x1,%al
+	jz  checkbuffstat
 	/* ready to query data from PS2_DATAPORT */
 	inportb PS2_DATAPORT
 	cmp $0xfc,%al
@@ -61,18 +61,18 @@ _initps2:
 	/* after sending the a8 command, read the config byte, this time bit 5 should be clear if its set then it cant be a dual channel ps2 */
 	outportb 0xa8 PS2_CMDPORT	/* activate the second ps2 channel */
 	outportb 0x20 PS2_CMDPORT
-	waitforbuff:	
+waitforbuff:	
 	inportb PS2_STATUSPORT
-		test $0x1,%al
-		jz waitforbuff
+	test $0x1,%al
+	jz waitforbuff
 	
 	inportb PS2_DATAPORT
 	test $0x10,%al 			/* result should be zero for the second ps channel tobe well up and running else that chanel dont exist */
 	jz onechannel2
 	jmp secondchannelup
-	onechannel2:
+onechannel2:
 	nop
-	secondchannelup:	/* disable the second channel again and finish step */
+secondchannelup:	/* disable the second channel again and finish step */
 	outportb 0xa7 PS2_CMDPORT	/* command to disable second channel */
 
 	/* next is to test the controller channels whether they are working */
@@ -97,8 +97,20 @@ _initps2:
 	or $0x3,%al			/* set bits 0 and 1 to imply that the two ps2 channels are up and working well */
 	outb %al,$PS2_CMDPORT		/* set the config byte */
 	
-	
-	
+
+	nop
+	outportb 0xf5 PS2_CMDPORT
+	inportb PS2_STATUSPORT
+	nop
+	inportb PS2_DATAPORT
+	nop
+	nop
+	nop
+	outportb 0xfa PS2_CMDPORT
+	inportb PS2_STATUSPORT
+	nop
+	inportb PS2_DATAPORT
+	nop
 	
 	
 	

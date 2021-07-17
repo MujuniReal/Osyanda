@@ -1,5 +1,5 @@
-#include "include/system.h"
-#include "include/irq.h"
+#include "system.h"
+#include "irq.h"
 
 extern void clears();
 extern uint8 putc(uint8);
@@ -30,3 +30,4 @@ void run_impala(){
 hang:
     goto hang;
 }
+ 
