@@ -15,6 +15,7 @@
 	push $\isr_addr
 	push $\introffset
 	call set_idt_interrupt_gate
+	add $0x8,%esp				/* always dont forget to put back our stack in its original position */
 	.endm
 	
 install_isr:
@@ -53,7 +54,7 @@ install_isr:
 	setidt_intrpt 224 isr28
 	setidt_intrpt 232 isr29
 	setidt_intrpt 240 isr30
-	setidt_intrpt 248 isr31
+	setidt_intrpt 248 isr31 
     
 	ret
     

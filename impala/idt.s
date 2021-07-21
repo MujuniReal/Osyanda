@@ -5,6 +5,7 @@
 	CS_SELECTOR_GDT = 0x8
 	.comm idt, 2048
 	.text
+	.global idt
 	.global setup_idt
 	.global set_idt_interrupt_gate
 	.global set_idt_task_gate
@@ -19,7 +20,7 @@ setup_idt:
 	/* Set the IDT Pointer */
 	lea (idtp),%esi
 	movw $IDTLIMIT,(%esi)
-	movl $idt,%edx
+	mov $idt,%edx
 	mov %edx,0x2(%esi)
 
 	/* Fill the IDT with zeros */
@@ -48,10 +49,8 @@ set_idt_interrupt_gate:
 	push %ebx				/* third arg offset of idt entry*/
 	call set_idt_entry
 
-	pop %ebx
-	pop %edx
-	pop %eax
-	
+	add $0xc,%esp				/* Put back our stack */
+
 	ret
 	.endfunc
 
@@ -64,9 +63,7 @@ set_idt_task_gate:
 	push %ebx				/* third arg */
 	call set_idt_entry
 
-	pop %ebx
-	pop %edx
-	pop %eax
+	add $0xc,%esp
 
 	ret
 	.endfunc
