@@ -105,6 +105,7 @@ void install_interrupt_handler(uint8 irq, void (*interrupthandler)(GP_REGISTERS 
 void interrupt_handler(GP_REGISTERS *gpregs){
 
     /* beware function declaration below blank function pointer*/
+    /* it takes in an arguement of GP_REGISTERS */
     void (*interrupthandler)(GP_REGISTERS *gpregs);
 
 

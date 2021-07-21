@@ -24,59 +24,69 @@ install_isr:
 	//lea (idt),%edi
 	
 	setidt_intrpt 0  isr0		/* setidt_intrpt offset/location in idt isr */
-	setidt_intrpt 8   isr1
-	setidt_intrpt 16  isr2
-	setidt_intrpt 24  isr3
-	setidt_intrpt 32  isr4
-	setidt_intrpt 40  isr5
-	setidt_intrpt 48  isr6
-	setidt_intrpt 56  isr7
-	setidt_intrpt 64  isr8
-	setidt_intrpt 72  isr9
-	setidt_intrpt 80  isr10
-	setidt_intrpt 88  isr11
-	setidt_intrpt 96  isr12
-	setidt_intrpt 104 isr13
-	setidt_intrpt 112 isr14
-	setidt_intrpt 120 isr15
-	setidt_intrpt 128 isr16
-	setidt_intrpt 136 isr17
-	setidt_intrpt 144 isr18
-	setidt_intrpt 152 isr19
-	setidt_intrpt 160 isr20
-	setidt_intrpt 168 isr21
-	setidt_intrpt 176 isr22
-	setidt_intrpt 184 isr23
-	setidt_intrpt 192 isr24
-	setidt_intrpt 200 isr25
-	setidt_intrpt 208 isr26
-	setidt_intrpt 216 isr27
-	setidt_intrpt 224 isr28
-	setidt_intrpt 232 isr29
-	setidt_intrpt 240 isr30
-	setidt_intrpt 248 isr31 
+	setidt_intrpt 1  isr1
+	setidt_intrpt 2  isr2
+	setidt_intrpt 3  isr3
+	setidt_intrpt 4  isr4
+	setidt_intrpt 5  isr5
+	setidt_intrpt 6  isr6
+	setidt_intrpt 7  isr7
+	setidt_intrpt 8  isr8
+	setidt_intrpt 9  isr9
+	setidt_intrpt 10 isr10
+	setidt_intrpt 11 isr11
+	setidt_intrpt 12 isr12
+	setidt_intrpt 13 isr13
+	setidt_intrpt 14 isr14
+	setidt_intrpt 15 isr15
+	setidt_intrpt 16 isr16
+	setidt_intrpt 17 isr17
+	setidt_intrpt 18 isr18
+	setidt_intrpt 19 isr19
+	setidt_intrpt 20 isr20
+	setidt_intrpt 21 isr21
+	setidt_intrpt 22 isr22
+	setidt_intrpt 23 isr23
+	setidt_intrpt 24 isr24
+	setidt_intrpt 25 isr25
+	setidt_intrpt 26 isr26
+	setidt_intrpt 27 isr27
+	setidt_intrpt 28 isr28
+	setidt_intrpt 29 isr29
+	setidt_intrpt 30 isr30
+	setidt_intrpt 31 isr31 
     
 	ret
     
 
 //void fault_checker(GP_REGISTERS *regs)    
 fault_checker:
+	mov %esp,%ebp
     /* offset of location of interrupt number from the global structure of pushed registers */
-    /* check if interrupt number is less than 32 if so, print message tobe fetched from */
+	/* check if interrupt number is less than 32 if so, print message tobe fetched from */
 
-    /* fetch interrupt number */
-    mov INTRNO_OFFSET(%esp),%eax
-    /* check if initiated interrupt is less than 32 */
-    cmp $32, %eax
-    jge  hang
-    lea (exception_msgs),%esi
-    add %eax,%esi
-    push %esi
-    //call puts
-    pop %esi
-    push (halt_msg)
-    //call puts
-    pop  (halt_msg)
+	push %edi
+	push %esi
+	
+	/* fetch interrupt number */
+	/* The essence of ebp/ the neccessity of ebp comes in here ive thought of it to locate the variables that were parsed change this in the future*/
+	mov 0x4(%ebp),%esi			/* capture the parsed structure of registers and other segments */
+	mov INTRNO(%esi),%eax
+	/* check if initiated interrupt is less than 32 */
+	cmp $32, %eax
+	jge  hang
+	
+	
+	lea (exception_msgs),%edi
+	add %eax,%edi			/* find the error message */
+	push %edi
+	call puts				
+	push (halt_msg)
+	call puts
+	add $0x8,%esp			/* discard error strings from stack */
+
+	pop %esi
+	pop %edi
 
     hang:
         jmp hang

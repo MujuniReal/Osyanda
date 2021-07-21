@@ -1,4 +1,22 @@
 /*
+
+
+typedef struct {
+    uint16 interrupthandler_lo;     Low 2bytes of location of interrupt handler 
+    uint16 code_segment_selector;   Index of code segment descriptor in gdt 
+    uint8  zero;                    Always set to zero 
+    uint8  entry_attrib;             idt entry attributes; defines gate type, storage segment, privilleges, presence of idt entry 
+    uint16 interrupthandler_hi;      High 2bytes of location of interrupt handler 
+} __attribute__((packed)) IDTENTRY;
+
+
+typedef struct {
+    uint16 idt_size;                 size/limit of idt, ensure to subtract 1 when declaring this, to avoid +1 - errors
+    uint32 idt_location;            base/location of idt in memory (absolute) 
+}__attribute__((packed)) IDTPOINTER;
+  
+
+
 typedef struct{
     uint32 gs, fs, es, ds;
     uint32 edi, esi, ebp, esp, ebx, edx, ecx, eax;
@@ -7,25 +25,25 @@ typedef struct{
 
 }GP_REGISTERS;
 */
-GS_OFFSET = 4
-FS_OFFSET = 8
-ES_OFFSET = 12
-DS_OFFSET = 16
-EDI_OFFSET = 20
-ESI_OFFSET = 24
-EBP_OFFSET = 28
-ESP_OFFSET = 32
-EBX_OFFSET = 36
-EDX_OFFSET = 40
-ECX_OFFSET = 44
-EAX_OFFSET = 48
-INTRNO_OFFSET = 52
-INTRERRCODE_OFFSET = 56
-EIP_OFFSET = 60
-CS_OFFSET = 64
-EFLAGS_OFFSET = 68
-OLDESP_OFFSET = 72
-SS_OFFSET = 76
+R_GS = 0
+R_FS = 4
+R_ES = 8
+R_DS = 12
+R_EDI = 16
+R_ESI = 20
+R_EBP = 24
+R_ESP = 28
+R_EBX = 32
+R_EDX = 36
+R_ECX = 40
+R_EAX = 44
+INTRNO = 48
+INTRERRCODE = 52
+R_EIP = 56
+R_CS = 60
+R_EFLAGS = 64
+R_OLDESP = 68
+R_SS = 72
 
 
 

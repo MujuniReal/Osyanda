@@ -6,14 +6,16 @@ run_impala:
 	cli
 	call setup_idt
 	call install_isr
-	sti
+	call install_irqs
+//	sti
+
 	call clears
-	push %esi
-	lea (welcome_str),%esi
-	push %esi
+	
+	push $welcome_str
 	call puts
+	
 	add $0x4,%esp
-	pop %esi
+	
 	nop
 	nop
 

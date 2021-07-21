@@ -37,10 +37,12 @@ assembly: main_s.s idt.s kernel.s isr.s isr_s.s
 	$(AS) idt.s -o idt.o
 	$(AS) isr_s.s -o isr_s.o
 	$(AS) isr.s -o isr.o
+	$(AS) irq_s.s -o irq_s.o
+	$(AS) irq.s -o irq.o
 	$(AS) kernel.s -o kernel.o
 	$(MAKE) -C drivers/ monitor.o
 	$(MAKE) -C lib/ mem.o
-	$(LD) $(LDFLAGS) kernel.o main_s.o idt.o isr_s.o isr.o drivers/monitor.o lib/mem.o -o impala.img
+	$(LD) $(LDFLAGS) kernel.o main_s.o idt.o isr_s.o irq.o irq_s.o isr.o drivers/monitor.o lib/mem.o -o impala.img
 
 $(libs):
 	$(MAKE) -C $(IMPALA_LIBDIR)
@@ -49,30 +51,28 @@ $(drivers):
 	$(MAKE) -C $(IMPALA_DRIVERDIR)
 
 io.o: io.c
-	$(CC) $(CFLAGS) io.c -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 irq_s.o: irq_s.s
-	$(AS) irq_s.s -o $@
+	$(AS) $< -o $@
 
 irq.o: irq.c 
-	$(CC) $(CFLAGS) irq.c -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 isr_s.o: isr_s.s
-	$(AS) isr_s.s -o $@
+	$(AS) $< -o $@
 
-isr.o: isr.c include/types.h include/system.h include/idt.h
-	#$(CPP) isr.s -o isr.S
-	#$(AS) isr.S -o $@
-	$(CC) $(CFLAGS) isr.c -o $@
+isr.o: isr.s include/idt_s.h
+	$(AS) $< -o $@
 
 idt.o: idt.c include/system.h
-	$(CC) $(CFLAGS) idt.c -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 main.o: main.c include/system.h
-	$(CC) $(CFLAGS) main.c -o $@
+	$(CC) $(CFLAGS) $< -o $@
 
 kernel.o: kernel.s
-	$(AS) kernel.s -o $@
+	$(AS) $< -o $@
 
 
 config:

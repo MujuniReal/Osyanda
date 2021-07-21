@@ -57,7 +57,7 @@ prepregs_irq:
     mov %ax,%fs
     mov %ax,%gs
     mov %esp,%eax
-    push %eax
+    push %eax		/* This statement stores all of them pushed items as a structure on the stack  before calling the function a way of parsing a structure as an arguement */
 
     /* Load the C function that deals with priting the exception on screen */
     lea (interrupt_handler),%eax

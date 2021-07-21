@@ -1,5 +1,6 @@
 	.code32
 	IDTLIMIT = 2047			/* 2048 minus 1 */
+	IDTENTRY_SIZE = 8
 	IDT_INTERRUPT_GATE = 0x8e
 	IDT_INTERRUPT_TASK_GATE = 0x8f
 	CS_SELECTOR_GDT = 0x8
@@ -71,15 +72,24 @@ set_idt_task_gate:
 	.func set_idt_entry
 set_idt_entry:
 //	CS_SELECTOR_GDT
+	xor %eax,%eax
+	xor %ebx,%ebx
+
+	/* Calculate the location of the interrupt in the idt */
+	movb 4(%esp),%bl		/* last arg in edx the interrupt id */
+	movw $IDTENTRY_SIZE,%ax
+	mul %bl
+
+	mov %eax,%edx			/* Finally we have the displacement of the interrupt in the idt */
 	
-	mov 12(%esp),%eax	/* put first arg in eax */
-	mov 8(%esp),%ebx	/* second arg task/interrupt attribute*/
-	mov 4(%esp),%edx		/* last arg in edx the displacement of entry in idt*/
+	mov 12(%esp),%eax		/* put first arg in eax */
+	mov 8(%esp),%ebx		/* second arg task/interrupt attribute*/
+
 
 	push %edi
 	lea (idt),%edi
 
-	add %edx,%edi		/* make our pointer point to the victim area to set our interrupt */
+	add %edx,%edi			/* make our pointer point to the victim area to set our interrupt */
 	
 	movw %ax,(%edi)			/* isr low 2 bytes */
 	movw $CS_SELECTOR_GDT,0x2(%edi)	/* code segment selector 2bytes */
