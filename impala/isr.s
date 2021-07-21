@@ -1,54 +1,61 @@
-.code32
+
+	.code32
 	
-.include "idt_s.h"
+	.include "idt_s.h"
+
+	INTERRUPT_SIZE = 8				/* An interrupt weighs 8bytes */
 	
-.text
-.global install_exception_handlers
-.global fault_checker
+	.text
+	
+	.global install_isr
+	.global fault_checker
 
+	.macro setidt_intrpt introffset isr_addr
+	/* using the calling scheme of function (3,2,1,0) push 0, push1 ..... */
+	push $\isr_addr
+	push $\introffset
+	call set_idt_interrupt_gate
+	.endm
+	
+install_isr:
 
-
-.macro exception_handler exnum handler
-    push \handler
-    push $\exnum
-    call set_idt_interrupt_gate
-.endm
-
-install_exception_handlers:
-    exception_handler 0 isr0
-    exception_handler 1 isr1
-    exception_handler 2 isr2
-    exception_handler 3 isr3
-    exception_handler 4 isr4
-    exception_handler 5 isr5
-    exception_handler 6 isr6
-    exception_handler 7 isr7
-    exception_handler 8 isr8
-    exception_handler 9 isr9
-    exception_handler 10 isr10
-    exception_handler 11 isr11
-    exception_handler 12 isr12
-    exception_handler 13 isr13
-    exception_handler 14 isr14
-    exception_handler 15 isr15
-    exception_handler 16 isr16
-    exception_handler 17 isr17
-    exception_handler 18 isr18
-    exception_handler 19 isr19
-    exception_handler 20 isr20
-    exception_handler 21 isr21
-    exception_handler 22 isr22
-    exception_handler 23 isr23
-    exception_handler 24 isr24
-    exception_handler 25 isr25
-    exception_handler 26 isr26
-    exception_handler 27 isr27
-    exception_handler 28 isr28
-    exception_handler 29 isr29
-    exception_handler 30 isr30
-    exception_handler 31 isr31
+	/* Load the location of the idt so that we put the 32 interrupts for CPU */
+	//lea (idt),%edi
+	
+	setidt_intrpt 0  isr0		/* setidt_intrpt offset/location in idt isr */
+	setidt_intrpt 8   isr1
+	setidt_intrpt 16  isr2
+	setidt_intrpt 24  isr3
+	setidt_intrpt 32  isr4
+	setidt_intrpt 40  isr5
+	setidt_intrpt 48  isr6
+	setidt_intrpt 56  isr7
+	setidt_intrpt 64  isr8
+	setidt_intrpt 72  isr9
+	setidt_intrpt 80  isr10
+	setidt_intrpt 88  isr11
+	setidt_intrpt 96  isr12
+	setidt_intrpt 104 isr13
+	setidt_intrpt 112 isr14
+	setidt_intrpt 120 isr15
+	setidt_intrpt 128 isr16
+	setidt_intrpt 136 isr17
+	setidt_intrpt 144 isr18
+	setidt_intrpt 152 isr19
+	setidt_intrpt 160 isr20
+	setidt_intrpt 168 isr21
+	setidt_intrpt 176 isr22
+	setidt_intrpt 184 isr23
+	setidt_intrpt 192 isr24
+	setidt_intrpt 200 isr25
+	setidt_intrpt 208 isr26
+	setidt_intrpt 216 isr27
+	setidt_intrpt 224 isr28
+	setidt_intrpt 232 isr29
+	setidt_intrpt 240 isr30
+	setidt_intrpt 248 isr31
     
-    ret
+	ret
     
 
 //void fault_checker(GP_REGISTERS *regs)    
@@ -64,10 +71,10 @@ fault_checker:
     lea (exception_msgs),%esi
     add %eax,%esi
     push %esi
-    call puts
+    //call puts
     pop %esi
     push (halt_msg)
-    call puts
+    //call puts
     pop  (halt_msg)
 
     hang:

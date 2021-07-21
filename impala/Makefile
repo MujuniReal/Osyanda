@@ -32,6 +32,15 @@ all: $(CONFIGURE) impala.img
 impala.img: $(objs) $(libs) $(drivers)
 	$(LD) $(LDFLAGS)  $(objs) $(libs) $(drivers) -o $@
 
+assembly: main_s.s idt.s kernel.s isr.s isr_s.s 
+	$(AS) main_s.s -o main_s.o
+	$(AS) idt.s -o idt.o
+	$(AS) isr_s.s -o isr_s.o
+	$(AS) isr.s -o isr.o
+	$(AS) kernel.s -o kernel.o
+	$(MAKE) -C drivers/ monitor.o
+	$(MAKE) -C lib/ mem.o
+	$(LD) $(LDFLAGS) kernel.o main_s.o idt.o isr_s.o isr.o drivers/monitor.o lib/mem.o -o impala.img
 
 $(libs):
 	$(MAKE) -C $(IMPALA_LIBDIR)
