@@ -15,6 +15,7 @@
 	.text
 	.global install_irqs
 	.global interrupt_handler
+	.global install_interrupt_handler
 
 
 

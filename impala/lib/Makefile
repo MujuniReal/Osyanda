@@ -13,17 +13,11 @@ AS = as --32
 CFLAGS = -nostdinc -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 
 
-all: $(CONFIGURE) mem.o port.o
+all: $(CONFIGURE) mem.o
 
 
 mem.o: mem.s
 	$(AS) mem.s -o $@
-
-port.o: port.c
-	$(CC) $(CFLAGS) port.c -o $@
-
-#mem.o: mem.c
-#	$(CC) -m32 -ggdb mem.c -o $@
 
 config:
 	echo "IMPALA_LIBDIR="$(IMPALA_LIBDIR) > config.txt
