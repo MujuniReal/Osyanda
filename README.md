@@ -11,7 +11,7 @@ Crane bootloader - Bootloader
 #CraneBootloader
 The software that is starting the Operating system from the point of switching on your computer.
 
-Impala  	 - Kernel
+Impala  	 - Kernel 
 
 #Impala
 This is the Operating system itself, The fastest kernel on the planet, faster than linux. As fast as
