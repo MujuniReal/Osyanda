@@ -1,4 +1,5 @@
 	.code32
+//	.include "macros/port.h"
 	.text
 	.global run_impala
 
@@ -7,7 +8,7 @@ run_impala:
 	call setup_idt
 	call install_isr
 	call install_irqs
-//	sti
+	sti
 
 	call clears
 	
@@ -22,6 +23,7 @@ run_impala:
 hang:
 	jmp hang
 
+	
 	.data
 
 welcome_str:	.asciz "We are a Revolution\n"
