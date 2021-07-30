@@ -39,25 +39,7 @@ $(drivers):
 	$(MAKE) -C $(IMPALA_DRIVERDIR)
 
 
-irq_s.o: irq_s.s
-	$(AS) $< -o $@
-
-irq.o: irq.s
-	$(AS) $< -o $@
-
-isr_s.o: isr_s.s
-	$(AS) $< -o $@
-
-isr.o: isr.s include/idt_s.h
-	$(AS) $< -o $@
-
-idt.o: idt.s
-	$(AS) $< -o $@
-
-main.o: main.s
-	$(AS) $< -o $@
-
-kernel.o: kernel.s
+%.o: %.s
 	$(AS) $< -o $@
 
 

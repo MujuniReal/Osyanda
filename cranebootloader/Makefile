@@ -12,6 +12,7 @@ endif
 CC = gcc -m32 -Wall
 CFLAGS = -I $(CRANE_INCLUDEDIR) -c
 
+objs = main.o crane_prep-disk.o
 
 all: $(CONFIGURE) crane-disk crane.mbr cranebl.img
 
@@ -24,14 +25,11 @@ cranebl.img:
 	$(MAKE) -C $(CRANE_STAGE2DIR)
 	cp $(CRANE_STAGE2DIR)/stage2.img $(CRANE_ROOT)/$@
 
-crane-disk: main.o crane_prep-disk.o
+crane-disk: $(objs)
 	$(CC) $^ -o $@
 
 
-main.o: main.c
-	$(CC) $(CFLAGS) $< -o $@
-
-crane_prep-disk.o: crane_prep-disk.c
+%.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
 

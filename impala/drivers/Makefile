@@ -9,18 +9,12 @@ endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 
+objs = monitor.o ps2.o keyboard.o
 
-all: $(CONFIGURE) monitor.o ps2.o keyboard.o 
+all: $(CONFIGURE) $(objs)
 
 
-
-ps2.o: ps2.s
-	$(AS) $< -o $@
-
-keyboard.o: keyboard.s
-	$(AS) $< -o $@
-
-monitor.o: monitor.s
+%.o: %.s
 	$(AS) $< -o $@
 
 config:
