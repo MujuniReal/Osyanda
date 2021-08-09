@@ -1,11 +1,16 @@
 /* code in here initializes the ps2 controller */
-.code32
-.include "macros/port.h"
-PS2_STATUSPORT	= 0x64
-PS2_CMDPORT	= 0x64
-PS2_DATAPORT	= 0x60
-.text
-.global _initps2
+	.code32
+	.include "macros/port.h"
+	PS2_STATUSPORT	= 0x64
+	PS2_CMDPORT	= 0x64
+	PS2_DATAPORT	= 0x60
+
+	PS2_DEV1CMD = 0x60
+	PS2_DEV1STATUS = 0x64
+	PS2_DEV1DATA = 0x60
+
+	.text
+	.global _initps2
 	
 _initps2:
 	//push %esi
@@ -98,23 +103,41 @@ secondchannelup:	/* disable the second channel again and finish step */
 	outb %al,$PS2_CMDPORT		/* set the config byte */
 	
 
-	nop
-	outportb 0xf5 PS2_CMDPORT
-	inportb PS2_STATUSPORT
-	nop
-	inportb PS2_DATAPORT
-	nop
-	nop
-	nop
-	outportb 0xfa PS2_CMDPORT
-	inportb PS2_STATUSPORT
-	nop
-	inportb PS2_DATAPORT
-	nop
-	
-	
-	
 
+wait_for_write:
+	inportb PS2_STATUSPORT
+	test $0x2,%al
+	jnz wait_for_write
+	
+	outportb 0xf5 PS2_DEV1CMD
+
+read_ackno:	
+	inportb PS2_DATAPORT
+	cmp $0xfa,%al
+	jnz read_ackno			/* Loop to wait for acknoledgement */
+
+	push $ps2status_success
+	call puts
+	add $0x4,%esp
+
+wait_for_write2:
+	inportb PS2_STATUSPORT
+	test $0x2,%al
+	jnz wait_for_write2
+	
+	outportb 0xf2 PS2_DEV1CMD
+
+wait_fa:
+	inportb PS2_DEV1CMD
+	cmp $0xfa,%al
+	jnz wait_fa
+
+wait_not_fa:
+	inportb PS2_DEV1CMD
+	cmp $0xfa,%al
+	jz wait_not_fa
+
+	call init_keyboard
 	
 	ret
 
@@ -125,3 +148,4 @@ failed_to_perform_controller_test:
 ps2status_initiating:	.asciz "[impala] Initializing Keyboard and mouse\n"
 ps2status_success:	.asciz "[impala] Done\n"
 ps2status_failed:	.asciz "[impala] Failed to initialize keyboard and mouse\n"
+ps2_done_stat:	.asciz "[impala] Done Receiveing the Config byte\n"

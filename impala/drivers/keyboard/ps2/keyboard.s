@@ -49,24 +49,8 @@ init_keyboard:
 	push $KYBD_DATA		/* Port to wait acknowledgement on */
 	call wait_kybd_stat
 	add $0x8,%esp
-	
+
 	push $succ_msg_keybd
-	call puts
-	add $0x4,%esp
-
-get_key:
-	inportb KYBD_DATA
-	cmp $0xfa,%al
-	jz get_key
-
-	push %eax
-	push $KYBD_DATA
-	call wait_kybd_stat
-	add $0x8,%esp
-
-
-print_stat_key:	
-	push $diff_key
 	call puts
 	add $0x4,%esp
 
@@ -115,4 +99,3 @@ end_wait_for_write_kybd:
 	.data
 
 succ_msg_keybd:	.asciz "[impala] Keyboard Sucessfully Initialized\n"
-diff_key:	.asciz "Different key pressed\n"
