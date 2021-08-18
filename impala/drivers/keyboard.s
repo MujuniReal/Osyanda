@@ -54,21 +54,76 @@ init_keyboard:
 	call puts
 	add $0x4,%esp
 
+
+
+	
 get_key:
 	inportb KYBD_DATA
 	cmp $0xfa,%al
 	jz get_key
 
+
 	push %eax
-	push $KYBD_DATA
-	call wait_kybd_stat
-	add $0x8,%esp
-
-
-print_stat_key:	
-	push $diff_key
-	call puts
+wait_key_b:
+	inportb KYBD_DATA
+	pop %ebx
+	push %ebx
+	cmp %al,%bl
+	jz wait_key_b
+	
+	pop %eax
+	push %eax
+	push %edi
+	mov $asci_keys,%edi
+	add %eax,%edi
+	xor %eax,%eax
+	movb (%edi),%al
+	pop %edi
+	push %eax
+	call putc
 	add $0x4,%esp
+	pop %eax		/* old character from kybd */
+	push %eax
+
+read_more:
+	inportb KYBD_DATA
+	pop %ebx
+	push %ebx
+	cmp %al,%bl
+	jz read_more
+
+	add $0x4,%esp
+	push %eax
+
+read_other_scaned:
+	inportb KYBD_DATA
+	pop %ebx
+	push %ebx
+	cmp %al,%bl
+	jz read_other_scaned
+
+	pop %eax
+	push %eax
+	push %edi
+	mov $asci_keys,%edi
+	add %eax,%edi
+	xor %eax,%eax
+	movb (%edi),%al
+	pop %edi
+	push %eax
+	call putc
+	add $0x4,%esp
+	pop %eax
+	push %eax
+	jmp read_more
+	
+
+	
+keyboard_program:
+	
+
+
+
 
 end_init_keyboard:	
 	ret
@@ -116,3 +171,89 @@ end_wait_for_write_kybd:
 
 succ_msg_keybd:	.asciz "[impala] Keyboard Sucessfully Initialized\n"
 diff_key:	.asciz "Different key pressed\n"
+arrv_mes:	.asciz "Scancode arrived\n"
+asci_keys:
+key_nothing: .byte 0x00
+key_0: .byte 0x00			
+key_1: .byte 0x31
+key_2: .byte 0x32
+key_3: .byte 0x33
+key_4: .byte 0x34
+key_5: .byte 0x35
+key_6: .byte 0x36
+key_7: .byte 0x37
+key_8: .byte 0x38
+key_9: .byte 0x39
+key_10: .byte 0x30
+key_11: .byte 0x2d
+key_12: .byte 0x3d
+key_13: .byte 0x08
+key_14: .byte 0x09
+key_15: .byte 0x71
+key_16: .byte 0x77
+key_17: .byte 0x65
+key_18: .byte 0x72
+key_19: .byte 0x74
+key_20: .byte 0x79
+key_21: .byte 0x75
+key_22: .byte 0x69
+key_23: .byte 0x6f
+key_24: .byte 0x70
+key_25: .byte 0x5b
+key_26: .byte 0x5d
+key_27: .byte 0x0d
+key_28: .byte 0x00 	
+key_29: .byte 0x61
+key_30: .byte 0x73
+key_31: .byte 0x64
+key_32: .byte 0x66
+key_33: .byte 0x67
+key_34: .byte 0x68
+key_35: .byte 0x6a
+key_36: .byte 0x6b
+key_37: .byte 0x6c
+key_38: .byte 0x3b
+key_39: .byte 0x27
+key_40: .byte 0x60
+key_41: .byte 0x00		
+key_42: .byte 0x5c
+key_43: .byte 0x7a
+key_44: .byte 0x78
+key_45: .byte 0x63
+key_46: .byte 0x76
+key_47:	.byte 0x62
+key_48: .byte 0x6e
+key_49: .byte 0x6d
+key_50: .byte 0x2c
+key_51: .byte 0x2e
+key_52: .byte 0x2f
+key_53: .byte 0x0	
+key_54: .byte 0x0	 
+key_55: .byte 0x0		
+key_56: .byte 0x20
+key_57: .byte 0x00		
+key_58: .byte 0x00		
+key_59: .byte 0x00		
+key_60: .byte 0x00		
+key_61: .byte 0x00		
+key_62: .byte 0x00		
+key_63: .byte 0x00		
+key_64: .byte 0x00		
+key_65: .byte 0x00		
+key_66:	.byte 0x00		
+key_67: .byte 0x00		
+key_68: .byte 0x00		 
+key_69: .byte 0x00		
+key_70: .byte 0x00		
+key_71: .byte 0x00		
+key_72:	.byte 0x00		
+key_73: .byte 0x00		
+key_74: .byte 0x00		
+key_75: .byte 0x00		
+key_76: .byte 0x00		
+key_77: .byte 0x00		
+key_78: .byte 0x00		
+key_79: .byte 0x00		
+key_80: .byte 0x00		
+key_81: .byte 0x00		
+key_82: .byte 0x00		
