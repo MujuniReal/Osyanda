@@ -1,7 +1,7 @@
-.code32
-.text
-.global memset
-.global memsetw
+	.code32
+	.text
+	.global memset
+	.global memsetw
 
 
 //memset(uint8*,uint8,uint32)

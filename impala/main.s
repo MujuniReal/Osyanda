@@ -17,7 +17,15 @@ run_impala:
 	
 	add $0x4,%esp
 
-	call _initps2
+	//call _initps2
+	call initpit
+
+	push $aftr_sleep
+	call puts
+
+	add $0x4,%esp
+
+	
 
 
 //	outportb 0x12 0x43
@@ -44,3 +52,4 @@ hang:
 	.data
 
 welcome_str:	.asciz "We are a Revolution\n"
+aftr_sleep:	.asciz "After sleeping\n"
