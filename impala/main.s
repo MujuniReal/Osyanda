@@ -18,49 +18,12 @@ run_impala:
 	add $0x4,%esp
 
 	//call _initps2
-	call initpit
+	//call initpit
 
 	push $aftr_sleep
 	call puts
 
-	add $0x4,%esp
-
-	xor %eax,%eax
-	mov $0x1f6,%dx
-	out %al,(%dx)
-	mov $0x1f3,%dx
-	out %al,(%dx)
-	mov $0x1f4,%dx
-	out %al,(%dx)
-	mov $0x1f5,%dx
-	out %al,(%dx)
-	
-	mov $0x1,%al
-	mov $0x1f2,%dx
-	out %al,(%dx)
-	
-
-	push %edi
-	lea (disk_dat),%edi
-
-	//outportb 0x20 0x1f7
-	xor %edx,%edx
-	mov $0x1f7,%dx
-	mov $0x20,%al
-	out %al,(%dx)
-
-	xor %ecx,%ecx
-	xor %edx,%edx
-	mov $256,%ecx
-
-	mov $0x1f0,%dx
-
-	rep insw
-
-	nop
-	nop
-	
-	
+	add $0x4,%esp	
 
 //	outportb 0x12 0x43
 //	outportb 0x20 0x40
