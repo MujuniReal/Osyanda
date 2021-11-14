@@ -9,7 +9,7 @@ endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 
-objs = monitor.o ps2.o keyboard/ps2_kbd.o hardisk/hardisk.o
+objs = monitor.o ps2.o keyboard/keyboard.o hardisk/hardisk.o
 
 all: $(CONFIGURE) $(objs)
 
@@ -21,7 +21,7 @@ all: $(CONFIGURE) $(objs)
 hardisk/hardisk.o:
 	$(MAKE) -C hardisk
 
-keyboard/ps2_kbd.o:
+keyboard/keyboard.o:
 	$(MAKE) -C keyboard
 
 config:

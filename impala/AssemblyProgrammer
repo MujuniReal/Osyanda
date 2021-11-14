@@ -1,0 +1,35 @@
+setup_idt
+call setup_idt
+
+install_isr
+call install_isr
+
+install_irqs
+call install_irqs
+
+putc
+push (char c)
+call putc
+
+puts
+push (void *s)
+call puts
+
+clears
+call clears
+
+
+init_keyboard
+call init_keyboard
+
+memset
+push (int size)
+push (char c)
+push (void *s)
+call memset
+
+memsetw
+push (int size / 2)
+push (short int)
+push (void *s)
+call memsetw

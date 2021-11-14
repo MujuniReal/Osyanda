@@ -1,0 +1,12 @@
+void setup_idt()
+void install_isr()
+void install_irqs()
+
+putc(char c);
+puts(char *c);
+clears();
+
+void init_keyboard()
+
+memset(void *s, char c, int size);
+memsetw(void *s, short int, int size / 2);

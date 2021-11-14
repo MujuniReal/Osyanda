@@ -5,3 +5,5 @@ xcute -> substitute for execve in gnu/linux
 
 rdsk -> Read harddisk
 wrtdsk -> Write harddisk
+
+drop initialization guys that check whether its a ps2 installed, usb installed etc

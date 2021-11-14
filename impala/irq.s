@@ -92,17 +92,17 @@ install_interrupt_handler:
 	lea (interrupt_handlers),%edi
 
 	/* the essence of ebp change this in the future */
-	mov 0x4(%ebp),%edx		/* function pointer address */
+	mov 0x8(%ebp),%edx		/* function pointer address */
 	push %edx			/* Secure it for multilication */
 	
-	movb 0x8(%ebp),%al		/* chosen interrupt number */
+	movb 0x4(%ebp),%al		/* chosen interrupt number */
 	movb $0x4,%bl
 	mul %bl				/* calculate the location to store the interrupt */
 
 	pop %edx			/* retrieve it after multiplication */
 
 	add %eax,%edi
-	mov %edx,%edi			/* register the interrupt handler */
+	mov %edx,(%edi)			/* register the interrupt handler */
 
 	pop %edi
 	ret

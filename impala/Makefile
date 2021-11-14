@@ -13,7 +13,7 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
 libs = lib/mem.o lib/pit.o
-drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard.o
+drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard/keyboard.o
 
 LINKSCRIPT = linkscript.ld
 
