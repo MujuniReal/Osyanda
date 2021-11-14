@@ -26,7 +26,7 @@ rdsk:
 	
 
 	push %edi
-	lea (disk_dat),%edi
+//	lea (disk_dat),%edi
 
 	//outportb 0x20 0x1f7
 	xor %edx,%edx
@@ -37,7 +37,7 @@ rdsk:
 read_again:
 	in %dx,%al
 	test $0x8,%al
-	jz still_gg
+	jz read_again
 
 	nop
 	add $0x4,%esp

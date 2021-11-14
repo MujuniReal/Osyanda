@@ -2,30 +2,31 @@ ifeq (config.txt, $(wildcard config.txt))
 include config.txt
 else
 CONFIGURE = config
-IMPALA_DRIVERDIR = `pwd`
-IMPALA_ROOT = $(IMPALA_DRIVERDIR)/../
+HARDISK_DRIVERDIR = `pwd`
+IMPALA_ROOT = $(HARDISK_DRIVERDIR)/../../
 IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include
+IMPALA_DRIVERDIR = $(IMPALA_ROOT)/drivers/
 endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
+LD = ld -m elf_i386 -r
+objs = ide/rdsk.o ide/wrtdsk.o
 
-objs = monitor.o ps2.o keyboard/ps2_kbd.o hardisk/hardisk.o
-
-all: $(CONFIGURE) $(objs)
+all: $(CONFIGURE) $(objs) hardisk.o
 
 
 %.o: %.s
 	$(AS) $< -o $@
 
 
-hardisk/hardisk.o:
-	$(MAKE) -C hardisk
+hardisk.o: $(objs)
+	cp ide/rdsk.o $(HARDISK_DRIVERDIR)
+	cp ide/wrtdsk.o $(HARDISK_DRIVERDIR)
+	$(LD) $^ -o $@
 
-keyboard/ps2_kbd.o:
-	$(MAKE) -C keyboard
 
 config:
-	echo "IMPALA_DRIVERDIR="$(IMPALA_DRIVERDIR) > config.txt
+	echo "HARDISK_DRIVERDIR="$(HARDISK_DRIVERDIR) > config.txt
 	echo "IMPALA_ROOT="$(IMPALA_ROOT) >> config.txt
 	echo "IMPALA_INCLUDEDIR="$(IMPALA_INCLUDEDIR) >> config.txt
 	echo "IMPALA_DRIVERDIR="$(IMPALA_DRIVERDIR) >> config.txt
@@ -34,5 +35,5 @@ clean:
 	rm -f *.S
 	rm -f *.o
 	rm -f config*
-	$(MAKE) -C hardisk clean
-	$(MAKE) -C keyboard clean
+	$(MAKE) -C ide/ clean
+	$(MAKE) -C sata/ clean
