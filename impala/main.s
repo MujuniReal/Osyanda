@@ -16,13 +16,13 @@ run_impala:
 	call puts
 	add $0x4,%esp
 
-	mov $print_handler,%eax
-	push %eax
-	push $0x00
-	call install_interrupt_handler
+//	mov $print_handler,%eax
+//	push %eax
+//	push $0x00
+//	call install_interrupt_handler
 //	int $0x20
 	
-	add $0x8,%esp
+//	add $0x8,%esp
 
 	
 
@@ -51,17 +51,7 @@ run_impala:
 //	add $0x4,%esp
 
 hang:
-	call print_handler
-	nop
 	jmp hang
-
-
-print_handler:
-	push $intr_str
-	call puts
-	add $0x4,%esp
-	ret
-	
 
 
 	.bss
@@ -70,4 +60,3 @@ print_handler:
 	.data
 welcome_str:	.asciz "We are a Revolution\n"
 aftr_sleep:	.asciz "After sleeping\n"
-intr_str:	.asciz "Bro here I am ive been called thru an interrupt\n"

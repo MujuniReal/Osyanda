@@ -8,5 +8,7 @@ clears();
 
 void init_keyboard()
 
-memset(void *s, char c, int size);
-memsetw(void *s, short int, int size / 2);
+void memset(void *s, char c, int size);
+void memsetw(void *s, short int, int size / 2);
+
+void iread(char *s, int size)

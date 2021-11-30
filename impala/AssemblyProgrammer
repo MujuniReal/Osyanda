@@ -33,3 +33,8 @@ push (int size / 2)
 push (short int)
 push (void *s)
 call memsetw
+
+iread
+push size
+push char *
+call iread
