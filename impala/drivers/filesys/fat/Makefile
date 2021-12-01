@@ -19,7 +19,7 @@ HFILES = fs/fat16bpb.h
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
 
-objs = fat16/r_fat.o fat16/r_fatfile.o fat16/r_rootdir.o
+objs = fat16/fat16bpb.o fat16/r_fat.o fat16/r_fatfile.o fat16/r_rootdir.o
 
 all: $(CONFIGURE) $(objs) fat.o
 
@@ -27,6 +27,7 @@ all: $(CONFIGURE) $(objs) fat.o
 	$(AS) $< -o $@
 
 fat.o: $(objs)
+	cp fat16/fat16bpb.o $(FATFS_DRIVERDIR)
 	cp fat16/r_fat.o  $(FATFS_DRIVERDIR)
 	cp fat16/r_fatfile.o $(FATFS_DRIVERDIR)
 	cp fat16/r_rootdir.o $(FATFS_DRIVERDIR)

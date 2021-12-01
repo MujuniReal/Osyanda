@@ -17,12 +17,16 @@ run_impala:
 	add $0x4,%esp
 	
 	push $0x200
-//	lea (red_data),%edx
-	//	push %edx
+	//lea (red_data),%edx
+	//push %edx
 	push $red_data
 	call iread
 
 	add $0x8,%esp
+
+	call readfat
+
+	call readrootdir
 
 //	mov $print_handler,%eax
 //	push %eax
