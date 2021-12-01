@@ -9,7 +9,7 @@ endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 
-objs = monitor.o ps2.o keyboard/keyboard.o hardisk/hardisk.o
+objs = monitor.o ps2.o keyboard/keyboard.o hardisk/hardisk.o filesys/filesys.o
 
 all: $(CONFIGURE) $(objs)
 
@@ -24,6 +24,9 @@ hardisk/hardisk.o:
 keyboard/keyboard.o:
 	$(MAKE) -C keyboard
 
+filesys/filesys.o:
+	$(MAKE) -C filesys
+
 config:
 	echo "IMPALA_DRIVERDIR="$(IMPALA_DRIVERDIR) > config.txt
 	echo "IMPALA_ROOT="$(IMPALA_ROOT) >> config.txt
@@ -36,3 +39,4 @@ clean:
 	rm -f config*
 	$(MAKE) -C hardisk clean
 	$(MAKE) -C keyboard clean
+	$(MAKE) -C filesys clean

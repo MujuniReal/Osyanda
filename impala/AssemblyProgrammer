@@ -38,3 +38,8 @@ iread
 push size
 push char *
 call iread
+
+iopen
+push mode
+push char *filelocation
+call iopen

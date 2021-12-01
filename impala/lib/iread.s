@@ -16,7 +16,7 @@ iread:
 	push 0xc(%ebp)
 	push 0x8(%ebp)
 	call rdsk
-
+	/* With this scheme below, it saves us from bringing back the stack pointer */
 	mov %ebp,%esp
 	pop %ebp
 	ret

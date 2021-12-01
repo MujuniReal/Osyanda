@@ -3,6 +3,7 @@
 	//DSK_CMD
 	.text
 	.global lba
+	.global sects_to_read
 	.global rdsk
 
 rdsk:
@@ -41,14 +42,20 @@ rdsk:
 	mov $0x1f5,%dx
 	/* Send bits 16 - 23 to port */
 	out %al,%dx
-	
-	mov $0x1,%al
+
+	/* Number of sectors to read in %al */
+	//mov $0x1,%eax
+
+	mov sects_to_read,%eax
+	/* This subtraction is to cater for the overlapping maximum of 1byte since %al is the one able to send data to our controller
+	More research here is needed to look for a way of sending 2bytes or even more to the HDD controller */
+	sub $0x1,%eax
 	mov $0x1f2,%dx
 	out %al,%dx
 	
-
 	push %edi
-//	lea (disk_dat),%edi
+	mov 0x8(%ebp),%edx
+	lea (%edx),%edi
 
 	//outportb 0x20 0x1f7
 	xor %edx,%edx
@@ -94,4 +101,6 @@ read_again:
 
 	.data
 
+disk_dat:	.space 512, 0
 lba:	.int 0x0
+sects_to_read:	.int 0x0

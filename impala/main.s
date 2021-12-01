@@ -15,6 +15,14 @@ run_impala:
 	push $welcome_str
 	call puts
 	add $0x4,%esp
+	
+	push $0x200
+//	lea (red_data),%edx
+	//	push %edx
+	push $red_data
+	call iread
+
+	add $0x8,%esp
 
 //	mov $print_handler,%eax
 //	push %eax
@@ -58,5 +66,6 @@ hang:
 	.lcomm disk_dat, 512
 
 	.data
+red_data:	.space 512, 0
 welcome_str:	.asciz "We are a Revolution\n"
 aftr_sleep:	.asciz "After sleeping\n"

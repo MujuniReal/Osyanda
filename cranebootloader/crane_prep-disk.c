@@ -4,6 +4,7 @@
 
 #include <bpbsize.h>
 
+#include <string.h>
 
 /*#define JMPCODE_NOP_SIZE 3
 #define DEVOEM_STRSIZE 8
@@ -93,7 +94,15 @@ int fat1216prep_disk(char *fatbpb){
 
     //__asm__("movw (%%esi),%0":"=r" (FSType));
     //printf("jumpcode:\t.word 0x%x",jumpcode);
-    fprintf(Fathdrfile,"devOEM:\t.asciz \"%s\"\n",devOEM);
+    if(strlen(devOEM) == 8){
+       fprintf(Fathdrfile,"devOEM:\t.ascii \"%s\"\n",devOEM);
+    }
+    else{
+      // printf("Length = %d\n",strlen(devOEM));
+      /* If devOEM is having names with length 7 */
+      fprintf(Fathdrfile,"devOEM:\t.asciz \"%s\"\n",devOEM);
+    }
+  
     fprintf(Fathdrfile,"ByPSect:\t.word 0x%x\n",ByPSect);
     fprintf(Fathdrfile,"SectPClust:\t.byte 0x%x\n",SectPClust);
     fprintf(Fathdrfile,"ResSects:\t.word 0x%x\n",ResSects);

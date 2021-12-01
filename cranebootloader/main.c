@@ -18,19 +18,24 @@ int fat1216prep_disk(char*);
 
 
 int main(int argc,char **argv){
+
+	if(argc == 1){
+	  printf("Usage: %s path-to-disk-image ",argv[0]);
+		return 1;
+	}
     
-    char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
+	char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
 
-    FILE *diskmbrPTR;
-    diskmbrPTR = fopen(argv[1],"r");
+	FILE *diskmbrPTR;
+	diskmbrPTR = fopen(argv[1],"r");
 
-    fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
-    fclose(diskmbrPTR);
+	fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
+	fclose(diskmbrPTR);
 
-    fat1216prep_disk(Fatbpb);
+	fat1216prep_disk(Fatbpb);
 
 
-    free(Fatbpb);
+	free(Fatbpb);
 
     return 0;
 }
