@@ -3,6 +3,7 @@
 //	.global
 	.global readrootdir
 	.global rootdir_mem
+	.global rootdir_start
 	.text
 
 readrootdir:
@@ -18,6 +19,7 @@ readrootdir:
 	addw NHiddenSects,%eax
 	/* %eax has the start of the root directory */
 	mov %eax,lba
+	mov %eax,rootdir_start
 
 	xor %eax,%eax
 	movw NRootDirEs,%ax
@@ -43,4 +45,6 @@ readrootdir:
 	
 
 	.data
-rootdir_mem:	.space 16384, 0
+//Total size occupied by rootdirectory in bytes	
+rootdir_mem:	.space 16384, 0		
+rootdir_start:	.int 0x0

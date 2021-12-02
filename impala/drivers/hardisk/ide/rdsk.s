@@ -49,7 +49,7 @@ rdsk:
 	mov sects_to_read,%eax
 	/* This subtraction is to cater for the overlapping maximum of 1byte since %al is the one able to send data to our controller
 	More research here is needed to look for a way of sending 2bytes or even more to the HDD controller */
-	sub $0x1,%eax
+//	sub $0x1,%eax
 	mov $0x1f2,%dx
 	out %al,%dx
 	

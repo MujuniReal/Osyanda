@@ -43,3 +43,12 @@ iopen
 push mode
 push char *filelocation
 call iopen
+
+readfatfile
+push int size
+push void *dest
+push int filecluster
+call readfatfile
+
+rdsk
+push int size

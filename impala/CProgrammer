@@ -13,3 +13,5 @@ void memsetw(void *s, short int, int size / 2);
 
 void iread(char *s, int size)
 iopen(char *file-location, char *mode);
+
+void readfatfile(int filecluster, void *dest,int size);
