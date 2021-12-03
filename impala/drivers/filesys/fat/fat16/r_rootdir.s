@@ -36,6 +36,8 @@ readrootdir:
 	/* %eax has total sectors occupied by the root directory */
 	
 	mov %eax,sects_to_read
+	add lba,%eax
+	mov %eax,first_datacluster
 	push $rootdir_mem
 	call rdsk
 

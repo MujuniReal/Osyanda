@@ -15,8 +15,11 @@ readfat:
 	/* eax is bearing LBA of FAT */
 	mov %eax,lba
 	movw SectsPFat,%bx
+	cmp $0xff,%bx
+	jl set_sectors
+	sub $0x1,%bx
+set_sectors:
 	mov %ebx,sects_to_read
-
 	xor %ebx,%ebx
 	xor %eax,%eax
 	xor %edx,%edx

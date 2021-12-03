@@ -1,4 +1,5 @@
 	.code32
+	.global first_datacluster
 	.global readfatfile
 	.text
 
@@ -14,7 +15,7 @@ readfatfile:
 	movb SectPClust,%bl
 	mul %bx
 	
-	add rootdir_start,%eax
+	add first_datacluster,%eax
 	/* eax -> file cluster + rootdirstart */
 	mov %eax,lba
 	
@@ -40,3 +41,7 @@ cont_to_read:
 	mov %ebp,%esp
 	pop %ebp
 	ret
+
+	.data
+
+first_datacluster:	.int 0x0
