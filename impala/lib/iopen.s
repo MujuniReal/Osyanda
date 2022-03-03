@@ -12,9 +12,19 @@ iopen:
 	call readfat
 	call readrootdir
 
-check_rootir:
+check_rootdir:
 	
-	
+
+
+	xor %ecx,%ecx
+	push %esi
+	push %edi
+
+	mov $11,%cx
+	lea $0x8(%ebp),%edi
+	lea (rootdir_mem),%esi
+	//%ds:%esi -> rootdirmem
+	//es:%edi -> search phrase on stack
 
 	mov %ebp,%esp
 	pop %ebp

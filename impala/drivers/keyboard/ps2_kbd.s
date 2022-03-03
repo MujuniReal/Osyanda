@@ -110,9 +110,15 @@ read_other_scaned:
 	xor %eax,%eax
 	movb (%edi),%al
 	pop %edi
+
+	cmp $0x0,%eax
+	jz continue_
+	
 	push %eax
 	call putc
 	add $0x4,%esp
+	
+continue_:	
 	pop %eax
 	push %eax
 	jmp read_more

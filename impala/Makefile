@@ -13,6 +13,7 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
 libs = lib/mem.o lib/pit.o lib/iread.o
+progs = programs/lister.o programs/samples.o
 drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard/keyboard.o drivers/hardisk/hardisk.o drivers/filesys/filesys.o
 
 LINKSCRIPT = linkscript.ld
@@ -29,14 +30,17 @@ LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000 -Map=System.map
 all: $(CONFIGURE) impala.img
 
 
-impala.img: $(objs) $(libs) $(drivers)
-	$(LD) $(LDFLAGS)  $(objs) $(libs) $(drivers) -o $@
+impala.img: $(objs) $(libs) $(drivers) $(progs)
+	$(LD) $(LDFLAGS)  $^ -o $@
 
 $(libs):
 	$(MAKE) -C $(IMPALA_LIBDIR)
 
 $(drivers):
 	$(MAKE) -C $(IMPALA_DRIVERDIR)
+
+$(progs):
+	$(MAKE) -C programs
 
 
 %.o: %.s
@@ -60,3 +64,4 @@ clean:
 	rm -f *.map
 	$(MAKE) -C $(IMPALA_LIBDIR) clean
 	$(MAKE) -C $(IMPALA_DRIVERDIR) clean
+	$(MAKE) -C programs clean

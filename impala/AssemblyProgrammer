@@ -7,6 +7,12 @@ call install_isr
 install_irqs
 call install_irqs
 
+install_interrupt_handler
+push $handler_func
+push (int intr_num)
+call install_interrupt_handler
+
+
 putc
 push (char c)
 call putc
@@ -44,6 +50,12 @@ push mode
 push char *filelocation
 call iopen
 
+readfat
+call readfat
+
+readrootdir
+call readrootdir
+
 readfatfile
 push int size
 push void *dest
@@ -52,3 +64,5 @@ call readfatfile
 
 rdsk
 push int size
+push void *dest
+call rdsk
