@@ -20,7 +20,9 @@ run_impala:
 	
 	call _initps2
 
-//	call sample_func
+	//	call sample_func
+
+	//
 
 //	push $sample_func
 //	push $0x1
