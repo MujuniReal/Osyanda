@@ -13,7 +13,7 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
 libs = lib/mem.o lib/pit.o lib/iread.o
-progs = programs/lister.o programs/samples.o
+progs = programs/terminal.o
 drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard/keyboard.o drivers/hardisk/hardisk.o drivers/filesys/filesys.o
 
 LINKSCRIPT = linkscript.ld
@@ -24,7 +24,7 @@ LD = ld
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 CC = gcc 
 
-LDFLAGS =  -m elf_i386 --oformat binary -e _start -Ttext 0x60000 -Map=System.map
+LDFLAGS =  -m elf_i386 --oformat binary -T linkscript.ld -Map=System.map
 
 
 all: $(CONFIGURE) impala.img
@@ -32,6 +32,9 @@ all: $(CONFIGURE) impala.img
 
 impala.img: $(objs) $(libs) $(drivers) $(progs)
 	$(LD) $(LDFLAGS)  $^ -o $@
+
+impala.o: $(objs) $(libs) $(drivers) $(progs)
+	$(LD) -m elf_i386 -r $^ -T linkee.ld -Map=System.map -o $@
 
 $(libs):
 	$(MAKE) -C $(IMPALA_LIBDIR)
