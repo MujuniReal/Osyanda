@@ -50,6 +50,8 @@ run_impala:
 
 	//	call sample_func
 
+	call read_kybd
+
 	//
 
 //	push $sample_func

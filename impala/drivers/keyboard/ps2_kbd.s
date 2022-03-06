@@ -12,8 +12,8 @@
 
 	KYBD_SCAN_OFF = 0xf5
 	KYBD_SCAN_ON = 0xf4
-
-	
+	.global kybd_buff
+	.global read_kybd
 	.text
 	.global init_keyboard
 	
@@ -53,16 +53,20 @@ init_keyboard:
 	push $succ_msg_keybd
 	call puts
 	add $0x4,%esp
+	ret
 
 
-
+read_kybd:
+	xor %eax,%eax
+	push %edi
+	lea (kybd_buff),%edi
 	
-get_key:
+get_key:	
 	inportb KYBD_DATA
 	cmp $0xfa,%al
 	jz get_key
 
-
+	xor %ah,%ah
 	push %eax
 wait_key_b:
 	inportb KYBD_DATA
@@ -73,12 +77,12 @@ wait_key_b:
 	
 	pop %eax
 	push %eax
-	push %edi
-	mov $asci_keys,%edi
-	add %eax,%edi
+	push %esi
+	mov $asci_keys,%esi
+	add %eax,%esi
 	xor %eax,%eax
-	movb (%edi),%al
-	pop %edi
+	movb (%esi),%al
+	pop %esi
 	push %eax
 	call putc
 	add $0x4,%esp
@@ -113,7 +117,12 @@ read_other_scaned:
 
 	cmp $0x0,%eax
 	jz continue_
+
+	cmp $0x0d,%al		/* Check for Enter Key */
+	jz end_readkybd
+
 	
+	stosb			/* Store character in buffer */
 	push %eax
 	call putc
 	add $0x4,%esp
@@ -122,16 +131,20 @@ continue_:
 	pop %eax
 	push %eax
 	jmp read_more
+
+
+
+end_readkybd:
+	add $0x4,%esp		/* Clear the %eax on stack */
+	push $0x0a		/* Print new line */
+	call putc
+	add $0x4,%esp
+
+	push $kybd_buff
+	call puts
+	add $0x4,%esp
 	
-
-	
-keyboard_program:
-	
-
-
-
-
-end_init_keyboard:	
+	pop %edi
 	ret
 
 	
@@ -174,7 +187,7 @@ end_wait_for_write_kybd:
 
 
 	.data
-
+kybd_buff:	.space 512, 0
 succ_msg_keybd:	.asciz "[impala] Keyboard Sucessfully Initialized\n"
 diff_key:	.asciz "Different key pressed\n"
 arrv_mes:	.asciz "Scancode arrived\n"
