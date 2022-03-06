@@ -149,3 +149,7 @@ no_irq_handler:
 	//.section .bss	/* Assemble all code in this section to the bss
 interrupt_handlers: .space 64,0
 
+
+	.data
+
+intr_notfound:	.asciz "[impala] Interrupt not found\n"

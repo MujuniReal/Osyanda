@@ -92,7 +92,8 @@ fault_checker:
         jmp hang
 
 
-.data
+
+	.data
 
 halt_msg:   .asciz "System Halted !\n"
 

@@ -34,7 +34,7 @@ impala.img: $(objs) $(libs) $(drivers) $(progs)
 	$(LD) $(LDFLAGS)  $^ -o $@
 
 impala.o: $(objs) $(libs) $(drivers) $(progs)
-	$(LD) -m elf_i386 -r $^ -T linkee.ld -Map=System.map -o $@
+	$(LD) -m elf_i386 -r $^ -T linkscript.ld -Map=System.map -o $@
 
 $(libs):
 	$(MAKE) -C $(IMPALA_LIBDIR)

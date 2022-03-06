@@ -1,1 +1,4 @@
 Syscall interface / API
+
+reads and writes happen only when they have been told to,
+other than that, a file descriptor just exists with its subroutines quietly

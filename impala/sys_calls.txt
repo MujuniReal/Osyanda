@@ -1,0 +1,8 @@
+This file explains on how system calls of the kernel are called
+
+
+iread
+function number %eax
+first argument (int lba) %ebx
+second argument(char*) %ecx
+third argument(size) %edx
