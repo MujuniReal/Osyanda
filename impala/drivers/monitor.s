@@ -117,6 +117,14 @@ printc:
 		
 	xor %ax,%ax
 	movb 0x4(%esp),%al
+	cmp $0x1f,%al
+	jg non_special
+	push %eax
+	call handle_special_chars
+	pop %eax
+	ret
+
+non_special:	
 	movb $DEFAULT_ATTRIBUTE,%ah
 	stosw								/* Print the character */
 	//movw %ax,(VGA_ADDRESS)			/* Print the character */
