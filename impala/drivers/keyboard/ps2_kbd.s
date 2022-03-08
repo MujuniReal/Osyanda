@@ -14,8 +14,9 @@
 	KYBD_SCAN_ON = 0xf4
 //	.global kybd_buff
 	.global read_kybd
-	.text
 	.global init_keyboard
+	.text
+	
 	
 init_keyboard:	
 
@@ -53,7 +54,7 @@ init_keyboard:
 	push $succ_msg_keybd
 	call puts
 	add $0x4,%esp
-//	ret
+	ret
 
 
 read_kybd:
@@ -81,72 +82,15 @@ wait_key_b:
 	xor %eax,%eax
 	movb (%esi),%al
 	pop %esi
+	add $0x4,%esp
 	push %eax
 	call putc
-	add $0x4,%esp
-	pop %eax		/* old character from kybd */
-	push %eax
-
-read_more:
-	inportb KYBD_DATA
-	pop %ebx
-	push %ebx
-	cmp %al,%bl
-	jz read_more
-
-	add $0x4,%esp
-	push %eax
-
-read_other_scaned:
-	inportb KYBD_DATA
-	pop %ebx
-	push %ebx
-	cmp %al,%bl
-	jz read_other_scaned
-
-	pop %eax
-	push %eax
-	push %esi
-	mov $asci_keys,%esi
-	add %eax,%esi
-	xor %eax,%eax
-	movb (%esi),%al
-	pop %esi
-
-	cmp $0x0,%eax
-	jz continue_
-
-	cmp $0x0d,%al		/* Check for Enter Key */
-	jz end_readkybd
-
-	push %edi
-	lea (kybd_buff),%edi	
-	stosb			/* Store character in buffer */
-	pop %edi
-	push %eax
-	call putc
-	add $0x4,%esp
-	
-continue_:	
-	pop %eax
-	push %eax
-	jmp read_more
-
-
-
-end_readkybd:
-	add $0x4,%esp		/* Clear the %eax on stack */
-	push $0x0a		/* Print new line */
-	call putc
-	add $0x4,%esp
-
-//	push $kybd_buff
-//	call puts
 //	add $0x4,%esp
-	
-	ret
+	pop %eax		/* old character from kybd, return character in eax register */
 
-	
+
+end_it:	
+	ret
 
 	.func wait_kybd_stat
 
@@ -275,4 +219,4 @@ key_79: .byte 0x00
 key_80: .byte 0x00		
 key_81: .byte 0x00		
 key_82: .byte 0x00		
-kybd_buff:	.space 50, 0
+

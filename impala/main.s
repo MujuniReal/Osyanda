@@ -37,54 +37,19 @@ run_impala:
 	xor %ecx,%ecx
 	xor %edx,%edx
 
-	mov $0x2,%eax		/* Function number */
+//	mov $0x2,%eax		/* Function number */
 	/* lba %ebx leave as is */
-	mov $red_data,%ecx
-	mov $0x200,%edx		/* 512 bytes, that is size */
+//	mov $red_data,%ecx
+//	mov $0x200,%edx		/* 512 bytes, that is size */
 	
-	int $0x22
+//	int $0x22
 
 	nop
+	call _initps2
 
-	call _initps2	
-
-	//	call sample_func
-
-	call read_kybd
-
-	//
-
-//	push $sample_func
-//	push $0x1
-//	call install_interrupt_handler
-
-	nop
-	nop
-
-//	int $0x21
-
-	
-	nop
-	nop
-
-//	call _initps2
+	call terminal
 	
 
-//	push $sample_test
-//	call puts
-//	add $0x4,%esp
-//	call readfat
-//	call readrootdir
-//	call listdir
-
-
-	
-//	push $0x200
-//	push $red_data
-//	push $0x3
-//	call readfatfile
-
-//	add $0xc,%esp
 
 hang:
 	jmp hang

@@ -31,7 +31,7 @@ all: $(CONFIGURE) impala.img
 
 
 impala.img: $(objs) $(libs) $(drivers) $(progs)
-	$(LD) $(LDFLAGS)  $^ -o $@
+	$(LD)  $^ $(LDFLAGS)   -o $@
 
 impala.o: $(objs) $(libs) $(drivers) $(progs)
 	$(LD) -m elf_i386 -r $^ -T linkscript.ld -Map=System.map -o $@
