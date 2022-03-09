@@ -184,7 +184,12 @@ tab_char:
 
 newline_char:
 	cmp $0x0a,%al				/* for newline '\n' */
-	jnz endspchr
+	jz cont_
+	
+	cmp $0xd,%al
+	jnz endspecialchr	/* Check for enter key */
+
+cont_:	
 	xor %eax,%eax
 	xor %ebx,%ebx
 	xor %edx,%edx
@@ -204,11 +209,8 @@ newline_char:
 	/* this ones increaments the y axis how to get y axis is cursr_pos / 80 */
 	/* the quotient is y axis and remainder is x axis,, */
 	/* plan is  increment quotient by one, multiply quotient with 80 and add the initial remainder from the first division and set new cursor position */
-
-
-
 	
-endspchr:
+endspecialchr:
 	ret
 
 .endfunc
