@@ -139,8 +139,6 @@ done_readingkernel:
 /*
 	IN ORDER TO GET THIS SYSTEM IN PROTECTED MODE eg. 32BIT
 		   WE ARE GOING TO DO THE FOLLOWING
-
-
 		1) Set up the GDT
 			a) The three selectors of the GDT
 				i) Null Selector	(filled with zeros only)
@@ -155,8 +153,6 @@ done_readingkernel:
 		Inorder to inturn activate the above pins of RAM
 		4)Setup and organise the CR0 resgisters the control registers
 		5)Jump to the kernel
-
-
 Test the presence of the A20 port/pin
 Testing for overwrapping 
 okay the code below here is writing to some place in memory
@@ -241,9 +237,7 @@ hang:
 /* #include "activate_a20.s" 
 #include <sreadsect.h>
 #include
-
 /*
-
 		 THIS BELOW HERE IS THE .DATA SECTION KEEP CALM
 */
 
@@ -287,10 +281,8 @@ file_start: .byte 0,0
 
 /* We are going to put this functionality in an uninitialized space coz
 already made runtime code isnot re-writable
-
 Copy_old_variables:
 	push %ds	//Save data segment on stack
-
 	xor %ax,%ax
 	mov %ax,%es
 	mov %ax,%ds
@@ -305,5 +297,4 @@ Copy_old_variables:
 	xor %dx,%dx
 	movb %es:(0x0000),%dl
 	nop
-
 	pop %ds */

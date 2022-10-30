@@ -5,9 +5,11 @@ all: $(objs)
 
 AS = as --32 
 
-%.s: %.o
+%.o: %.s
+	$(AS) $^ -o $@
 
-
+%.o: %.c
+	gcc -m32 -c -nostdinc -nostdlib -fno-PIC $^ -o $@
 
 clean:
 	rm -f *.o

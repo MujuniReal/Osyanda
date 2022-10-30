@@ -11,14 +11,14 @@ endif
 
 CPP = cpp 
 
-objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o
+objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o loader.o
 libs = lib/mem.o lib/iread.o
 progs = programs/terminal.o
 drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard/keyboard.o drivers/hardisk/hardisk.o drivers/filesys/filesys.o
 
 LINKSCRIPT = linkscript.ld
 
-CFLAGS = -nostdinc -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
+CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
 
 LD = ld
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
@@ -49,6 +49,8 @@ $(progs):
 %.o: %.s
 	$(AS) $< -o $@
 
+%.o: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 config:
 	echo "IMPALA_ROOT="$(IMPALA_ROOT) > config.txt

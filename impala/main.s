@@ -47,6 +47,8 @@ run_impala:
 	nop
 	call _initps2
 
+	call loader
+
 	call terminal
 	
 
