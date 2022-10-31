@@ -1,4 +1,7 @@
-#define GDTSEG 0x800
+#define GDT 0x800
+
+//maximum gdt entries
+#define GDTMAX 8192
 
 typedef unsigned int uint32;
 typedef unsigned short int uint16;
@@ -14,14 +17,28 @@ typedef struct _gdtEntry{
 
 }__attribute__((packed)) gdtEntry;
 
-gdtEntry **gdts;
+gdtEntry *gdt;
 
 //Max gdt entries 8192 that is 65536Bytes
 int loader(){
 
-  asm("lea (%1),%%eax": "=r"(gdts): "r"(GDTSEG):"%eax"); //Load GDT Address in pointer gdts
+  gdt = (gdtEntry*)GDT;
 
-  asm("nop");
+  /*
+
+Steps of the loader
+1. Should binary file and read file header to acquire metadata like;
+Size of .text section, size of .data section so that it allocates the 
+efficient memory to hold the contents of the sections
+
+
+
+   */
+
+  //  gdt[0].limitLo;
+
+ 
+  
 
   return 0;
 }
