@@ -3,6 +3,10 @@
 //maximum gdt entries
 #define GDTMAX 8192
 
+//This is the start address of any external program in memory
+//We are giving the kernel a total of 1MB after that, that memory belongs to our programs
+#define FREEMEMORY_START 0x160000
+
 typedef unsigned int uint32;
 typedef unsigned short int uint16;
 typedef unsigned char uint8;
@@ -19,11 +23,13 @@ typedef struct _gdtEntry{
 
 gdtEntry *gdt;
 
+extern void rdsk(char *s,int size);
+extern int lba;
 //Max gdt entries 8192 that is 65536Bytes
 int loader(){
 
-  gdt = (gdtEntry*)GDT;
-
+  //Use rdsk
+  //rdsk((char*)&mbrSectTmp,512);
   /*
 
 Steps of the loader
@@ -38,7 +44,9 @@ efficient memory to hold the contents of the sections
   //  gdt[0].limitLo;
 
  
-  
+  gdt = (gdtEntry*)GDT;
+
+  lba = 0x0;
 
   return 0;
 }

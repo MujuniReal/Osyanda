@@ -63,6 +63,7 @@ push int filecluster
 call readfatfile
 
 rdsk
+set lba variable then
 push int size
 push void *dest
 call rdsk

@@ -7,12 +7,12 @@ IMPALA_ROOT = $(IMPALA_LIBDIR)/../
 IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include/
 endif
 
-CC = gcc -m32 -nostdinc -c 
+CC = gcc
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 
-objs = mem.o iread.o
+objs = mem.o iread.o string.o
 
-#CFLAGS = -nostdinc -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
+CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 
 
 all: $(CONFIGURE) $(objs)
@@ -20,6 +20,9 @@ all: $(CONFIGURE) $(objs)
 
 %.o: %.s
 	$(AS) $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 config:
 	echo "IMPALA_LIBDIR="$(IMPALA_LIBDIR) > config.txt
