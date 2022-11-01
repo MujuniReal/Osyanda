@@ -1,18 +1,30 @@
 
 
 int strlen(char *s){
+  
   if(*s == '\0'){
     return 1;
   }
-  int size = 1 + strlen(s+1);
-
-  return size;
+  
+  return (1 + strlen(s+1));
 }
 
 int strcmp(char *s1, char *s2){
-  if(*s1 != *s2){
+  
+  if (*s1 == '\0' && *s2 == '\0'){  
     return 0;
   }
   
+  else if (*s1 == *s2){
+    return strcmp(s1+1, s2+1);
+  }
+  
+  else if (*s1 > *s2){
+    return 1;
+  }
+  
+  else{
+    return -1;
+  }
 
 }

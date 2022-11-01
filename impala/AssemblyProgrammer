@@ -13,13 +13,13 @@ push (int intr_num)
 call install_interrupt_handler
 
 
-putc
+printc
 push (char c)
-call putc
+call printc
 
-puts
+prints
 push (void *s)
-call puts
+call prints
 
 clears
 call clears

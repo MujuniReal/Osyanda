@@ -11,7 +11,7 @@ struct dirEntry{
   uint16 dirFirstClustHi;
   uint16 dirWrtTime;
   uint16 dirWrtDate;
-  uint16 dirFirstClust;
+  uint16 dirFirstClustLo;
   uint32 dirFileSize;
   
 }__attribute__((packed));

@@ -19,18 +19,19 @@ HFILES = fs/fat16bpb.h
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
 
-objs = fat16/fat16bpb.o fat16/r_fat.o fat16/r_fatfile.o fat16/r_rootdir.o
+CC = gcc
+CFLAGS = m32 -nostdinc -nostdlib -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
+
+objs = fat16bpb.o r_fat.o r_fatfile.o r_rootdir.o
 
 all: $(CONFIGURE) $(objs) fat.o
 
 %.o: %.s
 	$(AS) $< -o $@
+%.o: %.c
+	$(CC) $(CFLAGS) 
 
 fat.o: $(objs)
-	cp fat16/fat16bpb.o $(FATFS_DRIVERDIR)
-	cp fat16/r_fat.o  $(FATFS_DRIVERDIR)
-	cp fat16/r_fatfile.o $(FATFS_DRIVERDIR)
-	cp fat16/r_rootdir.o $(FATFS_DRIVERDIR)
 	$(LD) $^ -o $@
 
 mkhfiles:
@@ -48,5 +49,3 @@ clean:
 	rm -f *.S
 	rm -f *.o
 	rm -f config*
-	$(MAKE) -C fat16/ clean
-	$(MAKE) -C fat32/ clean

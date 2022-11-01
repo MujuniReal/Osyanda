@@ -10,7 +10,7 @@ readfat:
 	xor %eax,%eax
 	xor %ebx,%ebx
 	movw ResSects,%ax
-	addw NHiddenSects,%eax
+	addw NHiddenSects,%ax
 	
 	/* eax is bearing LBA of FAT */
 	mov %eax,lba

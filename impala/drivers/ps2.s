@@ -17,7 +17,7 @@ _initps2:
 	//lea (ps2status_initiating),%esi
 	//push %esi
 	//push $0x20
-	//call puts
+	//call prints
 	//pop %esi
 	//pop %esi
 	/* 1 Disable all ps2 devices */
@@ -117,7 +117,7 @@ read_ackno:
 	jnz read_ackno			/* Loop to wait for acknoledgement */
 
 	push $ps2status_success
-	call puts
+	call prints
 	add $0x4,%esp
 
 wait_for_write2:

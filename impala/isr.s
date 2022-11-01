@@ -80,9 +80,9 @@ fault_checker:
 	lea (exception_msgs),%edi
 	add %eax,%edi			/* find the error message */
 	push %edi
-	call puts				
+	call prints				
 	push (halt_msg)
-	call puts
+	call prints
 	add $0x8,%esp			/* discard error strings from stack */
 
 	pop %esi

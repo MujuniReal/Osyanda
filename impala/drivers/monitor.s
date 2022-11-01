@@ -14,8 +14,8 @@ CURSOROFFSET_LO = 15
 
 .text
 .global clears
-.global putc
-.global puts
+.global printc
+.global prints
 	//memsetw(uint16*, )
 	//void clears(void);   clearscreen
 	//function(3,2,1) -- calling convention
@@ -91,18 +91,18 @@ scroll:
 	ret
 .endfunc
 
-.func putc
-putc:
-	/* procedure for putc,
+.func printc
+printc:
+	/* procedure for printc,
 	get current cursor position and save it
 	check if it needs to clear screen check whether 80*25 is reached
 	*/
 	movw $TOTAL_PIXEL,%dx
 	cmp (cursr_pos),%dx
-	jnz printc
+	jnz _printc
 	call scroll
 
-printc:
+_printc:
 	/* Prepare registers for multiplication result for multiplication %edx:%eax */
 	xor %eax,%eax
 	xor %ebx,%ebx
@@ -136,8 +136,8 @@ setcursor_next:
 	ret
 .endfunc	
 
-.func puts
-puts:
+.func prints
+prints:
 	/* cater for length of the string which will deal with our looping counter ecx */
 	xor %eax,%eax
 	mov 0x4(%esp),%esi
@@ -145,7 +145,7 @@ puts:
 next_char:
 	lodsb
 	cmp $0x0,%al
-	jz endputs
+	jz endprints
 							/* some more checks for the character inserted
 		   						like we would want tab to leave 4 spaces, newline to take you to a new y axis
 		   					enter/ carriage return to take you to a new y axis
@@ -153,19 +153,19 @@ next_char:
 							   so they will be in need of the setcursor function
 							*/
 	cmp $0x1f,%al						/* Following the ascii table All the special characters of tab,delete,return,new line are below 0x1f */
-	jg cont_puts
+	jg cont_prints
 	push %eax
 	call handle_special_chars			/* Those special ones that control the cursor are below 0x1f in the ascii */
 	pop %eax
 	jmp next_char						/* Load next character in the string */
 
-cont_puts:
+cont_prints:
 	push %eax
-	call putc
+	call printc
 	pop %eax
 	jmp next_char
 
-endputs:
+endprints:
 	ret
 .endfunc
 

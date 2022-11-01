@@ -12,11 +12,11 @@ readrootdir:
 	xor %edx,%edx
 
 	movw SectsPFat,%ax
-	movb FatTabs,%bx
+	movb FatTabs,%bl
 	mul %ebx
 
-	addw ResSects,%eax
-	addw NHiddenSects,%eax
+	addw ResSects,%ax
+	addw NHiddenSects,%ax
 	/* %eax has the start of the root directory */
 	mov %eax,lba
 	mov %eax,rootdir_start

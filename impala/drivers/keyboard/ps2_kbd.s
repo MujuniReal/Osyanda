@@ -52,7 +52,7 @@ init_keyboard:
 	add $0x8,%esp
 	
 	push $succ_msg_keybd
-	call puts
+	call prints
 	add $0x4,%esp
 	ret
 
@@ -84,7 +84,7 @@ wait_key_b:
 	pop %esi
 	add $0x4,%esp
 	push %eax
-	call putc
+	call printc
 //	add $0x4,%esp
 	pop %eax		/* old character from kybd, return character in eax register */
 

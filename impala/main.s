@@ -15,13 +15,13 @@ run_impala:
 	call clears
 
 	push $welcome_str
-	call puts
+	call prints
 	add $0x4,%esp
 
 
 	/* initialize file system info */
 	push $fs_msg
-	call puts
+	call prints
 	add $0x4,%esp
 	call readfat
 	call readrootdir
