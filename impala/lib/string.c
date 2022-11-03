@@ -3,7 +3,7 @@
 int strlen(char *s){
   
   if(*s == '\0'){
-    return 1;
+    return 0;
   }
   
   return (1 + strlen(s+1));

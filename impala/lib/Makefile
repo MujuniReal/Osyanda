@@ -33,3 +33,5 @@ config:
 clean:
 	rm -f config*
 	rm -f *.o
+	rm -f *.i
+	rm -f *.S

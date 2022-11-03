@@ -34,6 +34,7 @@ config:
 clean:
 	rm -f *.S
 	rm -f *.o
+	rm -f *.i
 	rm -f config*
 	$(MAKE) -C ide/ clean
 	$(MAKE) -C sata/ clean
