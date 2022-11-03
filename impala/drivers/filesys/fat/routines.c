@@ -7,13 +7,19 @@
 
 
 extern void rdsk(void *buf, int size);
+extern void memset(void *buf, char c, int size);
 
 typedef struct dirEntry dirEntryStruct;
 
-uint16 fat_tab[65536];
-dirEntryStruct rootdir_mem[MAXROOTENTRIES];
-uint32 rootdir_start;
-uint32 firstDataClust;
+extern void *rootdir_mem;
+extern uint16 *fat_tab;
+
+uint32 first_datacluster;
+
+//uint16 fat_tab[65536];
+//dirEntryStruct rootdir_mem[MAXROOTENTRIES];
+//uint32 rootdir_start;
+//uint32 firstDataClust;
 
 
 struct fat16bpb {
@@ -40,20 +46,25 @@ struct fat16bpb {
   
 }__attribute__((packed));
 
-void readfat(void){
+//void readfat(void){
 
   
-}
+//}
 
 uint32 find_file_startcluster(char *filename){
 
+  dirEntryStruct *rootDirMem = (dirEntryStruct*)&rootdir_mem;
   int i = 0;
   
   for(i ; i < MAXROOTENTRIES; i++){
 
-    dirEntryStruct entry = rootdir_mem[i];
+    dirEntryStruct entry = rootDirMem[i];
+    char tmpfname[12];
+
+    memset((char*)&tmpfname, '\0', 12);
+    strncpy((char*)&tmpfname, (char*)&entry.dirName, 11);
     //TODO add in formatters to handle file.extension ie. file.txt
-    if(strcmp(filename, (char*)&entry.dirName) == 0){
+    if(strcmp(filename, (char*)&tmpfname) == 0){
      
       uint32 startCluster = entry.dirFirstClustHi << 16 | entry.dirFirstClustLo;
       

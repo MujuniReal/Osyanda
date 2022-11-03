@@ -28,3 +28,11 @@ int strcmp(char *s1, char *s2){
   }
 
 }
+
+char *strncpy(char *dest, char *src, int size){
+
+  for(int i=0; i < size; i++){
+    dest[i] = src[i];
+  }
+  return dest;
+}

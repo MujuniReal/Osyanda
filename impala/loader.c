@@ -1,3 +1,4 @@
+#include <types.h>
 #define GDT 0x800
 
 //maximum gdt entries
@@ -24,6 +25,7 @@ typedef struct _gdtEntry{
 gdtEntry *gdt;
 
 extern void rdsk(char *s,int size);
+extern uint32 find_file_startcluster(char *filename);
 extern int lba;
 //Max gdt entries 8192 that is 65536Bytes
 int loader(){
@@ -42,11 +44,14 @@ efficient memory to hold the contents of the sections
    */
 
   //  gdt[0].limitLo;
-
+  char *fname = "STAGE2  BIN";
+  uint32 startClust = find_file_startcluster(fname);
  
   gdt = (gdtEntry*)GDT;
 
   lba = 0x0;
+
+  
 
   return 0;
 }

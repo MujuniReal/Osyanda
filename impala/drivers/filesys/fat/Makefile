@@ -20,16 +20,16 @@ AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
 
 CC = gcc
-CFLAGS = m32 -nostdinc -nostdlib -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
+CFLAGS = -m32 -nostdinc -nostdlib -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
 
-objs = fat16bpb.o r_fat.o r_fatfile.o r_rootdir.o
+objs = fat16bpb.o r_fat.o r_rootdir.o routines.o
 
 all: $(CONFIGURE) $(objs) fat.o
 
 %.o: %.s
 	$(AS) $< -o $@
 %.o: %.c
-	$(CC) $(CFLAGS) 
+	$(CC) $(CFLAGS) $^ -o $@
 
 fat.o: $(objs)
 	$(LD) $^ -o $@
