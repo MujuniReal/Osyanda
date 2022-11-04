@@ -12,7 +12,7 @@ AS = as --32
 %.o: %.c
 	gcc -m32 -nostdinc -nostdlib -e terminal -fno-PIC -c $^ -o $@
 %: %.o
-	ld -m elf_i386 --oformat binary -e terminal -Ttext=0x160000 $^ -o $@
+	ld -m elf_i386 --oformat binary -T linkscript.ld $^ -o $@
 clean:
 	rm -f *.o
 	rm -f *.i

@@ -31,6 +31,8 @@ gdtEntry *gdt;
 //extern void rdsk(char *s,int size);
 extern uint32 find_file_startcluster(char *filename);
 extern int lba;
+extern int sects_to_read;
+extern uint32 first_datacluster;
 
 //Max gdt entries 8192 that is 65536Bytes
 int loader(){
@@ -44,7 +46,7 @@ Size of .text section, size of .data section so that it allocates the
 efficient memory to hold the contents of the sections
    */
 
-  char *fname = "TERMINAL";
+  char *fname = "TERMINAL   ";
   uint32 startClust = find_file_startcluster(fname);
 
   if(startClust == 0){
@@ -81,20 +83,26 @@ efficient memory to hold the contents of the sections
   char *progMemory = (char*)FREEMEMORY_START;
   gdtEntry progGdt = gdt[i];
 
-  progGdt.limitLo = 1;
-  progGdt.baseLo = FREEMEMORY_START & 0xffff;
-  progGdt.baseMid = (FREEMEMORY_START >> 16) & 0xff;
-  progGdt.accessByte = 3;
+  //  progGdt.limitLo = 1;
+  //  progGdt.baseLo = FREEMEMORY_START & 0xffff;
+  //  progGdt.baseMid = (FREEMEMORY_START >> 16) & 0xff;
+  //  progGdt.accessByte = 3;
   
-  progGdt.flagsLimitHi = 0100 ;
-  progGdt.baseHi = FREEMEMORY_START >> 24;
+  // progGdt.flagsLimitHi = 0100 ;
+  //  progGdt.baseHi = FREEMEMORY_START >> 24;
 
   //  readfatfile(startClust,progMemory,);
 
   //Read and call, for now as we havent yet decided on the syscall
   //interface, the upper gdt code is useless
   //For now just read the file in memory and call it as below
+
+  //firstdata sector + (startclust -2) * sectors per cluster
+  uint32 lbaBlk = first_datacluster + ((startClust - 2) * 16);
+
+  lba = lbaBlk;
   
+  sects_to_read = 16;
   rdsk((char*)FREEMEMORY_START, 512);
 
   //Define type caster
