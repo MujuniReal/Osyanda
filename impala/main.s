@@ -49,7 +49,7 @@ run_impala:
 
 	call loader
 
-	call terminal
+//	call terminal
 	
 
 
