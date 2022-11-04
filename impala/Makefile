@@ -13,7 +13,6 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o loader.o
 libs = lib/mem.o lib/iread.o lib/string.o
-progs = programs/terminal.o
 drivers = drivers/ps2.o drivers/monitor.o drivers/keyboard/keyboard.o drivers/hardisk/hardisk.o drivers/filesys/filesys.o
 
 LINKSCRIPT = linkscript.ld
@@ -41,10 +40,6 @@ $(libs):
 
 $(drivers):
 	$(MAKE) -C $(IMPALA_DRIVERDIR)
-
-$(progs):
-	$(MAKE) -C programs
-
 
 %.o: %.s
 	$(AS) $< -o $@
