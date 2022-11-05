@@ -2,26 +2,28 @@
 #define PRINTS 0x60a58
 #define READKYBD 0x60b07
 #define CLEARS 0x60975
+#define FINDFILESTART 0x60cba
+
 
 typedef char (*charFunc)(void);
 typedef void (*voiFunc)(void);
 typedef void (*voiFuncArg)(char*);
 typedef void (*printcTy)(char);
+typedef unsigned int (*findF)(char*);
 
 char(*read_kybd)(void) = (charFunc)READKYBD;
 void(*prints)(char*) = (voiFuncArg)PRINTS;
 void(*printc)(char) = (printcTy)PRINTC;
 void(*clears)(void) = (voiFunc)CLEARS;
+unsigned int (*find_file_startcluster)(char*) = (findF)FINDFILESTART;
 
 void terminal(){
   
   char *prompt = "impala> ";
-  char *found_ent = "Enter Key found\n";
+  char *cmdNtF = "Command not found.";
   char c;
   int command_index = 0;
   char command[1024];
-
-  asm("nop");
 
   clears();
   prints(prompt);
@@ -31,7 +33,13 @@ void terminal(){
     if(c == '\r'){
       command[command_index] = '\0';
  	//prints(found_ent);
-	prints((char*)&command);
+      prints((char*)&command);
+      //unsigned int startCl = find_file_startcluster((char*)&command);
+	
+      //	if(startCl == 0){
+      //  prints(cmdNtF);
+      //  asm("nop");
+      //	}
 	printc('\n');
 	prints(prompt);
  	command_index = -1;
@@ -43,7 +51,6 @@ void terminal(){
      command[command_index] = c;
    } 
 
-     asm("nop");
      command_index++;
     }
 }
