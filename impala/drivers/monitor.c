@@ -19,7 +19,8 @@ typedef struct _monitorAxis{
 
 monitorAxis cursrPos = {x: 0, y: 0};     //Cursor positiion
 
-void memsetw(void *s, short int, int size);
+extern void memsetw(void *s, short int, int size);
+extern void outportb(uint8 data, uint16 port);
 
 void clears(void){
 
@@ -36,5 +37,13 @@ void clears(void){
 
 void setcursor(){
 
+  outportb(CURSORHI, VGACMD);
+
+  outportb(cursrPos.y, VGADATA);
+
+  outporb(CURSORLO, VGACMD);
+
+  outportb(cursrPos.x, VGADATA);
   
 }
+
