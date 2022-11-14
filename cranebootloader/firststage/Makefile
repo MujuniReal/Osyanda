@@ -16,7 +16,7 @@ AS = as
 ASFLAGS = --32
 LD = ld
 
-LDFLAGS = -m elf_i386 --oformat binary
+LDFLAGS = -m elf_i386 --oformat binary -Map=System.map
 
 HFILES = $(CRANE_INCLUDEDIR)/fat/fat16mbr.h \
 $(CRANE_INCLUDEDIR)/printer.h \

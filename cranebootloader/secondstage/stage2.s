@@ -94,8 +94,6 @@ loaDFAT:
 	mov %ax,%es
 
 	mov ResSects,%ax
-	add NHiddenSects,%ax
-	add NhiddnSectshi,%ax
 	xor %bx,%bx
 	mov SectsPFat,%cx
 	call ReadMulti

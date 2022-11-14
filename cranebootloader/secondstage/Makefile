@@ -10,10 +10,10 @@ endif
 CPP = cpp -nostdinc -I $(CRANE_INCLUDEDIR)
 
 
-AS = as
+AS = as --32
 LD = ld
 
-LDFLAGS = --oformat binary
+LDFLAGS = --oformat binary -Map=System.map
 
 HFILES = $(CRANE_INCLUDEDIR)/check_a20.s \
 $(CRANE_INCLUDEDIR)/g_idts.s

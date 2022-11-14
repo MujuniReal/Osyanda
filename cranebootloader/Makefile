@@ -10,9 +10,10 @@ endif
 
 
 CC = gcc -m32 -Wall
+#todo: -Wno-sizeof-pointer-memaccess
 CFLAGS = -I $(CRANE_INCLUDEDIR) -c
 
-objs = main.o crane_prep-disk.o
+objs = main.o crane_prep-disk.o partition_table.o
 
 all: $(CONFIGURE) crane-disk crane.mbr cranebl.img
 
@@ -22,6 +23,7 @@ crane.mbr:
 	cp $(CRANE_STAGE1DIR)/stage1.img  $(CRANE_ROOT)/$@
 
 cranebl.img:
+	cp $(CRANE_ROOT)/fatstruct.h $(CRANE_INCLUDEDIR)/fat/fat16mbr.h
 	$(MAKE) -C $(CRANE_STAGE2DIR)
 	cp $(CRANE_STAGE2DIR)/stage2.img $(CRANE_ROOT)/$@
 

@@ -1,4 +1,4 @@
-devOEM:	.ascii "mkfs.fat"	//There is a serious conflict here take note
+devOEM:	.ascii "mkfs.fat"
 ByPSect:	.word 0x200
 SectPClust:	.byte 0x10
 ResSects:	.word 0x10

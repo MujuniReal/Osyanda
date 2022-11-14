@@ -76,7 +76,7 @@ that is an output of the **lsblk** command you can notice that the system identi
 take note of the device name.
 * Next, run (as superuser) ``sudo dd if=cranebootloader/crane.mbr of=/dev/devicename`` replace ``devicename`` with the previously
 noted device name, following the example its ``loop22`` so the command should look like this;
-``sudo dd if=cranebootloader/crane-disk of=/dev/loop22``.
+``sudo dd if=cranebootloader/crane.mbr of=/dev/loop22``.
 * **Copy the required files; cranebl.img and impala.img to the mounted device,(remember our mount directory "/mnt")**, as superuser
 run ``sudo cp cranebootloader/cranebl.img /mnt``, run next command ``sudo cp impala/impala.img /mnt``.
 * If all is successful with no errors, unmount the device as super user by running ``sudo umount /mnt``

@@ -40,6 +40,8 @@ readsect:
 
 	//Sector
 	xor %dx,%dx
+	addw $0x2b90,%ax	//If carry flag is set and so the next instruction
+	adcw $0x4,%dx	//Division is dx:ax / devidend
 	mov SectsPTrck,%bx
 	div %bx
 	inc %dx
