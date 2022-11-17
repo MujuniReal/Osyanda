@@ -19,27 +19,35 @@ extern void read_partition_table(char*);
 
 int main(int argc,char **argv){
 
-	if(argc == 1){
-	  printf("Usage: %s path-to-disk-image ",argv[0]);
-		return 1;
-	}
+  char *filePath;
+  char fpath[256];
+
+  if(argc == 1){
+    printf("Usage: %s path-to-disk-image \n",argv[0]);
+    printf("Enter disk path (eg: /dev/sda or disk.img): ");
+    scanf("%s",&fpath);
+    filePath = (char*)&fpath;
+  }
+  else{
+    filePath = argv[1];
+  }
     
-	char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
-	//char *mbr = (char*)malloc(512);
+  char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
+  //char *mbr = (char*)malloc(512);
 
-	FILE *diskmbrPTR;
-	diskmbrPTR = fopen(argv[1],"r");
+  FILE *diskmbrPTR;
+  diskmbrPTR = fopen(filePath,"r");
 
-	fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
-	//fread(mbr,1,512,diskmbrPTR);
-	fclose(diskmbrPTR);
+  fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
+  //fread(mbr,1,512,diskmbrPTR);
+  fclose(diskmbrPTR);
 
-	fat1216prep_disk(Fatbpb+3);
-	//read_partition_table(mbr);
+  fat1216prep_disk(Fatbpb+3);
+  //read_partition_table(mbr);
 
 
-	//free(mbr);
-	free(Fatbpb);
+  //free(mbr);
+  free(Fatbpb);
 
-    return 0;
+  return 0;
 }

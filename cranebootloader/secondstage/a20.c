@@ -1,11 +1,11 @@
-#include "types.h"
+#include <types.h>
 
 #define BIOS_A20ATTR 0x2401
 #define A20SUPPORTATTR 0x2403
 
 extern void prints(char *s);
 
-int16 test_a20pin(){
+int16 activate_a20pin(){
 
   //check if a20 is supported
   int16 supportStat = 0;
@@ -25,11 +25,8 @@ int16 test_a20pin(){
 
   //check if carry flag was set
   if(a20stat == 1){
-    char *a20fail = "Failed to activate A20 pin.\r\n";
-    prints(a20fail);
     return -1;
   }
-  char *a20suc = "A20 pin activated.\r\n";
-  prints(a20suc);
+  return 0;
   
 }

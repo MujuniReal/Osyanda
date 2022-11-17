@@ -7,14 +7,14 @@ NRootDirEs:	.word 0x200
 TotSects:	.word 0x0
 MedDescr:	.byte 0xf8
 SectsPFat:	.word 0x100
-SectsPTrck:	.word 0x20
-NHeads:	.word 0x10
+SectsPTrck:	.word 0x3f
+NHeads:	.word 0xff
 NHiddenSects:	.word 0x0
 NhiddnSectshi:	.word 0x0
-TotSectsInFS:	.int 0xfff00
+TotSectsInFS:	.int 0x100000
 LogDrvNo:	.byte 0x80
-Resrvd:	.byte 0x1
+Resrvd:	.byte 0x0
 ExtSig:	.byte 0x29
-DrvSeriNum:	.int 0xb31f206e
+DrvSeriNum:	.int 0xe95dbb19
 VolLabel:	.ascii "NO NAME    "
 FSType:	.ascii "FAT16   "

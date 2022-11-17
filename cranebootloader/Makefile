@@ -18,17 +18,18 @@ objs = main.o crane_prep-disk.o partition_table.o
 all: $(CONFIGURE) crane-disk crane.mbr cranebl.img
 
 
-crane.mbr:
+crane.mbr: crane-disk
 	$(MAKE) -C $(CRANE_STAGE1DIR)
 	cp $(CRANE_STAGE1DIR)/stage1.img  $(CRANE_ROOT)/$@
 
-cranebl.img:
+cranebl.img: crane-disk
 	cp $(CRANE_ROOT)/fatstruct.h $(CRANE_INCLUDEDIR)/fat/fat16mbr.h
 	$(MAKE) -C $(CRANE_STAGE2DIR)
-	cp $(CRANE_STAGE2DIR)/stage2.img $(CRANE_ROOT)/$@
+	cp $(CRANE_STAGE2DIR)/$@ $(CRANE_ROOT)/$@
 
 crane-disk: $(objs)
 	$(CC) $^ -o $@
+	$(CRANE_ROOT)/$@
 
 
 %.o: %.c

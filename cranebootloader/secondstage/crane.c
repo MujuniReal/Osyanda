@@ -9,7 +9,7 @@ extern void initialize_gdt();
 extern void initialize_idt();
 extern void load_gdt();
 extern void load_idt();
-extern int16 test_a20pin();
+extern int16 activate_a20pin();
 extern uint16 find_file(char* filename);
 extern int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust);
 
@@ -36,7 +36,11 @@ void crane_main(){
     return;
   }
 
-  test_a20pin();
+  if(activate_a20pin() != 0){
+    char *a20fail = "Failed to activate A20 pin.\r\n";
+    prints(a20fail);
+    return;
+  }
   initialize_gdt();
   initialize_idt();
   
@@ -60,10 +64,10 @@ mov %eax,%cr0");
       ::"a"(dataSelector));
   asm("mov $0x2ffff,%esp");
 
-  goto clearQue;
+  goto clearPrefetchQue;
   asm("nop; nop; nop;");
 
- clearQue:
+ clearPrefetchQue:
  
   asm(" .byte 0x66;\
 .byte 0xea;\

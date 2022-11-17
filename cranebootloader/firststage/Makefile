@@ -58,5 +58,6 @@ clean:
 	rm -f *.o
 	rm -f *.bin
 	rm -f *.img
+	rm -f *.map
 	rm -f config*
 
