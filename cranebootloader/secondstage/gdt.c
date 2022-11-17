@@ -1,4 +1,4 @@
-#include "types.h"
+#include <types.h>
 
 #define GDT_SEGMENT 0x0000
 #define GDT_OFFSET 0x800

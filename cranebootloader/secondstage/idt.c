@@ -1,4 +1,4 @@
-#include "types.h"
+#include <types.h>
 
 #define IDTMAX 256
 #define IDT_SEGMENT 0x0000
