@@ -15,7 +15,7 @@ CFLAGS = -I $(CRANE_INCLUDEDIR) -c
 
 objs = main.o crane_prep-disk.o partition_table.o
 
-all: $(CONFIGURE) crane-disk crane.mbr cranebl.img
+all: $(CONFIGURE) crane-disk disk crane.mbr cranebl.img
 
 
 crane.mbr: crane-disk
@@ -27,9 +27,12 @@ cranebl.img: crane-disk
 	$(MAKE) -C $(CRANE_STAGE2DIR)
 	cp $(CRANE_STAGE2DIR)/$@ $(CRANE_ROOT)/$@
 
+disk: crane-disk
+	$(CRANE_ROOT)/$^
+
 crane-disk: $(objs)
 	$(CC) $^ -o $@
-	$(CRANE_ROOT)/$@
+
 
 
 %.o: %.c

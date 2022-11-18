@@ -1,6 +1,35 @@
 #ifndef FAT_H
 #define FAT_H
 
+#define FATBPBOFFSET 3
+#define FAT1216_BPBSIZE 62
+#define VOLUMELABEL_STRLOCATION 43
+#define FSNAME_STRLOCATION 54
+
+struct _fatbpb1216{
+    char devOEM[8];
+    uint16 ByPSect;
+    uint8 SectPClust;
+    uint16 ResSects;
+    uint8 FatTabs;
+    uint16 NRootDirEs;
+    uint16 TotSects;
+    uint8 MedDescr;
+    uint16 SectsPFat;
+    uint16 SectsPTrck;
+    uint16 NHeads;	
+    uint16 NHiddenSects;
+    uint16 NhiddnSectshi;
+    uint32 TotSectsInFS;
+    uint8 LogDrvNo;
+    uint8 Resrvd;
+    uint8 ExtSig;
+    uint32 DrvSeriNum;
+    char VolLabel[11];
+    char FSType[8];
+}__attribute__((packed));
+ //fatbpb1216;
+
 struct _dirEntry{
   char dirName[11];
   char dirAttrib;

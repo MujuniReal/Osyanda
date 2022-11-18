@@ -1,55 +1,14 @@
 #include <stdio.h>
-
-// #include <sys/types.h>
-
-#include <bpbsize.h>
-
 #include <string.h>
-
-/*#define JMPCODE_NOP_SIZE 3
-#define DEVOEM_STRSIZE 8
-//#define FAT1216_BPBSIZE 25
-#define FAT1216_EXTENDEDBPBSIZE 26
-#define VOL_LABEL_STR_SIZE 11
-#define FILESYSTEM_ID_STR_SIZE 8 */
-//#define VOL_LABEL_LOCATION ((JMPCODE_NOP_SIZE + DEVOEM_STRSIZE + FAT1216_BPBSIZE + FAT1216_EXTENDEDBPBSIZE + ) - (VOL_LABEL_STR_SIZE + FILESYSTEM_ID_STR_SIZE))
-/* this content below here is for the header file of the organiser program */
-typedef unsigned char uint8;
-typedef unsigned short int uint16;
-typedef unsigned int uint32;
-
-typedef struct _fatbpb1216{
-    char devOEM[8];
-    uint16 ByPSect;
-    uint8 SectPClust;
-    uint16 ResSects;
-    uint8 FatTabs;
-    uint16 NRootDirEs;
-    uint16 TotSects;
-    uint8 MedDescr;
-    uint16 SectsPFat;
-    uint16 SectsPTrck;
-    uint16 NHeads;	
-    uint16 NHiddenSects;
-    uint16 NhiddnSectshi;
-    uint32 TotSectsInFS;
-    uint8 LogDrvNo;
-    uint8 Resrvd;
-    uint8 ExtSig;
-    uint32 DrvSeriNum;
-    char VolLabel[11];
-    char FSType[8];
-}__attribute__((packed)) fatbpb1216;
+#include "types.h"
 
 
+void handleFat(char *mbr){
 
-/* this will be code coming from the prep-disk arguement */
-/* so this is a library or a function coming from a library */
-/* it doesnt deserve tobe with a main function but for now lets just give it we will remove it */
-/* another alternative is prep-disk disk */
-/* in preparing disk involves many things this is one of them,, making a header file with disk layout */
+}
 
-int fat1216prep_disk(char *fatbpb){
+
+int createFat1216BpbSrc(char *fatbpb){
 
     fatbpb1216 *bpb = (fatbpb1216*)fatbpb;
     char devoem[9];
@@ -87,7 +46,7 @@ int fat1216prep_disk(char *fatbpb){
     /* printf("FSType %s\n",fstype); */
 
     FILE *Fathdrfile;
-    Fathdrfile = fopen("./fatstruct.h","w");
+    Fathdrfile = fopen("./fatbpb.s","w");
 
     if(strlen(devoem) == 8){
        fprintf(Fathdrfile,"devOEM:\t.ascii \"%s\"\n",devoem);

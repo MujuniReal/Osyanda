@@ -1,37 +1,66 @@
 #include <stdio.h>
+#include "types.h"
+#include "partable.h"
+
 #define PART_TABLE_OFFSET 446
+#define MAXTABLENTRIES 4
 
-typedef unsigned char uint8;
-typedef unsigned short int uint16;
-typedef unsigned int uint32;
+typedef struct _partblentry partTableEntry;
 
-typedef struct _partble{
-  uint8 bootSig;
-  uint8 startHead;
-  uint8 startSect;
-  uint8 startCylinder;
-  uint8 sysSig;
-  uint8 endHead;
-  uint8 endSect;
-  uint8 endCylinder;
-  uint32 sectsB4Partion;
-  uint32 sectsInPartition;
-}__attribute__((packed)) partTableEntry;
+partTableEntry *partitionTable;
+int numberOfPartitions;
 
+int readPartitionTable(char *mbr){
 
+  numberOfPartitions = 0;
 
-void read_partition_table(char *mbr){
+  partitionTable = (partTableEntry*)(mbr + PART_TABLE_OFFSET);
 
-  partTableEntry *patitionTable = (partTableEntry*)(mbr + PART_TABLE_OFFSET);
+  
+  for(int i=0; i < MAXTABLENTRIES; i++){
 
-  printf("Boot signature: 0x%x\n",patitionTable[3].bootSig);
-  printf("startHead  %d\n",patitionTable[3].startHead);
-  printf("startSect  %d\n",patitionTable[3].startSect);
-  printf("startCylinder  %d\n",patitionTable[3].startCylinder);
-  printf("sysSig  %d\n",patitionTable[3].sysSig);
-  printf("endHead  %d\n",patitionTable[3].endHead);
-  printf("endSect  %d\n",patitionTable[3].endSect);
-  printf("endCylinder  %d\n",patitionTable[3].endCylinder);
-  printf("sectsB4Partion  %d\n",patitionTable[3].sectsB4Partion);
-  printf("sectsInPartition  %d\n",patitionTable[3].sectsInPartition);
+    if(partitionTable[i].sectsInPartition != 0){
+      //If there are sectors in the partition means the partition exists
+      numberOfPartitions += 1;
+    }
+    
+  }
+
+  return numberOfPartitions;
+
+  
+
+  /* printf("Boot signature: 0x%x\n",patitionTable[3].bootSig); */
+  /* printf("startHead  %d\n",patitionTable[3].startHead); */
+  /* printf("startSect  %d\n",patitionTable[3].startSect); */
+  /* printf("startCylinder  %d\n",patitionTable[3].startCylinder); */
+  /* printf("sysSig  %d\n",patitionTable[3].sysSig); */
+  /* printf("endHead  %d\n",patitionTable[3].endHead); */
+  /* printf("endSect  %d\n",patitionTable[3].endSect); */
+  /* printf("endCylinder  %d\n",patitionTable[3].endCylinder); */
+  /* printf("sectsB4Partion  %d\n",patitionTable[3].sectsB4Partion); */
+  /* printf("sectsInPartition  %d\n",patitionTable[3].sectsInPartition); */
+}
+
+void createPartSrcFile(){
+
+  FILE *srcFilePtr;
+  srcFilePtr = fopen("./ptable.s","w");
+
+  for(int i=0; i < MAXTABLENTRIES; i++){
+    fprintf(srcFilePtr, "bootSig%d:\t.byte 0x%x\n",i , partitionTable[i].bootSig);
+    fprintf(srcFilePtr, "startHead%d:\t.byte 0x%x\n",i , partitionTable[i].startHead);
+    fprintf(srcFilePtr, "startSect%d:\t.byte 0x%x\n",i , partitionTable[i].startSect);
+    fprintf(srcFilePtr, "startCylinder%d:\t.byte 0x%x\n",i , partitionTable[i].startCylinder);
+    fprintf(srcFilePtr, "sysSig%d:\t.byte 0x%x\n",i , partitionTable[i].sysSig);
+    fprintf(srcFilePtr, "endHead%d:\t.byte 0x%x\n",i , partitionTable[i].endHead);
+    fprintf(srcFilePtr, "endSect%d:\t.byte 0x%x\n",i , partitionTable[i].endSect);
+    fprintf(srcFilePtr, "endCylinder%d:\t.byte 0x%x\n",i , partitionTable[i].endCylinder);
+    fprintf(srcFilePtr, "sectsB4Partion%d:\t.int 0x%x\n",i , partitionTable[i].sectsB4Partion);
+    fprintf(srcFilePtr, "sectsInPartition%d:\t.int 0x%x\n",i , partitionTable[i].sectsInPartition);
+    
+  }
+
+  flcose(srcFilePtr);
+  return;
 }

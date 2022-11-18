@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-
 #include <bpbsize.h>
+#define MBRSIZE 512
 /* this is the main caller of the bootloader loggedin user interface view */
 /*How program is called -> crane prep-disk
  steps of working 
@@ -15,7 +14,8 @@ this program has to read the file made from the crane mkconfig program
 */
 /* this program shd be able to detect other operating systems on disks ie reading partitions too */
 int fat1216prep_disk(char*);
-extern void read_partition_table(char*);
+extern int readPartitionTable(char* mbr);
+
 
 int main(int argc,char **argv){
 
@@ -31,23 +31,32 @@ int main(int argc,char **argv){
   else{
     filePath = argv[1];
   }
-    
-  char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
-  //char *mbr = (char*)malloc(512);
-
-  FILE *diskmbrPTR;
+  
+  FILE *diskmbrPtr;
   diskmbrPTR = fopen(filePath,"r");
+  
+  char *mbr = (char*)malloc(MBRSIZE);
+  
+  fread(mbr, 1, MBRSIZE, diskmbrPTR);
 
-  fread(Fatbpb,1,FAT1216_BPBSIZE,diskmbrPTR);
-  //fread(mbr,1,512,diskmbrPTR);
   fclose(diskmbrPTR);
 
-  fat1216prep_disk(Fatbpb+3);
+  readPartitionTable(mbr);
+  createPartSrcFile();
+
+  detectFs();
+  //char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
+  //check for partition table
+  //Detect Fs
+  //detect_fs();
+  //fread(mbr,1,512,diskmbrPTR);
+
+
+  //  fat1216prep_disk(Fatbpb+3);
   //read_partition_table(mbr);
 
 
-  //free(mbr);
-  free(Fatbpb);
+  free(mbr);
 
   return 0;
 }
