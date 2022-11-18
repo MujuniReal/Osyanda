@@ -18,6 +18,8 @@ all: $(CONFIGURE) $(objs) keyboard.o
 %.o: %.s
 	$(AS) $< -o $@
 
+%.o: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
 keyboard.o: $(objs)
 	$(LD) $^ -o $@
