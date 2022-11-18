@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <bpbsize.h>
 #define MBRSIZE 512
 /* this is the main caller of the bootloader loggedin user interface view */
 /*How program is called -> crane prep-disk
@@ -33,13 +32,13 @@ int main(int argc,char **argv){
   }
   
   FILE *diskmbrPtr;
-  diskmbrPTR = fopen(filePath,"r");
+  diskmbrPtr = fopen(filePath,"r");
   
   char *mbr = (char*)malloc(MBRSIZE);
   
-  fread(mbr, 1, MBRSIZE, diskmbrPTR);
+  fread(mbr, 1, MBRSIZE, diskmbrPtr);
 
-  fclose(diskmbrPTR);
+  fclose(diskmbrPtr);
 
   readPartitionTable(mbr);
   createPartSrcFile();

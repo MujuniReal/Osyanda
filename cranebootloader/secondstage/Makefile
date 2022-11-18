@@ -13,9 +13,9 @@ objs = stage2.o crane.o printer.o string.o printer.o readsect.o idt.o gdt.o a20.
 CFLAGS = -m16 -Wno-builtin-declaration-mismatch -nostdinc -nostdlib -I $(CRANE_INCLUDEDIR) -fno-PIC -c
 LDFLAGS = -m elf_i386 --oformat binary -nostdlib  -T linkscript.ld -Map=Map.map
 
-all: cranebl.img
+all: cranebl.bin
 
-cranebl.img: $(objs)
+cranebl.bin: $(objs)
 	$(LD) $(LDFLAGS) $^ -o $@
 
 AS = as --32 
@@ -36,6 +36,6 @@ clean:
 	rm -f *.i
 	rm -f *.img
 	rm -f *.S
-	rm -f *~
+	rm -f *.bin
 	rm -f config*
 	rm -f *.map

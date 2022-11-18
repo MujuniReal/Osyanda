@@ -61,6 +61,6 @@ void createPartSrcFile(){
     
   }
 
-  flcose(srcFilePtr);
+  fclose(srcFilePtr);
   return;
 }

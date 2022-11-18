@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include "types.h"
+#include "fat.h"
 
+typedef struct _fatbpb1216 fatbpb1216;
 
 void handleFat(char *mbr){
 

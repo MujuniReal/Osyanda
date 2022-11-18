@@ -13,26 +13,28 @@ CC = gcc -m32 -Wall
 #todo: -Wno-sizeof-pointer-memaccess
 CFLAGS = -I $(CRANE_INCLUDEDIR) -c
 
-objs = main.o crane_prep-disk.o partition_table.o
+objs = main.o partition_table.o fs.o fat.o
 
-all: $(CONFIGURE) crane-disk disk crane.mbr cranebl.img
+all: $(CONFIGURE) crane-disk asmfiles 
+
+bootdisk.img: crane.mbr cranebl.bin
+	cat $(word 1,$^) > $@
+	cat $(word 2,$^) >> $@
 
 
-crane.mbr: crane-disk
+mbr.img: crane-disk
 	$(MAKE) -C $(CRANE_STAGE1DIR)
-	cp $(CRANE_STAGE1DIR)/stage1.img  $(CRANE_ROOT)/$@
+	cp $(CRANE_STAGE1DIR)/mbr.img  $(CRANE_ROOT)/$@
 
-cranebl.img: crane-disk
-	cp $(CRANE_ROOT)/fatstruct.h $(CRANE_INCLUDEDIR)/fat/fat16mbr.h
+cranebl.bin: crane-disk
 	$(MAKE) -C $(CRANE_STAGE2DIR)
 	cp $(CRANE_STAGE2DIR)/$@ $(CRANE_ROOT)/$@
 
-disk: crane-disk
+asmfiles: crane-disk
 	$(CRANE_ROOT)/$^
 
 crane-disk: $(objs)
 	$(CC) $^ -o $@
-
 
 
 %.o: %.c
