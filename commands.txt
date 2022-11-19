@@ -1,0 +1,13 @@
+On GNU/Linux;
+``cd Osyanda``
+``fallocate -l 512M osyanda.img``
+``mkfs.fat -F 16 -I osyanda.img``
+``make config`` 
+``make`` -> path/to/osyanda.img or path/to/real/disk
+``sudo mount osyanda.img /mnt``.
+``lsblk`` -> ``loop22   7:22   0 511.9M  0 loop /mnt``
+``sudo dd if=cranebootloader/bootdisk.img of=/dev/loop22``
+``sudo cp impala/impala.img /mnt``.
+``sudo cp impala/programs/* /mnt``
+``sudo umount /mnt``
+``bochs -f amOsyandaLinux``
