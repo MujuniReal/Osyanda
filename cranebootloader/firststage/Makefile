@@ -15,6 +15,7 @@ LD = ld
 LDFLAGS = -m elf_i386 --oformat binary -e main -Ttext 0x7c00 -Map=MBR.map
 
 objs = mbr.o
+SFILES = ptable.s fatbpb.s
 
 all: $(CONFIGURE) $(objs) mbr.img
 
@@ -31,6 +32,8 @@ config:
 	echo "CRANE_INCLUDEDIR="$(CRANE_INCLUDEDIR) >> config.txt
 
 clean:
+	echo "" > $(word 1, $(SFILES))
+	echo "" > $(word 2, $(SFILES))
 	rm -f *.S
 	rm -f *.o
 	rm -f *.bin

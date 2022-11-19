@@ -14,7 +14,7 @@ this program has to read the file made from the crane mkconfig program
 /* this program shd be able to detect other operating systems on disks ie reading partitions too */
 int fat1216prep_disk(char*);
 extern int readPartitionTable(char* mbr);
-
+extern void detectFs(char *mbr);
 
 int main(int argc,char **argv){
 
@@ -43,17 +43,7 @@ int main(int argc,char **argv){
   readPartitionTable(mbr);
   createPartSrcFile();
 
-  detectFs();
-  //char *Fatbpb = (char*)malloc(FAT1216_BPBSIZE);
-  //check for partition table
-  //Detect Fs
-  //detect_fs();
-  //fread(mbr,1,512,diskmbrPTR);
-
-
-  //  fat1216prep_disk(Fatbpb+3);
-  //read_partition_table(mbr);
-
+  detectFs(mbr);
 
   free(mbr);
 

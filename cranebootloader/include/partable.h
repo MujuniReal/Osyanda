@@ -3,6 +3,10 @@
 #ifndef PARTABLE_H
 #define PARTABLE_H
 
+#define PART_TABLE_OFFSET 446
+#define MAXTABLENTRIES 4
+
+
 struct _partblentry{
   uint8 bootSig;
   uint8 startHead;

@@ -15,14 +15,18 @@ CFLAGS = -I $(CRANE_INCLUDEDIR) -c
 
 objs = main.o partition_table.o fs.o fat.o
 
-all: $(CONFIGURE) crane-disk asmfiles 
+SFILES = ptable.s fatbpb.s
 
-bootdisk.img: crane.mbr cranebl.bin
-	cat $(word 1,$^) > $@
-	cat $(word 2,$^) >> $@
+all: $(CONFIGURE) crane-disk asmfiles bootdisk.img
+
+bootdisk.img: mbr.img cranebl.bin
+	cat $(word 1, $^) > $@
+	cat $(word 2, $^) >> $@
 
 
-mbr.img: crane-disk
+mbr.img: crane-disk $(SFILES)
+	cp $(word 1, $(SFILES)) $(CRANE_STAGE1DIR)
+	cp $(word 2, $(SFILES)) $(CRANE_STAGE1DIR)
 	$(MAKE) -C $(CRANE_STAGE1DIR)
 	cp $(CRANE_STAGE1DIR)/mbr.img  $(CRANE_ROOT)/$@
 
@@ -56,6 +60,7 @@ clean:
 	rm -f config*
 	rm -f *.mbr
 	rm -f crane-disk
+	rm -f $(SFILES)
 	$(MAKE) -C $(CRANE_STAGE1DIR) clean
 	$(MAKE) -C $(CRANE_STAGE2DIR) clean
 

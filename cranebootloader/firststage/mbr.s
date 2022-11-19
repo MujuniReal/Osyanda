@@ -9,8 +9,10 @@ main:
 	nop
 	/* If disk has no partition Include Fatbpb header bootloader program should take care of this*/
 
-	/* below its sleeping for now */
-	/* .include "bpb.h" */
+fatbpb:	
+	/* below is if installed file system is FAT it requires a bpb */
+	/* Else, this space  is blank or filled with zeros */
+	.include "fatbpb.s"
 	
 prints:
 	lodsb
@@ -113,5 +115,11 @@ FReadStr: .asciz "Totally Failed to read Sector\r\n"
 RebootStr: .asciz "Press Any Key to Reboot.\r\n"
 SucReadStr: .asciz "Successfully read the disk\r\n"
 
-.fill 510-(.-main),1,0
+	.fill 446-(.-main),1,0
+	
+partitionTable:
+	.include "ptable.s"
+
+	.fill 64-(.-partitionTable),1,0
+	
 BootMagic: .word 0xaa55

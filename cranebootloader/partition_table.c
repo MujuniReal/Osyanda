@@ -2,9 +2,6 @@
 #include "types.h"
 #include "partable.h"
 
-#define PART_TABLE_OFFSET 446
-#define MAXTABLENTRIES 4
-
 typedef struct _partblentry partTableEntry;
 
 partTableEntry *partitionTable;
@@ -48,7 +45,7 @@ void createPartSrcFile(){
   srcFilePtr = fopen("./ptable.s","w");
 
   for(int i=0; i < MAXTABLENTRIES; i++){
-    fprintf(srcFilePtr, "bootSig%d:\t.byte 0x%x\n",i , partitionTable[i].bootSig);
+    fprintf(srcFilePtr, "\nbootSig%d:\t.byte 0x%x\n",i , partitionTable[i].bootSig);
     fprintf(srcFilePtr, "startHead%d:\t.byte 0x%x\n",i , partitionTable[i].startHead);
     fprintf(srcFilePtr, "startSect%d:\t.byte 0x%x\n",i , partitionTable[i].startSect);
     fprintf(srcFilePtr, "startCylinder%d:\t.byte 0x%x\n",i , partitionTable[i].startCylinder);

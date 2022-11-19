@@ -38,6 +38,10 @@ with the bochs software.
 
 Building the software;
 
+If you wish to access summarized commands on the build and install process,
+you can open the ``commands.txt`` file to setup otherwise you can follow on with
+the one in this file which explains each step
+
 1) Making a disk Image of a storage medium;
 Make a disk image of appropriately 512MBs using the disk creation tool
 
@@ -47,6 +51,32 @@ This will create a disk image called "osyanda.img", this in a realtime environme
 a storage device HDD/flash drive
 * Next format the disk image to FAT16, by running **``mkfs.fat -F 16 -I osyanda.img``**, This is a very
 important step as the FAT16 filesystem has been greatly used in the project.
+
+2) Building and Running Impala
+
+* Open your commandline terminal and navigate to the root directory of the Osyanda project **cd Osyanda**.
+* Run the ``make config`` command to publish required makefile variables.
+* Next, run the ``make`` as the project is building it will prompt for the location of a disk that you wish to use
+to install the bootloader on and the project on this can be the previously created disk image "osyanda.img" or
+a real hardisk like "/dev/sda" for a real disk like "/dev/sda" you will need to run the ``make`` command with super user
+previlleges ``sudo make`` to start the build process, this should take a while.
+* Mount **(as superuser)** the previously created disk image ``sudo mount osyanda.img /mnt``.
+* Run the ``lsblk`` command to note the device name, endevour to locate the disk name matching with its mount point
+example;
+	**``loop22   7:22   0 511.9M  0 loop /mnt``**
+that is an output of the **lsblk** command you can notice that the system identifies our mounted disk image as **loop22**,
+take note of the device name.
+* Next, run (as superuser) ``sudo dd if=cranebootloader/bootdisk.img of=/dev/devicename`` replace ``devicename`` with the previously
+noted device name, following the example its ``loop22`` so the command should look like this;
+``sudo dd if=cranebootloader/bootdisk.img of=/dev/loop22``.
+*Copy the required files; impala.img to the mounted device,(remember our mount directory "/mnt")**, as superuser
+next run command ``sudo cp impala/impala.img /mnt`` next ``sudo cp impala/programs/* /mnt.
+* If all is successful with no errors, unmount the device as super user by running ``sudo umount /mnt``
+* Make sure that bochs is installed on your GNU/Linux machine correctly.
+* Goto the root directory of the Osyanda project and open to edit the **amOsyandaLinux** file, search for the line that contains
+the phrase **path** it should look like ``path=**path-to-your-disk-image**``,if the path to your disk image file you created previously
+looks like this ``/home/user/osyanda.img`` then edit the line in the amOsyandaLinux file to look like this; ``path="/home/user/osyanda.img"``
+* Save the file,close it and run the command ``bochs -f amOsyandaLinux``
 
 On Windows;
 Disk Image creation tool that comes with bochs
@@ -60,31 +90,3 @@ Disk Image creation tool that comes with bochs
 filename like **C:\Users\UsernameX\osyanda.img** with this path, replace **UsernameX** with your exact
 username on your windows machine and then hit the enter Key to finish
 The disk image **osyanda.img** will be stored in your home directory
-
-
-2) Building and Running Impala
-
-On GNU/Linux;
-* Open your commandline terminal and navigate to the root directory of the Osyanda project **cd Osyanda**.
-* Run the ``make config`` command to publish required makefile variables.
-* Next, run the ``make`` command to start the build process, this should take a while.
-* Mount **(as superuser)** the previously created disk image ``sudo mount osyanda.img /mnt``.
-* Run the ``lsblk`` command to note the device name, endevour to locate the disk name matching with its mount point
-example;
-	**``loop22   7:22   0 511.9M  0 loop /mnt``**
-that is an output of the **lsblk** command you can notice that the system identifies our mounted disk image as **loop22**,
-take note of the device name.
-* Next, run (as superuser) ``sudo dd if=cranebootloader/crane.mbr of=/dev/devicename`` replace ``devicename`` with the previously
-noted device name, following the example its ``loop22`` so the command should look like this;
-``sudo dd if=cranebootloader/crane.mbr of=/dev/loop22``.
-* **Copy the required files; cranebl.img and impala.img to the mounted device,(remember our mount directory "/mnt")**, as superuser
-run ``sudo cp cranebootloader/cranebl.img /mnt``, run next command ``sudo cp impala/impala.img /mnt``.
-* If all is successful with no errors, unmount the device as super user by running ``sudo umount /mnt``
-* Make sure that bochs is installed on your GNU/Linux machine correctly.
-* Goto the root directory of the Osyanda project and open to edit the **amOsyandaLinux** file, search for the line that contains
-the phrase **path** it should look like ``path=**path-to-your-disk-image**``,if the path to your disk image file you created previously
-looks like this **/home/user/osyanda.img** then edit the line in the amOsyandaLinux file to look like this;
-      **path="/home/user/osyanda.img"**
-* Save the file,close it and run the command ``bochs -f amOsyandaLinux``
-
-On Windows

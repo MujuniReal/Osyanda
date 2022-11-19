@@ -7,6 +7,24 @@ typedef struct _fatbpb1216 fatbpb1216;
 
 void handleFat(char *mbr){
 
+  fatbpb1216 *bpb = (fatbpb1216*)(mbr +  FATBPBOFFSET);
+
+  if(strncmp(bpb->FSType, "FAT12", 5) == 0){
+    //FAT12 installed
+    createFat1216BpbSrc(bpb);
+  }
+  else if(strncmp(bpb->FSType, "FAT16", 5) == 0){
+    //FAT16 installed
+    /* printf("FAT 16 installed\n"); */
+     createFat1216BpbSrc(bpb);
+  }
+  else if(strncmp(bpb->FSType, "FAT16", 5) == 0){
+    //FAT32 installed
+  }
+  else{
+    printf("File system not recognized.\n");
+    return;
+  }
 }
 
 
