@@ -2,25 +2,25 @@
 
 #define BIOSDISKREAD 2
 
-extern uint8 LogDrvNo;
-extern uint16 NHeads;
-extern uint16 SectsPTrck;
+extern uint8 driveNo;
+extern uint16 totalHeads;
+extern uint16 sectsPerTrack;
 extern void prints(char *s);
 
 //Returns the number of sectors read returns 0 if fails
 uint8 readsect(char *buf, uint8 numSects, uint32 lba){
 
-  uint32 qoutient = lba / SectsPTrck;
+  uint32 qoutient = lba / sectsPerTrack;
   
-  uint16 sector = (lba % SectsPTrck) + 1;
-  uint16 head = qoutient % NHeads;
-  uint16 cylinder = qoutient / NHeads;
+  uint16 sector = (lba % sectsPerTrack) + 1;
+  uint16 head = qoutient % totalHeads;
+  uint16 cylinder = qoutient / totalHeads;
 
   uint8 CH = cylinder & 0x00ff;
   uint8 CL = cylinder & 0xc0 | (sector & 0x3f);
 
   uint8 DH = head & 0x00ff;
-  uint8 DL = LogDrvNo;
+  uint8 DL = driveNo;
 
   uint16 AX =  (BIOSDISKREAD << 8) | numSects;
   uint16 CX = CH << 8 | CL;

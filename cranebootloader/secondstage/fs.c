@@ -1,115 +1,61 @@
-#include <types.h>
-#include <string.h>
-#include <fat.h>
-#define ROOTDIRENTRYSIZE 32
-#define EOFMAGIC 0xffff
+#include "types.h"
+#include "string.h"
+#include "partable.h"
+#include "fat.h"
+#define MBRSIZE 512
 
-extern void prints(char *s);
-extern uint8 readsect(char *buf, uint8 numSects, uint32 lba);
-extern uint16 ResSects;
-extern uint16 SectsPFat;
-extern uint8 FatTabs;
-extern uint16 NRootDirEs;
-extern uint16 ByPSect;
-extern uint8 SectPClust;
+extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
+typedef struct _partblentry partTableEntry;
+partTableEntry *partitionTable;
+char mbr[MBRSIZE];
+int16 numberOfPartitions;
 
-typedef struct _dirEntry dirEntry;
+int16 readPartitionTable(){
+  //Read the first Sector of the disk the mbr
+  readsect((char*)&mbr, 1, 0);
+  numberOfPartitions = 0;
 
-uint16 *load_fat(uint16 *fat);
+  partitionTable = (partTableEntry*)(mbr + PART_TABLE_OFFSET);
+  
+  for(uint16 i=0; i < MAXTABLENTRIES; i++){
 
-//Returns 0 if file not found, returns file start Cluster number if file found
-uint32 find_file(char *filename){
-
-  char rootdirSect[ByPSect];
-
-  uint32 rootdirStart = ResSects + (SectsPFat * FatTabs);
-  uint32 rootdirSectors = (NRootDirEs * ROOTDIRENTRYSIZE) / ByPSect;
-  uint16 dirEntriesInSect = ByPSect / ROOTDIRENTRYSIZE;
-
-
-  uint16 i = 0;
-  for(i; i < rootdirSectors; i++){
-    uint32 dirSectLba = rootdirStart + i;
-
-    if(readsect((char*)&rootdirSect, 1, dirSectLba) == 0){
-      //Failed to read sector
-      break;
-    };
-    
-    dirEntry *rootdirMem = (dirEntry*)&rootdirSect;
-
-    for(uint16 e=0; e < dirEntriesInSect; e++){
-
-      if(strncmp((char*)&rootdirMem[e].dirName,filename, 11) == 0){
-	      /* File Found */
-	      uint32 filestartCluster = rootdirMem[e].dirFirstClustHi << 16 | rootdirMem[e].dirFirstClustLo;
-	      return filestartCluster;
-      } 
+    if(partitionTable[i].sectsInPartition != 0){
+      //If there are sectors in the partition means the partition exists
+      numberOfPartitions += 1;
     }
+    
   }
 
-  
-  /* File Not Found */
-  return 0;
+  return numberOfPartitions;
 }
 
-int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust){
+void detectFs(){
 
-  uint32 fatSize = SectsPFat * ByPSect;
-  uint32 rootdirStart = ResSects + (SectsPFat * FatTabs);
-  uint32 rootdirSectors = (NRootDirEs * ROOTDIRENTRYSIZE) / ByPSect;
-  uint32 firstDataSect = rootdirStart + rootdirSectors;
-  uint32 ByPClust = SectPClust * ByPSect;
-  uint16 ByPSeg = ByPClust / 16;     //Real address / 16 = segment
-  
-  //Because fat16 entry in fat is 2bytes
-  //Load Just one sector of the FAT for now
-  uint16 fat[ByPSect];
+  readPartitionTable();
 
-  if(load_fat(fat) == 0){
-    char *errFat = "Error reading FAT sector.\r\n";
-    prints(errFat);
-    return -1;
-  };
-  
-  uint16 fileClust = fstartClust;
-  uint16 nextSegment = segment;
-  do {
-    //Read file cluster into memory
-    uint32 clusterLBA = firstDataSect + ((fileClust - 2) * SectPClust);  //Minus 2
+  if(numberOfPartitions == 0){
+    //Disk has no partitions
+  }
 
-    //Since we are reading the file to a special segment
-    asm("pushw %es");
+  //Known file systems FAT first
+  fatbpb1216 *bpb = (fatbpb1216*)(mbr + FATBPBOFFSET);
 
-    asm("mov %%ax,%%es"::"a"(nextSegment));
-
-    uint8 readscts = readsect((char*)offset, SectPClust, clusterLBA);
-    asm("popw %es");
-    
-    if(readscts == 0){
-      return -1;
-    }
-
-    fileClust = fat[fileClust];
-    nextSegment += ByPSeg;
-    
-  } while(fileClust != EOFMAGIC);
-    
-    return 0;
-  
+  if(strncmp(bpb->FSType, "FAT", 3) == 0){
+    //prepare fat bpb structure src file
+    loadFatDependancies(bpb);
+  }
+  else{
+    //Just Create the bpb file as its necessary in the build process
+    FILE *bpbSrcPtr;
+    bpbSrcPtr = fopen("./fatbpb.s","w");
+    fclose(bpbSrcPtr);
+  }
 
 }
 
+//This function below is to setup functions that read the selected partition
+//Common necessary functions like reading a file from the filesystem of the selected partition
+//It takes in pointers to those functions of the selected file system
+void initializeSubRoutines(){
 
-uint16 *load_fat(uint16 *fat){
-  
-  uint32 fatStartSect = ResSects + 0;
-
-  if(readsect((char*)fat, 1, fatStartSect) == 0){
-    uint16 *nullPtr = 0;
-    return nullPtr;
-  }
-
-  return fat;
-  
 }

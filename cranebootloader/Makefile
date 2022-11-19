@@ -30,7 +30,9 @@ mbr.img: crane-disk $(SFILES)
 	$(MAKE) -C $(CRANE_STAGE1DIR)
 	cp $(CRANE_STAGE1DIR)/mbr.img  $(CRANE_ROOT)/$@
 
-cranebl.bin: crane-disk
+cranebl.bin: crane-disk $(SFILES)
+	cp $(word 1, $(SFILES)) $(CRANE_STAGE2DIR)
+	cp $(word 2, $(SFILES)) $(CRANE_STAGE2DIR)
 	$(MAKE) -C $(CRANE_STAGE2DIR)
 	cp $(CRANE_STAGE2DIR)/$@ $(CRANE_ROOT)/$@
 

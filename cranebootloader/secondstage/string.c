@@ -1,4 +1,4 @@
-#include <types.h>
+#include "types.h"
 
 uint16 strlen(char *s){
   
@@ -52,8 +52,7 @@ int16 strncmp(char *s1, char *s2, uint32 size){
 char *strncpy(char *dest, char *src, uint32 size){
 
   for(uint32 i=0; i < size; i++){
-    uint8 cha = (uint8)src[i];
-    dest[i] = cha;
+    *(dest+i) = *(src+i);
   }
   return dest;
 }

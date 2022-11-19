@@ -20,6 +20,8 @@ void crane_main(){
   prints(welcome);
 
 
+  detectFs();
+
   char *kernelName = "IMPALA  IMG";
   
   uint32 fileStartClust = find_file(kernelName);
