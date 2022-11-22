@@ -1,17 +1,22 @@
-#include <types.h>
+#include "types.h"
 #define IMPALASEGMENT 0x6000
 #define IMPALAOFFSET 0x0000
 
 extern void prints(char *s);
-extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
+//extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
 
+extern void detectFs();
 extern void initialize_gdt();
 extern void initialize_idt();
 extern void load_gdt();
 extern void load_idt();
 extern int16 activate_a20pin();
-extern uint16 find_file(char* filename);
-extern int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust);
+extern char *toasci10(int number, char *buff);
+
+typedef uint32 (*findFileFunc)(char*);
+extern findFileFunc (*findFile)(char* filename);
+typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+extern readFileFunc readFile(uint16 segment, uint16 offset, uint32 fstartClust);
 
 void crane_main(){
 
@@ -19,20 +24,28 @@ void crane_main(){
 
   prints(welcome);
 
-
   detectFs();
 
   char *kernelName = "IMPALA  IMG";
   
-  uint32 fileStartClust = find_file(kernelName);
+  uint32 fileStartClust = (uint32)findFile(kernelName);
+
 
   if(fileStartClust == 0){
     char *knfound = "Kernel not found\r\n";
     prints(knfound);
     return;
   }
+  else if (fileStartClust == 3){
+    char b[11];
+    toasci10(fileStartClust, (char*)&b);
+    
+    prints("Kernel Found at:");
+    prints((char*)&b);
+    prints("\r\n");
+  }
 
-  if(read_file(IMPALASEGMENT, IMPALAOFFSET, fileStartClust) != 0){
+  if(readFile(IMPALASEGMENT, IMPALAOFFSET, fileStartClust) != 0){
     char *eReadkern = "Error Occured while reading kernel\r\n";
     prints(eReadkern);
     return;

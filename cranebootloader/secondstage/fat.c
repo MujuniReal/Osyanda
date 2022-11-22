@@ -7,37 +7,56 @@
 extern void prints(char *s);
 extern uint8 readsect(char *buf, uint8 numSects, uint32 lba);
 char activeFat[6]; //Active FAT String
-/* extern uint16 ResSects; */
-/* extern uint16 SectsPFat; */
-/* extern uint8 FatTabs; */
-/* extern uint16 NRootDirEs; */
-/* extern uint16 ByPSect; */
-/* extern uint8 SectPClust; */
 
+typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _dirEntry dirEntry;
 
-uint16 *load_fat(uint16 *fat);
+typedef uint32 (*findFileFunc)(char*);
+extern findFileFunc findFile;
+typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+extern readFileFunc readFile;
 
-loadFatDependancies(char *fatbpb){
+uint32 find_file16(char*);
+int16 read_file16(uint16, uint16, uint32);
+fatbpb1216 *activeBpb;
+extern uint16 sectsPerTrack;
+extern uint16 totalHeads;
+void loadFatDependancies(fatbpb1216 *fatbpb){
 
   //Detect which FAT is Exactly
   //Initialize Rootdir
   //Initialize FAT
   //Initialize required variables
-  
+
+  activeBpb = fatbpb;
+
+  if(strncmp(fatbpb->FSType, "FAT16", 5) == 0){
+    prints("FAT16 Detected\r\n");
+    //Set data from bpb as standard
+    sectsPerTrack = fatbpb->SectsPTrck;
+    totalHeads = fatbpb->NHeads;
+    findFile = (findFileFunc)find_file16;
+    readFile = (readFileFunc)read_file16;
+  }
+  else{
+    //Handle Other file systems here
+    prints("Other FAT is detected\r\n");
+  }
   
 }
 
 
 //Returns 0 if file not found, returns file start Cluster number if file found
-uint32 find_file(char *filename){
+uint32 find_file16(char *filename){
 
-  char rootdirSect[ByPSect];
+  //char rootdirSect[activeBpb->ByPSect];
+  char rootdirSect[512];
 
-  uint32 rootdirStart = ResSects + (SectsPFat * FatTabs);
-  uint32 rootdirSectors = (NRootDirEs * ROOTDIRENTRYSIZE) / ByPSect;
-  uint16 dirEntriesInSect = ByPSect / ROOTDIRENTRYSIZE;
+  uint32 rootdirStart = activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
+  uint32 rootdirSectors = (activeBpb->NRootDirEs * ROOTDIRENTRYSIZE) / activeBpb->ByPSect;
+  uint16 dirEntriesInSect = activeBpb->ByPSect / ROOTDIRENTRYSIZE;
 
+  //  prints("Rootdirstart: 
 
   uint16 i = 0;
   for(i; i < rootdirSectors; i++){
@@ -50,6 +69,8 @@ uint32 find_file(char *filename){
     
     dirEntry *rootdirMem = (dirEntry*)&rootdirSect;
 
+    //This code below here is bringiing issues, its not advancing the pointer to the next structure of
+    //The root directory
     for(uint16 e=0; e < dirEntriesInSect; e++){
 
       if(strncmp((char*)&rootdirMem[e].dirName,filename, 11) == 0){
@@ -62,21 +83,36 @@ uint32 find_file(char *filename){
 
   
   /* File Not Found */
+  asm("nop; nop");
   return 0;
 }
 
-int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust){
+uint16 *load_fat(uint16 *fat){
+  
+  uint32 fatStartSect = activeBpb->ResSects + 0;
 
-  uint32 fatSize = SectsPFat * ByPSect;
-  uint32 rootdirStart = ResSects + (SectsPFat * FatTabs);
-  uint32 rootdirSectors = (NRootDirEs * ROOTDIRENTRYSIZE) / ByPSect;
+  if(readsect((char*)fat, 1, fatStartSect) == 0){
+    uint16 *nullPtr = 0;
+    return nullPtr;
+  }
+
+  return fat;
+  
+}
+
+
+int16 read_file16(uint16 segment, uint16 offset, uint32 fstartClust){
+
+  uint32 fatSize = activeBpb->SectsPFat * activeBpb->ByPSect;
+  uint32 rootdirStart = activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
+  uint32 rootdirSectors = (activeBpb->NRootDirEs * ROOTDIRENTRYSIZE) / activeBpb->ByPSect;
   uint32 firstDataSect = rootdirStart + rootdirSectors;
-  uint32 ByPClust = SectPClust * ByPSect;
+  uint32 ByPClust = activeBpb->SectPClust * activeBpb->ByPSect;
   uint16 ByPSeg = ByPClust / 16;     //Real address / 16 = segment
   
   //Because fat16 entry in fat is 2bytes
   //Load Just one sector of the FAT for now
-  uint16 fat[ByPSect];
+  uint16 fat[activeBpb->ByPSect];
 
   if(load_fat(fat) == 0){
     char *errFat = "Error reading FAT sector.\r\n";
@@ -88,14 +124,14 @@ int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust){
   uint16 nextSegment = segment;
   do {
     //Read file cluster into memory
-    uint32 clusterLBA = firstDataSect + ((fileClust - 2) * SectPClust);  //Minus 2
+    uint32 clusterLBA = firstDataSect + ((fileClust - 2) * activeBpb->SectPClust);  //Minus 2
 
     //Since we are reading the file to a special segment
     asm("pushw %es");
 
     asm("mov %%ax,%%es"::"a"(nextSegment));
 
-    uint8 readscts = readsect((char*)offset, SectPClust, clusterLBA);
+    uint8 readscts = readsect((char*)offset, activeBpb->SectPClust, clusterLBA);
     asm("popw %es");
     
     if(readscts == 0){
@@ -113,15 +149,3 @@ int16 read_file(uint16 segment, uint16 offset, uint32 fstartClust){
 }
 
 
-uint16 *load_fat(uint16 *fat){
-  
-  uint32 fatStartSect = ResSects + 0;
-
-  if(readsect((char*)fat, 1, fatStartSect) == 0){
-    uint16 *nullPtr = 0;
-    return nullPtr;
-  }
-
-  return fat;
-  
-}

@@ -1,10 +1,27 @@
-#include "types"
+#include "types.h"
 #include "string.h"
 
 uint8 to_ascii(uint8 c){
 
   
 }
+
+char *_toasci10(int number, char* numAsci){
+  
+  int quotient = number / 10;
+  int rem = number % 10;
+  
+  
+  if(quotient == 0){
+    *numAsci = (uint8)(0x30 | rem & 0x0f);
+    return numAsci + 1;
+  }
+  numAsci = _toasci10(quotient, numAsci);
+  *numAsci  = (uint8)(0x30 | rem & 0x0f);
+  return numAsci + 1;
+
+}
+
 
 char *toasci10(int number, char *buff){
   
@@ -19,18 +36,3 @@ char *toasci10(int number, char *buff){
   
 }
 
-char *_toasci10(int number, char* numAsci){
-  
-  int quotient = number / 10;
-  int rem = number % 10;
-  
-  
-  if(quotient == 0){
-    *numAsci = (uint8)(0x30 | rem & 0x0f);
-    return numAsci + 1;
-  }
-  numAsci = toasci10(quotient, numAsci);
-  *numAsci  = (uint8)(0x30 | rem & 0x0f);
-  return numAsci + 1;
-
-}

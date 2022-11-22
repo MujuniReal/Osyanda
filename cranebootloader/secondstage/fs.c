@@ -5,10 +5,17 @@
 #define MBRSIZE 512
 
 extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
+typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _partblentry partTableEntry;
+extern void loadFatDependancies(fatbpb1216*);
 partTableEntry *partitionTable;
 char mbr[MBRSIZE];
 int16 numberOfPartitions;
+
+typedef uint32 (*findFileFunc)(char*);
+findFileFunc findFile;
+typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+readFileFunc readFile;
 
 int16 readPartitionTable(){
   //Read the first Sector of the disk the mbr
@@ -33,22 +40,25 @@ void detectFs(){
 
   readPartitionTable();
 
+  fatbpb1216 *bpb;
   if(numberOfPartitions == 0){
     //Disk has no partitions
+    bpb = (fatbpb1216*)(mbr + FATBPBOFFSET);
   }
-
+  //If it has partitions the file system identifier wont be in the bpb
+  else{
+    //Calculate the offset to the partition containing the fs
+    //Read the bpb of the start of the bpb containing FS info
+    //and update the bpb variable
+  }
   //Known file systems FAT first
-  fatbpb1216 *bpb = (fatbpb1216*)(mbr + FATBPBOFFSET);
+  
 
   if(strncmp(bpb->FSType, "FAT", 3) == 0){
-    //prepare fat bpb structure src file
     loadFatDependancies(bpb);
   }
   else{
-    //Just Create the bpb file as its necessary in the build process
-    FILE *bpbSrcPtr;
-    bpbSrcPtr = fopen("./fatbpb.s","w");
-    fclose(bpbSrcPtr);
+    //not a FAT fs
   }
 
 }
