@@ -13,10 +13,8 @@ extern void load_idt();
 extern int16 activate_a20pin();
 extern char *toasci10(int number, char *buff);
 
-typedef uint32 (*findFileFunc)(char*);
-extern findFileFunc (*findFile)(char* filename);
-typedef int16 (*readFileFunc)(uint16, uint16, uint32);
-extern readFileFunc readFile(uint16 segment, uint16 offset, uint32 fstartClust);
+extern uint32 (*findFile)(char* filename);
+extern int16 (*readFile)(uint16 segment, uint16 offset, uint32 fstartClust);
 
 void crane_main(){
 

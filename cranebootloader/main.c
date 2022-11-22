@@ -57,7 +57,7 @@ int main(int argc,char **argv){
   
   char *allocMem[4];
 
-  printf("Choose Osyanda partition:\n\n");
+  printf("Partitions:\n\n");
   for(int i=0; i < numPartitions; i++){
     
     char *mbrBpb = (char*)malloc(MBRSIZE);
@@ -72,7 +72,17 @@ int main(int argc,char **argv){
     //    printf("*%i. %s\n",(i+1), fsName);
     
   }
-  
+  printf("Select Osyanda partition: ");
+  int selectedPartition;
+  scanf("%i",&selectedPartition);
+
+  if(selectedPartition < 5){
+    detectFs(allocMem[selectedPartition - 1]);
+  }
+  else{
+    printf("Partition not found\n");
+    //    goto selectPart:
+  }
   
   fclose(diskmbrPtr);  
 
