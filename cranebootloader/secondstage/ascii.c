@@ -1,16 +1,10 @@
 #include "types.h"
 #include "string.h"
 
-uint8 to_ascii(uint8 c){
-
-  
-}
-
 char *_toasci10(int number, char* numAsci){
   
   int quotient = number / 10;
   int rem = number % 10;
-  
   
   if(quotient == 0){
     *numAsci = (uint8)(0x30 | rem & 0x0f);
@@ -18,6 +12,8 @@ char *_toasci10(int number, char* numAsci){
   }
   numAsci = _toasci10(quotient, numAsci);
   *numAsci  = (uint8)(0x30 | rem & 0x0f);
+  //Fix this function it returns the pointer plus the length of the string version of the
+  //number and so if you print from this address you print nothing
   return numAsci + 1;
 
 }

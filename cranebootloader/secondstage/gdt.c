@@ -1,23 +1,11 @@
-#include <types.h>
-
+#include "types.h"
+#include "gdt.h"
 #define GDT_SEGMENT 0x0000
 #define GDT_OFFSET 0x800
 #define GDTSIZE 24
 
-typedef struct _gdtEntry{
-  uint16 limitLo;
-  uint16 baseLo;
-  uint8 baseMid;
-  uint8 accessByte;
-  uint8 flagsLimitHi;
-  uint8 baseHi;
-
-}__attribute__((packed)) gdtEntry;
-
-typedef struct _gdtPtr{
-  uint16 noEntries;
-  uint32 gdtAddr;
-}__attribute__((packed)) gdtPtr;
+typedef struct _gdtEntry gdtEntry;
+typedef struct _gdtPtr gdtPtr;
 
 gdtPtr gdtptr;
 gdtEntry *gdt;

@@ -17,6 +17,7 @@ readrootdir:
 
 	addw ResSects,%ax
 	addw NHiddenSects,%ax
+	adc NhiddnSectshi,%ax
 	/* %eax has the start of the root directory */
 	mov %eax,lba
 	mov %eax,rootdir_start

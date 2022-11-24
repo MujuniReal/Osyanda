@@ -3,8 +3,6 @@
 
 #define FATBPBOFFSET 3
 #define FAT1216_BPBSIZE 62
-#define VOLUMELABEL_STRLOCATION 43
-#define FSNAME_STRLOCATION 54
 
 struct _fatbpb1216{
   char devOEM[8];
