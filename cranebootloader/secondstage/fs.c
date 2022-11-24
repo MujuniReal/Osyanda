@@ -4,22 +4,25 @@
 #include "fat.h"
 #define MBRSIZE 512
 
-extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
 typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _partblentry partTableEntry;
+typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+typedef uint32 (*findFileFunc)(char*);
+
+extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
 extern void loadFatDependancies(fatbpb1216*);
+
 partTableEntry *partitionTable;
-char mbr[MBRSIZE];
+
 int16 numberOfPartitions;
 
-typedef uint32 (*findFileFunc)(char*);
 findFileFunc findFile;
-typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+
 readFileFunc readFile;
 
-int16 readPartitionTable(){
+int16 readPartitionTable(char *mbr){
   //Read the first Sector of the disk the mbr
-  readsect((char*)&mbr, 1, 0);
+  //readsect((char*)&mbr, 1, 0);
   numberOfPartitions = 0;
 
   partitionTable = (partTableEntry*)(mbr + PART_TABLE_OFFSET);
@@ -36,21 +39,21 @@ int16 readPartitionTable(){
   return numberOfPartitions;
 }
 
-void detectFs(){
+void detectFs(char *mbr){
 
-  readPartitionTable();
+  //readPartitionTable(mbr);
 
-  fatbpb1216 *bpb;
-  if(numberOfPartitions == 0){
+  fatbpb1216 *bpb = (fatbpb1216*)(mbr + FATBPBOFFSET);
+//  if(numberOfPartitions == 0){
     //Disk has no partitions
-    bpb = (fatbpb1216*)(mbr + FATBPBOFFSET);
-  }
+    //    bpb
+//  }
   //If it has partitions the file system identifier wont be in the bpb
-  else{
+//  else{
     //Calculate the offset to the partition containing the fs
     //Read the bpb of the start of the bpb containing FS info
     //and update the bpb variable
-  }
+//  }
   //Known file systems FAT first
   
 
@@ -60,12 +63,5 @@ void detectFs(){
   else{
     //not a FAT fs
   }
-
-}
-
-//This function below is to setup functions that read the selected partition
-//Common necessary functions like reading a file from the filesystem of the selected partition
-//It takes in pointers to those functions of the selected file system
-void initializeSubRoutines(){
 
 }

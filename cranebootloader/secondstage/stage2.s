@@ -4,6 +4,7 @@
 	.global driveNo
 	.global totalHeads
 	.global sectsPerTrack
+	.global maxTracks
 	.text
 	.org 0x00
 
@@ -12,6 +13,7 @@ mainSecond:
 	nop
 
 	.include "fatbpb.s"
+	
 sectsPerTrack:		.word 0x0
 totalHeads:		.word 0x0
 driveNo:		.byte 0x0
@@ -42,6 +44,3 @@ _start:
 
 _hang:
 	jmp _hang
-
-Welcome_Note:
-kernelfilename: .ascii "IMPALA  IMG"

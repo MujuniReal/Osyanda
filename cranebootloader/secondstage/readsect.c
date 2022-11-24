@@ -1,5 +1,4 @@
-#include <types.h>
-
+#include "types.h"
 #define BIOSDISKREAD 2
 
 extern uint8 driveNo;
@@ -53,7 +52,6 @@ uint8 readsect(char *buf, uint8 numSects, uint32 lba){
     return (uint8)(result & 0x00ff);
   }
 
-  char *err = "Error occured while reading disk\n";
-  prints(err);
+  prints("Error occured while reading disk\n");
   return 0;
 }

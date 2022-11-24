@@ -77,6 +77,7 @@ int main(int argc,char **argv){
   scanf("%i",&selectedPartition);
 
   if(selectedPartition < 5){
+    partitionTable[selectedPartition - 1].bootSig = 0x80;
     detectFs(allocMem[selectedPartition - 1]);
   }
   else{
