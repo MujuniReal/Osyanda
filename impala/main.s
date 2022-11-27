@@ -32,11 +32,24 @@ run_impala:
 	call install_interrupt_handler
 	add $0x8,%esp
 
+	push $keydrv
+	push $0x1
+	call install_interrupt_handler
+	add $0x8,%esp
+
+	
 	xor %eax,%eax
 	xor %ebx,%ebx
 	xor %ecx,%ecx
 	xor %edx,%edx
 
+	// push %edi
+	// mov %eax,%edi
+	// movl $0x000107ae,264(%edi)
+	// movl $0x00060e00,268(%edi)
+	
+
+	// pop %edi
 //	mov $0x2,%eax		/* Function number */
 	/* lba %ebx leave as is */
 //	mov $red_data,%ecx

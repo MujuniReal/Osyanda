@@ -3,13 +3,13 @@ dirs = fat
 
 FILE_SYSTEMS = fat/fat.o
 
-all: filesys.o
+all: fs.o
 
 
 LD = ld -m elf_i386 -r
 
 
-filesys.o: $(FILE_SYSTEMS)
+fs.o: $(FILE_SYSTEMS)
 	$(LD) $^ -o $@
 
 fat/fat.o:

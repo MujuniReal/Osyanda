@@ -4,15 +4,17 @@ else
 CONFIGURE = config
 KEYBOARD_DRIVERDIR = `pwd`
 IMPALA_ROOT = $(KEYBOARD_DRIVERDIR)/../../
-IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include
+IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include/
 IMPALA_DRIVERDIR = $(IMPALA_ROOT)/drivers/
 endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
-objs = ps2_kbd.o
+objs = ps2_kbd.o  ascikeys.o
+CC = gcc
+CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 
-all: $(CONFIGURE) $(objs) keyboard.o
+all: $(CONFIGURE) $(objs) kbd.o
 
 
 %.o: %.s
@@ -21,7 +23,7 @@ all: $(CONFIGURE) $(objs) keyboard.o
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@
 
-keyboard.o: $(objs)
+kbd.o: $(objs)
 	$(LD) $^ -o $@
 
 

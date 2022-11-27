@@ -76,7 +76,7 @@ void crane_main(){
   
   load_idt();
   load_gdt();
-  asm("int $0x16"::"a"(0x0));
+  //  asm("int $0x16"::"a"(0x0));
 
   asm("nop");
 

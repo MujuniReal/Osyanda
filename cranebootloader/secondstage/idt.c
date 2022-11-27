@@ -1,10 +1,11 @@
 #include "types.h"
+#include "idt.h"
 #define IDTMAX 256
 #define IDT_SEGMENT 0x0000
 #define IDT_OFFSET 0x0000
 #define IDTSIZE 2048
 
-typedef struct _idtEntry gdtEntry;
+typedef struct _idtEntry idtEntry;
 typedef struct _idtPtr idtPtr;
 
 idtEntry *idt;

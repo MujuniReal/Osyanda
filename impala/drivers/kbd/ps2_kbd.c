@@ -14,36 +14,15 @@
 
 extern uint16 *asci_keys;
 
-void init_keyboard(){
 
-  wait_for_write(KYBDSTAT, 2);
-
-  //Turn off keyboard scanning
-  outportb(KYBDSCANOFF, KYBDCMD);
-
-  wait_kybd_stat(KYBDDATA, CMDACK);
-
-  wait_for_write(KYBDSTAT, 2);
-
-  //Turn on Keyboard scanning
-  outportb(KYBDSCANON, KYBDCMD);
-
-  //Wait for Acknowledgement
-  wait_kybd_stat(KYBDDATA, CMDACK);
-
-  char *succStr = "[impala] Keyboard Sucessfully Initialized\n";
-
-  prints(succStr);
-  
-}
-
-int wait_for_write(uint16 port, uint8 writeByte){
+uint8 wait_for_write(uint16 port, uint8 writeByte){
   
   uint8 result = inportb(port);
   while( result & writeByte ){
     //Will jump out of loop if and result is zero
     result = inportb(port);
   }
+  return result;
 }
 
 void wait_kybd_stat(uint16 port, uint8 waitByte){
@@ -77,3 +56,25 @@ char read_kybd(){
   return asciChar;
 }
 
+void init_keyboard(){
+
+  wait_for_write(KYBDSTAT, 2);
+
+  //Turn off keyboard scanning
+  outportb(KYBDSCANOFF, KYBDCMD);
+
+  wait_kybd_stat(KYBDDATA, CMDACK);
+
+  wait_for_write(KYBDSTAT, 2);
+
+  //Turn on Keyboard scanning
+  outportb(KYBDSCANON, KYBDCMD);
+
+  //Wait for Acknowledgement
+  wait_kybd_stat(KYBDDATA, CMDACK);
+
+  char *succStr = "[impala] Keyboard Sucessfully Initialized\n";
+
+  prints(succStr);
+  
+}

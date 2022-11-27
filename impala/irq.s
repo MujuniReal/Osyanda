@@ -89,7 +89,11 @@ install_interrupt_handler:
 	xor %edx,%edx
 	xor %ebx,%ebx
 	
-	lea (interrupt_handlers),%edi
+	push %eax
+	xor %eax,%eax
+	mov $256,%eax
+	mov %eax,%edi
+	pop %eax
 
 	/* the essence of ebp change this in the future */
 	mov 0x8(%ebp),%edx		/* function pointer address */
@@ -115,7 +119,11 @@ interrupt_handler:
 	xor %ebx,%ebx
 
 	mov 0x4(%ebp),%esi			/* collect the parsed structure of registers*/
-	lea (interrupt_handlers),%edi
+	push %eax
+	xor %eax,%eax
+	mov $256,%eax
+	mov %eax,%edi
+	pop %eax
 	
 	mov INTRNO(%esi),%eax
 	sub $32,%eax

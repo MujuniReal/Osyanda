@@ -12,14 +12,14 @@ AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
 objs = ide/rdsk.o ide/wrtdsk.o
 
-all: $(CONFIGURE) $(objs) hardisk.o
+all: $(CONFIGURE) $(objs) hd.o
 
 
 %.o: %.s
 	$(AS) $< -o $@
 
 
-hardisk.o: $(objs)
+hd.o: $(objs)
 	cp ide/rdsk.o $(HARDISK_DRIVERDIR)
 	cp ide/wrtdsk.o $(HARDISK_DRIVERDIR)
 	$(LD) $^ -o $@

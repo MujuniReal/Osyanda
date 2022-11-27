@@ -9,14 +9,16 @@ endif
 
 CC = gcc
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
-
-objs = mem.o iread.o string.o
+LD = ld -m elf_i386 -r
+objs = mem.o iread.o string.o port.o
 
 CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 
 
-all: $(CONFIGURE) $(objs)
+all: $(CONFIGURE) lib.o
 
+lib.o:	$(objs)
+	$(LD) $^ -o $@
 
 %.o: %.s
 	$(AS) $< -o $@
