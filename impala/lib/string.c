@@ -48,7 +48,16 @@ char *memset(char *s, char c, uint32 size){
 
 uint16 *memsetw(uint16 *ss, uint16 cc, uint32 size){
   for(int i=0; i < size; i++){
-    *(ss+1) = cc;
+    *(ss+i) = cc;
   }
   return ss;
+}
+
+void *memcpy(char *dest, char *src, uint32 size){
+
+  for(int i=0; i < size; i++){
+    *(dest + i) = *(src + i);
+  }
+
+  return dest;
 }

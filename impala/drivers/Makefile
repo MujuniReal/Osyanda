@@ -11,7 +11,7 @@ AS = as --32 -I $(IMPALA_INCLUDEDIR)
 CC = gcc
 LD = ld -m elf_i386 -r
 CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
-objs = monitor.o mon.o ps2.o kbd/kbd.o hd/hd.o fs/fs.o
+objs = monitor.o ps2.o kbd/kbd.o hd/hd.o fs/fs.o
 
 all: $(CONFIGURE) drivers.o
 

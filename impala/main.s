@@ -29,29 +29,29 @@ run_impala:
 	add $0x4,%esp
 
 
-	/* initialize file system info */
-	push $fs_msg
-	call prints
-	add $0x4,%esp
+	// /* initialize file system info */
+	// push $fs_msg
+	// call prints
+	// add $0x4,%esp
 	// call readfat
 	// call readrootdir
 
 	/* Install the iread syscall interrupt */
-	push $iread
-	push $0x2	/* int 0x22 */
-	call install_interrupt_handler
-	add $0x8,%esp
+	// push $iread
+	// push $0x2	/* int 0x22 */
+	// call install_interrupt_handler
+	// add $0x8,%esp
 
-	push $keydrv
-	push $0x1
-	call install_interrupt_handler
-	add $0x8,%esp
+	// push $keydrv
+	// push $0x1
+	// call install_interrupt_handler
+	// add $0x8,%esp
 
 	
-	xor %eax,%eax
-	xor %ebx,%ebx
-	xor %ecx,%ecx
-	xor %edx,%edx
+	// xor %eax,%eax
+	// xor %ebx,%ebx
+	// xor %ecx,%ecx
+	// xor %edx,%edx
 
 	// push %edi
 	// mov %eax,%edi
@@ -67,7 +67,7 @@ run_impala:
 	
 //	int $0x22
 
-	nop
+	// nop
 	call _initps2
 
 	call loader
