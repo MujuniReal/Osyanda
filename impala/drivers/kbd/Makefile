@@ -10,7 +10,7 @@ endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
-objs = ps2_kbd.o  ascikeys.o
+objs = ps2_kbd.o 
 CC = gcc
 CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 

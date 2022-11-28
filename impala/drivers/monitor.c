@@ -12,15 +12,12 @@
 #define CURSORHI 14
 #define CURSORLO 15
 
-typedef struct _monitorAxis{
-  uint8 x;
-  uint8 y;
-} monitorAxis;
-
-monitorAxis cursrPos = {x: 0, y: 0};     //Cursor positiion
+uint16 cursorLocation;
 
 extern void memsetw(void *s, short int, int size);
 extern void outportb(uint8 data, uint16 port);
+extern void scroll();
+extern void prints(char *str);
 
 void clears(void){
 
@@ -29,21 +26,57 @@ void clears(void){
   memsetw((uint16*)VGA, ATTRIBSPACE, 1000);
 
   //Set cursor position
-  cursrPos.x = 0;
-  cursrPos.y = 0;
-  
-  setcursor();
+  setcursor(0);
 }
 
-void setcursor(){
+void setcursor(uint16 newCursorLocation){
+
+  cursorLocation = newCursorLocation;
+  uint8 hi = 0xf & cursorLocation >> 8 ;
+  uint8 lo = 0xf & cursorLocation;
+
 
   outportb(CURSORHI, VGACMD);
 
-  outportb(cursrPos.y, VGADATA);
+  outportb(hi, VGADATA);
 
-  outporb(CURSORLO, VGACMD);
+  outportb(CURSORLO, VGACMD);
 
-  outportb(cursrPos.x, VGADATA);
+  outportb(lo, VGADATA);
   
 }
 
+void printc(char c){
+
+  if(cursorLocation == TOTALPIXEL){
+    //Scroll
+    scroll();
+  }
+  if(c <= 0x1f){
+    // prints("")
+    uint32 yAxis;
+    yAxis = cursorLocation / MAXCOLUMNS;   //yaxis = cursorLocation / 80, xaxis = cursorLocation mod 80
+        yAxis += 1;   //Advance it to the next line on the y axis
+        yAxis *= MAXCOLUMNS;
+        setcursor((uint16)yAxis);
+    // switch(c){
+    //   case '\n':
+    //     yAxis = cursorLocation / MAXCOLUMNS;   //yaxis = cursorLocation / 80, xaxis = cursorLocation mod 80
+    //     yAxis += 1;   //Advance it to the next line on the y axis
+    //     yAxis *= MAXCOLUMNS;
+    //     setcursor((uint16)yAxis);
+    //     break;
+      
+    //   default:
+    //     break;
+    // }
+  }
+  uint32 newCursPos = cursorLocation * 2;
+  uint16 *vgaPtr = (uint16*)(VGA + newCursPos);
+
+  //Print the character
+  *vgaPtr = DEFAULTATTRIB << 8 | c;
+
+  cursorLocation += 1;
+  setcursor(cursorLocation);
+}

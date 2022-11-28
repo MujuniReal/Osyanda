@@ -1,6 +1,6 @@
 	.code32
-	.include "macros/port.h"
-	.include "macros/io.h"
+	
+	
 	.include "idt_s.h"
 
 	PRIMARY_PIC_CMDPORT = 0x20
@@ -17,7 +17,20 @@
 	.global interrupt_handler
 	.global install_interrupt_handler
 
+	.macro iowait
+    mov $0x0,%al
+    outb %al,$0x80
+.endm
 
+.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 
 	.macro setirq irqno irqfunc
 	push $\irqfunc

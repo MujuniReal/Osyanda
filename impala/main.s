@@ -1,9 +1,19 @@
 	.code32
-	.include "macros/port.h"
+	
 	.global prep_r
 	.global red_data
 	.text
 	.global run_impala
+
+	.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 
 run_impala:
 	cli
@@ -23,8 +33,8 @@ run_impala:
 	push $fs_msg
 	call prints
 	add $0x4,%esp
-	call readfat
-	call readrootdir
+	// call readfat
+	// call readrootdir
 
 	/* Install the iread syscall interrupt */
 	push $iread

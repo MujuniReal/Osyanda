@@ -1,3 +1,5 @@
+#include "types.h"
+
 struct _idtEntry{
   uint16 handlerLo;
   uint16 gdtCsSelector;

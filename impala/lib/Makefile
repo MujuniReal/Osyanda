@@ -10,7 +10,7 @@ endif
 CC = gcc
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
 LD = ld -m elf_i386 -r
-objs = mem.o iread.o string.o port.o
+objs = iread.o string.o port.o
 
 CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
 

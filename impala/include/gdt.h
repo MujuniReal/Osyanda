@@ -1,3 +1,5 @@
+#include "types.h"
+
 struct _gdtEntry{
   uint16 limitLo;
   uint16 baseLo;

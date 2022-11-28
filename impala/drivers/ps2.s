@@ -1,6 +1,6 @@
 /* code in here initializes the ps2 controller */
 	.code32
-	.include "macros/port.h"
+	// .include "macros/port.h"
 	PS2_STATUSPORT	= 0x64
 	PS2_CMDPORT	= 0x64
 	PS2_DATAPORT	= 0x60
@@ -11,6 +11,15 @@
 
 	.text
 	.global _initps2
+	.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 	
 _initps2:
 	//push %esi

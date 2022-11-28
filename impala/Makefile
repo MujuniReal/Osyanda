@@ -13,7 +13,7 @@ CPP = cpp
 
 objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o loader.o key.o
 lib = lib/lib.o
-drivers = drivers/ps2.o drivers/monitor.o drivers/kbd/kbd.o drivers/hd/hd.o drivers/fs/fs.o
+drivers = drivers/drivers.o
 
 LINKSCRIPT = linkscript.ld
 
@@ -29,7 +29,7 @@ LDFLAGS =  -m elf_i386 --oformat binary -T linkscript.ld -Map=System.map
 all: $(CONFIGURE) impala.img
 
 
-impala.img: $(objs) $(lib) $(drivers) $(progs)
+impala.img: $(objs) $(drivers) $(lib) $(progs)
 	$(LD)  $^ $(LDFLAGS)   -o $@
 
 impala.o: $(objs) $(libs) $(drivers) $(progs)

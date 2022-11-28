@@ -12,7 +12,7 @@
 #define KYBDSCANOFF 0xf5
 #define KYBDSCANON 0xf4
 
-extern uint16 *asci_keys;
+// extern uint16 *asci_keys;
 
 
 uint8 wait_for_write(uint16 port, uint8 writeByte){
@@ -49,7 +49,7 @@ char read_kybd(){
     keyReleased = inportb(KYBDDATA);
   }
 
-  char asciChar = *(asci_keys + key);
+  char asciChar = key;
 
   printc(asciChar);
   
