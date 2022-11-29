@@ -11,7 +11,7 @@ endif
 
 CPP = cpp 
 
-objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o loader.o key.o
+objs = kernel.o main.o idt.o isr.o isr_s.o  irq.o irq_s.o loader.o
 lib = lib/lib.o
 drivers = drivers/drivers.o
 

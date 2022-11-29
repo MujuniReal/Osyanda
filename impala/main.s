@@ -70,13 +70,15 @@ run_impala:
 	// nop
 	call _initps2
 
-	call loader
+	//call loader
 
-//	call terminal
 	
 
+//	call terminal
+	// setcursor(1920);
 
 hang:
+	call read_kybd
 	jmp hang
 
 
