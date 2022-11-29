@@ -1,6 +1,6 @@
 	.code32
-	.include "macros/port.h"
-	.include "macros/io.h"
+	
+	
 	.include "idt_s.h"
 
 	PRIMARY_PIC_CMDPORT = 0x20
@@ -17,7 +17,20 @@
 	.global interrupt_handler
 	.global install_interrupt_handler
 
+	.macro iowait
+    mov $0x0,%al
+    outb %al,$0x80
+.endm
 
+.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 
 	.macro setirq irqno irqfunc
 	push $\irqfunc
@@ -89,7 +102,11 @@ install_interrupt_handler:
 	xor %edx,%edx
 	xor %ebx,%ebx
 	
-	lea (interrupt_handlers),%edi
+	push %eax
+	xor %eax,%eax
+	mov $256,%eax
+	mov %eax,%edi
+	pop %eax
 
 	/* the essence of ebp change this in the future */
 	mov 0x8(%ebp),%edx		/* function pointer address */
@@ -115,7 +132,11 @@ interrupt_handler:
 	xor %ebx,%ebx
 
 	mov 0x4(%ebp),%esi			/* collect the parsed structure of registers*/
-	lea (interrupt_handlers),%edi
+	push %eax
+	xor %eax,%eax
+	mov $256,%eax
+	mov %eax,%edi
+	pop %eax
 	
 	mov INTRNO(%esi),%eax
 	sub $32,%eax

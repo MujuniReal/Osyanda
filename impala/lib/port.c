@@ -7,9 +7,9 @@ void outportb(uint8 data, uint16 port){
   
 }
 
-/* void inportb(uint16 port){ */
+uint8 inportb(uint16 port){ 
 
-/*   uint8 result; */
-/*   asm("inb (%%dx),%%al":"=a"(result): "dN"(port): "%eax"); */
-/*   return result; */
-/* } */
+  uint8 result; 
+  asm("mov %%ax,%%dx; inb (%%dx)":"=a"(result):"a"(port));
+  return result; 
+} 

@@ -1,9 +1,19 @@
 	.code32
-	.include "macros/port.h"
+	
 	.global prep_r
 	.global red_data
 	.text
 	.global run_impala
+
+	.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 
 run_impala:
 	cli
@@ -19,24 +29,37 @@ run_impala:
 	add $0x4,%esp
 
 
-	/* initialize file system info */
-	push $fs_msg
-	call prints
-	add $0x4,%esp
-	call readfat
-	call readrootdir
+	// /* initialize file system info */
+	// push $fs_msg
+	// call prints
+	// add $0x4,%esp
+	// call readfat
+	// call readrootdir
 
 	/* Install the iread syscall interrupt */
-	push $iread
-	push $0x2	/* int 0x22 */
-	call install_interrupt_handler
-	add $0x8,%esp
+	// push $iread
+	// push $0x2	/* int 0x22 */
+	// call install_interrupt_handler
+	// add $0x8,%esp
 
-	xor %eax,%eax
-	xor %ebx,%ebx
-	xor %ecx,%ecx
-	xor %edx,%edx
+	// push $keydrv
+	// push $0x1
+	// call install_interrupt_handler
+	// add $0x8,%esp
 
+	
+	// xor %eax,%eax
+	// xor %ebx,%ebx
+	// xor %ecx,%ecx
+	// xor %edx,%edx
+
+	// push %edi
+	// mov %eax,%edi
+	// movl $0x000107ae,264(%edi)
+	// movl $0x00060e00,268(%edi)
+	
+
+	// pop %edi
 //	mov $0x2,%eax		/* Function number */
 	/* lba %ebx leave as is */
 //	mov $red_data,%ecx
@@ -44,16 +67,18 @@ run_impala:
 	
 //	int $0x22
 
-	nop
+	// nop
 	call _initps2
 
-	call loader
+	//call loader
 
-//	call terminal
 	
 
+//	call terminal
+	// setcursor(1920);
 
 hang:
+	call read_kybd
 	jmp hang
 
 

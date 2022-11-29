@@ -1,4 +1,4 @@
-
+#include <types.h>
 
 int strlen(char *s){
   
@@ -34,5 +34,30 @@ char *strncpy(char *dest, char *src, int size){
   for(int i=0; i < size; i++){
     dest[i] = src[i];
   }
+  return dest;
+}
+
+char *memset(char *s, char c, uint32 size){
+
+  for(int i=0; i < size; i++){
+    *(s+i) = c;
+  }
+
+  return s;
+}
+
+uint16 *memsetw(uint16 *ss, uint16 cc, uint32 size){
+  for(int i=0; i < size; i++){
+    *(ss+i) = cc;
+  }
+  return ss;
+}
+
+void *memcpy(char *dest, char *src, uint32 size){
+
+  for(int i=0; i < size; i++){
+    *(dest + i) = *(src + i);
+  }
+
   return dest;
 }

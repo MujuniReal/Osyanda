@@ -1,10 +1,20 @@
 	.code32
-	.include "macros/port.h"
+	// .include "macros/port.h"
 	//DSK_CMD
 	.text
 	.global lba
 	.global sects_to_read
 	.global rdsk
+
+	.macro outportb data port
+mov $\data,%al
+    outb %al,$\port
+.endm
+
+
+.macro inportb port
+	inb $\port,%al
+.endm
 
 rdsk:
 	push %ebp

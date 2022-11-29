@@ -8,24 +8,30 @@ IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include
 endif
 
 AS = as --32 -I $(IMPALA_INCLUDEDIR)
+CC = gcc
+LD = ld -m elf_i386 -r
+CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
+objs = monitor.o ps2.o kbd/kbd.o hd/hd.o fs/fs.o
 
-objs = monitor.o ps2.o keyboard/keyboard.o hardisk/hardisk.o filesys/filesys.o
+all: $(CONFIGURE) drivers.o
 
-all: $(CONFIGURE) $(objs)
-
+drivers.o: $(objs)
+	$(LD) $^ -o $@
 
 %.o: %.s
 	$(AS) $< -o $@
 
+%.o: %.c
+	$(CC) $(CFLAGS) $^ -o $@
 
-hardisk/hardisk.o:
-	$(MAKE) -C hardisk
+hd/hd.o:
+	$(MAKE) -C hd
 
-keyboard/keyboard.o:
-	$(MAKE) -C keyboard
+kbd/kbd.o:
+	$(MAKE) -C kbd
 
-filesys/filesys.o:
-	$(MAKE) -C filesys
+fs/fs.o:
+	$(MAKE) -C fs
 
 config:
 	echo "IMPALA_DRIVERDIR="$(IMPALA_DRIVERDIR) > config.txt
@@ -38,6 +44,6 @@ clean:
 	rm -f *.o
 	rm -f *.i
 	rm -f config*
-	$(MAKE) -C hardisk clean
-	$(MAKE) -C keyboard clean
-	$(MAKE) -C filesys clean
+	$(MAKE) -C hd clean
+	$(MAKE) -C kbd clean
+	$(MAKE) -C fs clean
