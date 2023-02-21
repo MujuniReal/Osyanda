@@ -32,6 +32,8 @@ int16 readPartitionTable(char *mbr){
     if(partitionTable[i].sectsInPartition != 0){
       //If there are sectors in the partition means the partition exists
       numberOfPartitions += 1;
+    } else{
+      return 0;
     }
     
   }
