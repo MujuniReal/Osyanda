@@ -8,15 +8,18 @@ IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include
 IMPALA_DRIVERDIR = $(IMPALA_ROOT)/drivers/
 endif
 
-AS = as --32 -I $(IMPALA_INCLUDEDIR)
+AS = as 
+
 LD = ld -m elf_i386 -r
+ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR)
 objs = ide/rdsk.o ide/wrtdsk.o
+
 
 all: $(CONFIGURE) $(objs) hd.o
 
 
 %.o: %.s
-	$(AS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 
 hd.o: $(objs)

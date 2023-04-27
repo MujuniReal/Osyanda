@@ -1,8 +1,8 @@
-#define PRINTC 0x60a08
-#define PRINTS 0x60a58
-#define READKYBD 0x60b07
-#define CLEARS 0x60975
-#define FINDFILESTART 0x60cba
+#define PRINTC 0x609a4
+#define PRINTS 0x60a30
+#define READKYBD 0x60bc1
+#define CLEARS 0x6085e
+#define FINDFILESTART 0x60d42
 
 
 typedef char (*charFunc)(void);

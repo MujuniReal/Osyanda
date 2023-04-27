@@ -8,11 +8,12 @@ IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include/
 endif
 
 CC = gcc
-AS = as --32 -I $(IMPALA_INCLUDEDIR)
+AS = as 
 LD = ld -m elf_i386 -r
 objs = iread.o string.o port.o
 
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
+ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
+CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 
 
 all: $(CONFIGURE) lib.o
@@ -21,7 +22,7 @@ lib.o:	$(objs)
 	$(LD) $^ -o $@
 
 %.o: %.s
-	$(AS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@

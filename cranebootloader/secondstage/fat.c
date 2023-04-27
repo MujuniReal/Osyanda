@@ -82,6 +82,7 @@ uint32 find_file16(char *filename){
 
   
   /* File Not Found */
+  prints("File not Found brother!!!!!!!!!!!!!!!!!!\n");
   return 0;
 }
 

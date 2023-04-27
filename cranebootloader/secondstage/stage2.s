@@ -1,5 +1,6 @@
 
 	.code16
+	.section gnuasm
 	.global mainSecond
 	.global driveNo
 	.global totalHeads
@@ -44,3 +45,5 @@ _start:
 
 _hang:
 	jmp _hang
+
+.fill 512-(.-mainSecond),1,0

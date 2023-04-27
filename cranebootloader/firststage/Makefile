@@ -9,7 +9,7 @@ endif
 
 
 AS = as
-ASFLAGS = --32
+ASFLAGS = --32 --gen-debug
 LD = ld
 
 LDFLAGS = -m elf_i386 --oformat binary -e main -Ttext 0x7c00 -Map=MBR.map
