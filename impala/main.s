@@ -1,5 +1,5 @@
 	.code32
-	
+	.section .gnuasm
 	.global prep_r
 	.global red_data
 	.text
@@ -69,6 +69,8 @@ run_impala:
 
 	// nop
 	call _initps2
+	// call setup_idt
+
 
 	call loader
 

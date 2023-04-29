@@ -27,11 +27,13 @@ uint32 osyandaStartSector;
 void crane_main(){
 
   prints("CRANE BOOTLOADER\r\n");
+
+ 
   
   char mbr[MBRSIZE];
   if(readsect((char*)&mbr, 1, 0) == 0){
     prints("Error occured while attempting to read mbr.\r\n");
-    return;
+    goto hangKernel;
   }
   
   //Tobe read from a config file to locate partition impala is installed on
@@ -44,7 +46,7 @@ void crane_main(){
     
     if(readsect((char*)&mbrPart, 1, osyandaStartSector) == 0){
       prints("Failed to read partition bpb\r\n");
-      return;
+      goto hangKernel;
     }
     detectFs((char*)&mbrPart);
   }
@@ -58,12 +60,12 @@ void crane_main(){
 
   if(fileStartClust == 0){
     prints("Kernel not found\r\n");
-    return;
+    goto hangKernel;
   }
 
   if(readFile(IMPALASEGMENT, IMPALAOFFSET, fileStartClust) != 0){
     prints("Error Occured while reading kernel.\r\n");
-    return;
+    goto hangKernel;
   }
 
   if(activate_a20pin() != 0){
@@ -72,9 +74,9 @@ void crane_main(){
     //    return;
   }
   initialize_gdt();
-  initialize_idt();
+  // initialize_idt();
   
-  load_idt();
+  // load_idt();
   load_gdt();
   //  asm("int $0x16"::"a"(0x0));
 
@@ -108,5 +110,6 @@ void crane_main(){
         .word 0x0008;"
         );
   
-  
+hangKernel:
+    goto hangKernel;
 }

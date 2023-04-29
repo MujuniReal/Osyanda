@@ -1,3 +1,5 @@
+#ifndef IDT_H
+#define IDT_H
 #include "types.h"
 
 struct _idtEntry{
@@ -10,6 +12,8 @@ struct _idtEntry{
 }__attribute__((packed));
 
 struct _idtPtr{
-  uint16 noEntries;
+  uint16 idtSize;
   uint32 idtAddr;
 }__attribute__((packed));
+
+#endif

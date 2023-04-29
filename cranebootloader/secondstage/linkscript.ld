@@ -3,31 +3,21 @@ ENTRY(mainSecond)
 
 SECTIONS{
 
-	.text 0x0: ALIGN(4096)
+	.text 0x0:
 	{
-
 		*(.text)
 		*(.rodata)
 	}
 
-	.rodata : ALIGN(4096)
-	{
-		*(.rodata)
-	}
-
-	.data : ALIGN(4096)
+	.data :
 	{
 		*(.data)
 
 	}
 
-	.bss : ALIGN(4096)
+	.bss : 
 	{
 		*(COMMON)
 		*(.bss)
-	}
-	.gnuasm : ALIGN(4096)
-	{
-		*(.gnuasm)
 	}
 }

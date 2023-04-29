@@ -13,3 +13,7 @@ uint8 inportb(uint16 port){
   asm("mov %%ax,%%dx; inb (%%dx)":"=a"(result):"a"(port));
   return result; 
 } 
+
+inportw(){}
+
+outportw(){}

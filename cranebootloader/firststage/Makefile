@@ -12,7 +12,7 @@ AS = as
 ASFLAGS = --32 --gen-debug
 LD = ld
 
-LDFLAGS = -m elf_i386 --oformat binary -e main -Ttext 0x7c00 -Map=MBR.map
+LDFLAGS = -m elf_i386 --oformat binary -e _start -Ttext 0x7c00 -Map=MBR.map
 
 objs = mbr.o
 SFILES = ptable.s fatbpb.s
