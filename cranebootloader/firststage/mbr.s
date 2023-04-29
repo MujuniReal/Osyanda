@@ -2,7 +2,7 @@
 	.global _start
 	.text
 	.org 0x00
-	New_MBR_Segment = 0x100000
+	NEW_BOOT_ADDRESS = 0x100000
     GDT_OFFSET = 0x800
 
 _start:
@@ -120,7 +120,7 @@ read_sectors:
 	out %al,%dx
 	
 	push %edi
-	mov 0x8(%ebp),%edx
+	mov $NEW_BOOT_ADDRESS,%edx
 	lea (%edx),%edi
 
 	//outportb 0x20 0x1f7
