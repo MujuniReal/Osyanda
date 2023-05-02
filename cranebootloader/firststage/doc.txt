@@ -17,7 +17,7 @@
   we gonna use the cx register as our counter to count
   4 3 more trys for disk reading
   from the ax,bx,cx,dx function calling style i think
-  that this function is like so readSect(No_sects,*ptrSrc,*ptrDst)
+  that this function is like so diskread(No_sects,*ptrSrc,*ptrDst)
   This function expects LBA put in %ax register
 
 */

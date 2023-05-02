@@ -10,7 +10,7 @@ typedef uint32 (*findFileFunc)(char*);
 typedef int16 (*readFileFunc)(uint16, uint16, uint32);
 
 extern void prints(char *s);
-extern uint8 readsect(char *buf, uint8 numSects, uint32 lba);
+extern uint8 diskread(char *buf, uint8 numSects, uint32 lba);
 extern char *toasci10(int number, char *buff);
 extern findFileFunc findFile;
 extern readFileFunc readFile;
@@ -62,7 +62,7 @@ uint32 find_file16(char *filename){
     
     uint32 dirSectLba = rootdirStart + i;
 
-    if(readsect((char*)&rootdirSect, 1, dirSectLba) == 0){
+    if(diskread((char*)&rootdirSect, 1, dirSectLba) == 0){
       //Failed to read sector
       break;
     };
@@ -91,7 +91,7 @@ uint16 *load_fat(uint16 *fat){
   
   uint32 fatStartSect = osyandaStartSector + activeBpb->ResSects + 0;
 
-  if(readsect((char*)fat, 1, fatStartSect) == 0){
+  if(diskread((char*)fat, 1, fatStartSect) == 0){
     uint16 *nullPtr = 0;
     return nullPtr;
   }
@@ -130,7 +130,7 @@ int16 read_file16(uint16 segment, uint16 offset, uint32 fstartClust){
 
     asm("mov %%ax,%%es"::"a"(nextSegment));
 
-    uint8 readscts = readsect((char*)offset, activeBpb->SectPClust, clusterLBA);
+    uint8 readscts = diskread((char*)offset, activeBpb->SectPClust, clusterLBA);
     asm("popw %es");
     
     if(readscts == 0){

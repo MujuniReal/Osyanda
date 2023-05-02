@@ -9,7 +9,7 @@ typedef struct _partblentry partTableEntry;
 typedef int16 (*readFileFunc)(uint16, uint16, uint32);
 typedef uint32 (*findFileFunc)(char*);
 
-extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
+extern uint8 diskread(char*buf, uint8 numSects, uint32 lba);
 extern void loadFatDependancies(fatbpb1216*);
 
 partTableEntry *partitionTable;
@@ -22,7 +22,7 @@ readFileFunc readFile;
 
 int16 readPartitionTable(char *mbr){
   //Read the first Sector of the disk the mbr
-  //readsect((char*)&mbr, 1, 0);
+  //diskread((char*)&mbr, 1, 0);
   numberOfPartitions = 0;
 
   partitionTable = (partTableEntry*)(mbr + PART_TABLE_OFFSET);

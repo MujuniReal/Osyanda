@@ -5,16 +5,11 @@
 #define MBRSIZE 512
 
 extern void prints(char *s);
-extern uint8 readsect(char*buf, uint8 numSects, uint32 lba);
+extern char *diskread(char*buf, uint8 numSects, uint32 lba);
 extern int16 readPartitionTable(char* mbr);
 extern uint32 (*findFile)(char* filename);
 extern int16 (*readFile)(uint16 segment, uint16 offset, uint32 fstartClust);
 extern void detectFs(char* mbr);
-extern void initialize_gdt();
-extern void initialize_idt();
-extern void load_gdt();
-extern void load_idt();
-extern int16 activate_a20pin();
 extern char *toasci10(int number, char *buff);
 extern struct _partblentry *partitionTable;
 
@@ -31,7 +26,7 @@ void crane_main(){
  
   
 //   char mbr[MBRSIZE];
-//   if(readsect((char*)&mbr, 1, 0) == 0){
+//   if(diskread((char*)&mbr, 1, 0) == 0){
 //     prints("Error occured while attempting to read mbr.\r\n");
 //     goto hangKernel;
 //   }
@@ -44,7 +39,7 @@ void crane_main(){
     
 //     char mbrPart[MBRSIZE];
     
-//     if(readsect((char*)&mbrPart, 1, osyandaStartSector) == 0){
+//     if(diskread((char*)&mbrPart, 1, osyandaStartSector) == 0){
 //       prints("Failed to read partition bpb\r\n");
 //       goto hangKernel;
 //     }
