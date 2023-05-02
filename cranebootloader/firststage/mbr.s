@@ -14,11 +14,6 @@ fatbpb:
 	//To cater for FAT filesystems
 	.include "fatbpb.s"
 
-GDT_PTR:
-	.word 23
-	.int 0x8000
-
-
 main:
 
 	cli
@@ -38,13 +33,13 @@ main:
 readCraneSectors:
 	//C - 0
     //H - 0
-    //S - 1
+    //S - 2
 
 	//ch - 0
     //cl - 1
     //dh - 0
 	push %es
-    movw $0x1,%cx
+    movw $0x2,%cx
     xor %dh,%dh
 	xor %bx,%bx
 	movw $CRANE_OFFSET,%ax
@@ -58,44 +53,11 @@ readCraneSectors:
 activate_a20:
     movw $0x2401,%ax
     int $0x15
+	cli
 	// mov 0x92,%dl
 	// inb %dl,%al
     // or $0x2,%al
     // out %al,%dl
-
-setupGDT:
-    push %es
-    mov $GDT_OFFSET,%ax
-    mov %ax,%es
-    
-    //First GDT Entry
-    xor %ax,%ax
-    mov %ax,%di
-    movw $0x4,%cx
-    rep stosw
-
-    //Second GDT Entry, Code
-    movw $0x0000,%es:(%di)
-	movw $0x0000,%es:0x2(%di)
-	movb $0x00,%es:0x4(%di)
-	movb $0x9a,%es:0x5(%di)
-	movb $0xc8,%es:0x6(%di)
-	movb $0x00,%es:0x7(%di)
-
-    add $0x8,%di
-	//The Third GDT Entry, Data
-
-	movw $0x0000,%es:(%di)
-	movw $0x0000,%es:0x2(%di)
-	movb $0x00,%es:0x4(%di)
-	movb $0x92,%es:0x5(%di)
-	movb $0xc8,%es:0x6(%di)
-	movb $0x00,%es:0x7(%di)
-	nop
-
-    pop %es
-
-
 loadGDT:
 	lgdt GDT_PTR
 
@@ -103,6 +65,37 @@ loadGDT:
 	mov %cr0,%eax
 	or $0x1,%eax
 	mov %eax,%cr0
+	// jmp $0x8,$loadPM
+	jmp loadPM
+
+GDT:
+
+	.word 0x0
+	.word 0x0
+	.byte 0x0
+	.byte 0x0
+	.byte 0x0
+	.byte 0x0
+
+csSelector:
+	.word 0x0
+	.word 0x0
+	.byte 0x0
+	.byte 0x9a
+	.byte 0xc8
+	.byte 0x0
+
+dataSelector:
+	.word 0x0
+	.word 0x0
+	.byte 0x0
+	.byte 0x92
+	.byte 0xc8
+	.byte 0x0
+
+GDT_PTR:
+	.word 23
+	.int GDT
 
 
 loadPM:
@@ -110,10 +103,11 @@ loadPM:
 	mov $0x10,%ax
 	mov %ax,%ds
 	mov %ax,%es
-	mov %ax,%gs
 	mov %ax,%fs
+	mov %ax,%gs
 	mov %ax,%ss
 	mov $0x2ffff,%esp
+	mov %esp,%ebp
 	jmp prefetch
 
 	nop

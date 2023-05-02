@@ -30,85 +30,85 @@ void crane_main(){
 
  
   
-  char mbr[MBRSIZE];
-  if(readsect((char*)&mbr, 1, 0) == 0){
-    prints("Error occured while attempting to read mbr.\r\n");
-    goto hangKernel;
-  }
+//   char mbr[MBRSIZE];
+//   if(readsect((char*)&mbr, 1, 0) == 0){
+//     prints("Error occured while attempting to read mbr.\r\n");
+//     goto hangKernel;
+//   }
   
-  //Tobe read from a config file to locate partition impala is installed on
-  int16 numPartitions = readPartitionTable((char*)&mbr);
-  osyandaStartSector = 0;
-  if(numPartitions > 0){
-    osyandaStartSector = partitionTable[osyandaPartition-1].sectsB4Partion;
+//   //Tobe read from a config file to locate partition impala is installed on
+//   int16 numPartitions = readPartitionTable((char*)&mbr);
+//   osyandaStartSector = 0;
+//   if(numPartitions > 0){
+//     osyandaStartSector = partitionTable[osyandaPartition-1].sectsB4Partion;
     
-    char mbrPart[MBRSIZE];
+//     char mbrPart[MBRSIZE];
     
-    if(readsect((char*)&mbrPart, 1, osyandaStartSector) == 0){
-      prints("Failed to read partition bpb\r\n");
-      goto hangKernel;
-    }
-    detectFs((char*)&mbrPart);
-  }
-  else{
-    detectFs((char*)&mbr);
-  }
+//     if(readsect((char*)&mbrPart, 1, osyandaStartSector) == 0){
+//       prints("Failed to read partition bpb\r\n");
+//       goto hangKernel;
+//     }
+//     detectFs((char*)&mbrPart);
+//   }
+//   else{
+//     detectFs((char*)&mbr);
+//   }
 
-  char *kernelName = "IMPALA  IMG";
+//   char *kernelName = "IMPALA  IMG";
   
-  uint32 fileStartClust = (uint32)findFile(kernelName);
+//   uint32 fileStartClust = (uint32)findFile(kernelName);
 
-  if(fileStartClust == 0){
-    prints("Kernel not found\r\n");
-    goto hangKernel;
-  }
+//   if(fileStartClust == 0){
+//     prints("Kernel not found\r\n");
+//     goto hangKernel;
+//   }
 
-  if(readFile(IMPALASEGMENT, IMPALAOFFSET, fileStartClust) != 0){
-    prints("Error Occured while reading kernel.\r\n");
-    goto hangKernel;
-  }
+//   if(readFile(IMPALASEGMENT, IMPALAOFFSET, fileStartClust) != 0){
+//     prints("Error Occured while reading kernel.\r\n");
+//     goto hangKernel;
+//   }
 
-  if(activate_a20pin() != 0){
-    char *a20fail = "Failed to activate A20 pin.\r\n";
-    prints(a20fail);
-    //    return;
-  }
-  initialize_gdt();
-  // initialize_idt();
+//   if(activate_a20pin() != 0){
+//     char *a20fail = "Failed to activate A20 pin.\r\n";
+//     prints(a20fail);
+//     //    return;
+//   }
+//   initialize_gdt();
+//   // initialize_idt();
   
-  // load_idt();
-  load_gdt();
-  //  asm("int $0x16"::"a"(0x0));
+//   // load_idt();
+//   load_gdt();
+//   //  asm("int $0x16"::"a"(0x0));
 
-  asm("nop");
+//   asm("nop");
 
-  asm("xor %eax,%eax;\
-      mov %cr0,%eax;\
-      or $0x1,%eax;\
-      mov %eax,%cr0"
-      );
+//   asm("xor %eax,%eax;\
+//       mov %cr0,%eax;\
+//       or $0x1,%eax;\
+//       mov %eax,%cr0"
+//       );
 
-  uint16 dataSelector = 0x10;
+//   uint16 dataSelector = 0x10;
 
-  asm("mov %%ax, %%ds;\
-	    mov %%ax,%%es;\
-	    mov %%ax,%%gs;\
-	    mov %%ax,%%fs;\
-	    mov %%ax,%%ss;"
-      ::"a"(dataSelector));
+//   asm("mov %%ax, %%ds;\
+// 	    mov %%ax,%%es;\
+// 	    mov %%ax,%%gs;\
+// 	    mov %%ax,%%fs;\
+// 	    mov %%ax,%%ss;"
+//       ::"a"(dataSelector));
 
-  asm("mov $0x2ffff,%esp");
+//   asm("mov $0x2ffff,%esp");
 
-  goto clearPrefetchQue;
-  asm("nop; nop; nop;");
+//   goto clearPrefetchQue;
+//   asm("nop; nop; nop;");
 
- clearPrefetchQue:
+//  clearPrefetchQue:
  
-  asm(" .byte 0x66;\
-        .byte 0xea;\
-        .int 0x60000;\
-        .word 0x0008;"
-        );
+//   asm(" .byte 0x66;\
+//         .byte 0xea;\
+//         .int 0x60000;\
+//         .word 0x0008;"
+//         );
   
 hangKernel:
     goto hangKernel;

@@ -3,19 +3,19 @@ ENTRY(mainSecond)
 
 SECTIONS{
 
-	.text 0x0:
+	.text 0x80000: ALIGN(4096)
 	{
 		*(.text)
 		*(.rodata)
 	}
 
-	.data :
+	.data : ALIGN(4096)
 	{
 		*(.data)
 
 	}
 
-	.bss : 
+	.bss : ALIGN(4096)
 	{
 		*(COMMON)
 		*(.bss)
