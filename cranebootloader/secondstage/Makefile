@@ -9,8 +9,8 @@ endif
 
 CC = gcc
 LD = ld
-objs = stage2.o
-#crane.o printer.o string.o printer.o diskread.o idt.o gdt.o a20.o fs.o fat.o ascii.o
+objs = crane.o
+#printer.o string.o printer.o diskread.o idt.o gdt.o a20.o fs.o fat.o ascii.o
 SFILES = ptable.s fatbpb.s
 CFLAGS = -m32 -Wno-builtin-declaration-mismatch -nostdinc -nostdlib -I $(CRANE_INCLUDEDIR) -fno-PIC -ggdb -c
 LDFLAGS = -m elf_i386 --oformat binary -nostdlib  -T linkscript.ld -Map=Map.map

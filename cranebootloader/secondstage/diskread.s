@@ -56,7 +56,8 @@ read_again:
 	xor %edx,%edx
 	xor %ebx,%ebx
 
-	movl $0x2000,%eax
+  //bytes per sector or per cluster
+	movl $512,%eax
 
 	/* Divide by 2 since the rep insw instruction that registers 2 bytes at a time */
 	mov $0x2,%ebx

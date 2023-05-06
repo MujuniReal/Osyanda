@@ -25,7 +25,7 @@ void crane_main(){
 
  
   
-//   char mbr[MBRSIZE];
+  char mbr[MBRSIZE];
 //   if(diskread((char*)&mbr, 1, 0) == 0){
 //     prints("Error occured while attempting to read mbr.\r\n");
 //     goto hangKernel;

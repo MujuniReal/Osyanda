@@ -3,7 +3,6 @@
 	.text
 	.org 0x00
 	CRANE_OFFSET = 0x8000
-    GDT_OFFSET = 0x800
 
 _start:
 	jmp main
