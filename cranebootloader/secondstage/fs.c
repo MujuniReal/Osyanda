@@ -6,7 +6,7 @@
 
 typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _partblentry partTableEntry;
-typedef int16 (*readFileFunc)(uint32*, uint32);
+typedef int16 (*readFileFunc)(char*, uint32);
 typedef uint32 (*findFileFunc)(char*);
 
 extern uint8 diskread(char*buf, uint8 numSects, uint32 lba);

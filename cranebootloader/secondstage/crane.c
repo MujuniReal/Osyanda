@@ -8,7 +8,7 @@ extern void prints(char *s);
 extern char *diskread(char*buf, uint8 numSects, uint32 lba);
 extern int16 readPartitionTable(char* mbr);
 extern uint32 (*findFile)(char* filename);
-extern int16 (*readFile)(uint16 segment, uint16 offset, uint32 fstartClust);
+extern int16 (*readFile)(uint32 *dest, uint32 fstartClust);
 extern void detectFs(char* mbr);
 extern char *toasci10(int number, char *buff);
 extern struct _partblentry *partitionTable;
@@ -61,7 +61,7 @@ void crane_main(){
     goto hangKernel;
   }
 
-  if(readFile(IMPALA_ADDR, fileStartClust) != 0){
+  if(readFile((char*)IMPALA_ADDR, fileStartClust) != 0){
     prints("Error Occured while reading kernel.\r\n");
     goto hangKernel;
   }

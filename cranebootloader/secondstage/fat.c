@@ -7,7 +7,7 @@
 typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _dirEntry dirEntry;
 typedef uint32 (*findFileFunc)(char*);
-typedef int16 (*readFileFunc)(uint16, uint16, uint32);
+typedef int16 (*readFileFunc)(char*, uint32);
 
 extern void prints(char *s);
 extern uint8 diskread(char *buf, uint8 numSects, uint32 lba);
@@ -19,7 +19,7 @@ extern uint16 totalHeads;
 extern uint32 osyandaStartSector;
 
 uint32 find_file16(char*);
-int16 read_file16(uint16, uint16, uint32);
+int16 read_file16(char*, uint32);
 fatbpb1216 *activeBpb;
 
 void loadFatDependancies(fatbpb1216 *fatbpb){
@@ -101,7 +101,7 @@ uint16 *load_fat(uint16 *fat){
 }
 
 
-int16 read_file16(uint32* dest, uint32 fstartClust){
+int16 read_file16(char* dest, uint32 fstartClust){
 
   uint32 fatSize = activeBpb->SectsPFat * activeBpb->ByPSect;
   uint32 rootdirStart = osyandaStartSector + activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
@@ -119,26 +119,21 @@ int16 read_file16(uint32* dest, uint32 fstartClust){
     return -1;
   };
   
-  uint16 fileClust = fstartClust;
-  uint16 nextSegment = segment;
+  uint32 fileClust = fstartClust;
+  char* nextAddr = dest;
   do {
     //Read file cluster into memory
     uint32 clusterLBA = firstDataSect + ((fileClust - 2) * activeBpb->SectPClust);  //Minus 2
 
-    //Since we are reading the file to a special segment
-    asm("pushw %es");
-
-    asm("mov %%ax,%%es"::"a"(nextSegment));
-
-    uint8 readscts = diskread((char*)offset, activeBpb->SectPClust, clusterLBA);
-    asm("popw %es");
+    uint8 readscts = diskread(nextAddr, activeBpb->SectPClust, clusterLBA);
+    // asm("popw %es");
     
     if(readscts == 0){
       return -1;
     }
 
     fileClust = fat[fileClust];
-    nextSegment += ByPSeg;
+    nextAddr += ByPClust;
     
   } while(fileClust != EOFMAGIC);
     
