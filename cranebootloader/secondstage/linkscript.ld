@@ -1,5 +1,5 @@
 
-ENTRY(mainSecond)
+ENTRY(crane_main)
 
 SECTIONS{
 

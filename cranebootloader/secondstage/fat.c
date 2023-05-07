@@ -32,7 +32,7 @@ void loadFatDependancies(fatbpb1216 *fatbpb){
   activeBpb = fatbpb;
 
   if(strncmp(fatbpb->FSType, "FAT16", 5) == 0){
-    //prints("FAT16 Detected\r\n");
+    prints("FAT16 Detected\r\n");
     //Set data from bpb as standard
     sectsPerTrack = fatbpb->SectsPTrck;
     totalHeads = fatbpb->NHeads;
@@ -101,7 +101,7 @@ uint16 *load_fat(uint16 *fat){
 }
 
 
-int16 read_file16(uint16 segment, uint16 offset, uint32 fstartClust){
+int16 read_file16(uint32* dest, uint32 fstartClust){
 
   uint32 fatSize = activeBpb->SectsPFat * activeBpb->ByPSect;
   uint32 rootdirStart = osyandaStartSector + activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
