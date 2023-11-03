@@ -9,7 +9,7 @@ endif
 
 CC = gcc
 LD = ld
-objs = crane.o string.o diskread.o fs.o fat.o display.o ascii.o port.o 
+objs = crane.o start_kernel.o string.o diskread.o fs.o fat.o display.o ascii.o port.o
 SFILES = ptable.s fatbpb.s
 CFLAGS = -m32 -Wno-builtin-declaration-mismatch -nostdinc -nostdlib -I $(CRANE_INCLUDEDIR) -fno-PIC -ggdb -c
 LDFLAGS = -m elf_i386 --oformat binary -nostdlib  -T linkscript.ld -Map=Map.map

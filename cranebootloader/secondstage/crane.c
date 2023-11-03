@@ -12,7 +12,7 @@ extern int16 (*readFile)(uint32 *dest, uint32 fstartClust);
 extern void detectFs(char* mbr);
 extern char *toasci10(int number, char *buff);
 extern struct _partblentry *partitionTable;
-
+extern void start_kernel();
 
 //TObe dynamic from setup automatically because it prompts user to select partition at install
 int16 osyandaPartition = 1;
@@ -65,6 +65,10 @@ void crane_main(){
     prints("Error Occured while reading kernel.\r\n");
     goto hangKernel;
   }
+
+  asm("nop");
+  
+  start_kernel();
   
 hangKernel:
     goto hangKernel;
