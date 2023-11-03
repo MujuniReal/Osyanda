@@ -13,3 +13,8 @@ On GNU/Linux;
 ``sudo umount /mnt``
 ``bochs -f amOsyandaLinux``
 genisoimage -R -J -c impala/ -b mbr.bin  -no-emul-boot -boot-load-size 4 -o boot.iso .
+
+gdb 
+add-symbol-file sym.o 0x10000
+break _start
+target remote | qemu-system-x86_64 -S -gdb stdio -hda ./os.bin

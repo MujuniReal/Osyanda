@@ -2,6 +2,7 @@
 	.text
 
 	.global load_idt
+	.global IDTPTR
 
 	.global isr0
 	.global isr1
@@ -122,3 +123,5 @@ prepregs_isr:
 	add $0x8,%esp       /* Clear the pushed error code and interrupt handler number*/
 	iret                /* pop cs, eip, ss, esp */
 
+	.data
+IDTPTR: .byte 0,0,0,0,0,0
