@@ -61,6 +61,13 @@ void crane_main(){
     goto hangKernel;
   }
 
+  prints("READING THE KERNEL\r\n");
+  char charb[1024];
+  toasci10(fileStartClust, (char*)&charb);
+  prints("Kernel starts on: ");
+  prints((char*)&charb);
+  prints("\r\n");
+
   if(readFile((char*)IMPALA_ADDR, fileStartClust) != 0){
     prints("Error Occured while reading kernel.\r\n");
     goto hangKernel;

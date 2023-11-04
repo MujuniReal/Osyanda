@@ -86,12 +86,13 @@ uint32 find_file16(char *filename){
   return 0;
 }
 
-uint16 *load_fat(uint16 *fat){
+uint16 *load_fat(uint16 *fat, uint16 *fat2){
 
   
-  uint32 fatStartSect = osyandaStartSector + activeBpb->ResSects + 0;
+  uint32 fatStartSect = osyandaStartSector + activeBpb->ResSects;
+  uint32 fat2StartSect = osyandaStartSector + activeBpb->ResSects + activeBpb->SectsPFat;
 
-  if(diskread((char*)fat, 1, fatStartSect) == 0){
+  if(diskread((char*)fat, activeBpb->SectsPFat, fatStartSect) == 0 && diskread((char*)fat2, activeBpb->SectsPFat, fat2StartSect) == 0){
     uint16 *nullPtr = 0;
     return nullPtr;
   }
@@ -112,12 +113,14 @@ int16 read_file16(char* dest, uint32 fstartClust){
   
   //Because fat16 entry in fat is 2bytes
   //Load Just one sector of the FAT for now
-  uint16 fat[activeBpb->ByPSect];
+  uint16 fat[fatSize];
+  uint16 fat2[fatSize];
 
-  if(load_fat(fat) == 0){
+  if(load_fat(fat, fat2) == 0){
     prints("Error reading FAT sector.\r\n");
     return -1;
   };
+
   
   uint32 fileClust = fstartClust;
   char* nextAddr = dest;
@@ -132,7 +135,12 @@ int16 read_file16(char* dest, uint32 fstartClust){
       return -1;
     }
 
-    fileClust = fat[fileClust];
+    uint32 oldClust = fileClust;
+    fileClust = fat[oldClust];
+    if(fileClust == 0){
+      //Unexpected issue with the first FAT table use the second FAT
+      fileClust = fat2[oldClust];
+    }
     nextAddr += ByPClust;
     
   } while(fileClust != EOFMAGIC);
