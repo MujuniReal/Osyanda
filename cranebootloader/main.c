@@ -23,6 +23,7 @@ extern char *detectFs(char *mbr);
 int main(int argc,char **argv){
 
   char *filePath;
+  char *action; 
   char fpath[256];
 
   if(argc == 1){
@@ -31,8 +32,12 @@ int main(int argc,char **argv){
     scanf("%s",(char*)&fpath);
     filePath = (char*)&fpath;
   }
+  else if(argc == 2){
+    filePath = argv[1];
+  }
   else{
     filePath = argv[1];
+    action = argv[2];
   }
   
   FILE *diskmbrPtr;

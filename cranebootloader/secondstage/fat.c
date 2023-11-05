@@ -116,7 +116,7 @@ int16 read_file16(char* dest, uint32 fstartClust){
   uint16 fat[fatSize];
   uint16 fat2[fatSize];
 
-  if(load_fat(fat, fat2) == 0){
+  if(load_fat((uint16*)&fat, (uint16*)&fat2) == 0){
     prints("Error reading FAT sector.\r\n");
     return -1;
   };
