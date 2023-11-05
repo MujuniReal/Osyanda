@@ -45,13 +45,10 @@ readCraneSectors:
 	movw $CRANE_OFFSET,%ax
 	mov %ax,%es
 	//%dl is set to drive No
-	mov $0x0201,%ax
+	mov $0x0210,%ax		
 	int $0x13
 	nop
 	pop %es
-	//Plan
-	//REad the configuration from the Next Sector
-	//with that config, locate the bootloader
 
 activate_a20:
     movw $0x2401,%ax
