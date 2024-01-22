@@ -8,10 +8,6 @@ _start:
 	jmp main
 	nop
 
-fatbpb:	
-	//To cater for FAT filesystems
-	.include "fatbpb.s"
-
 main:
 
 	cli
@@ -30,7 +26,7 @@ main:
 //SET SEGMENT REGISTERS
 //JUMP
 
-readCraneSectors:
+read_crane_sectors:
 	//C - 0
     //H - 0
     //S - 2
@@ -58,15 +54,15 @@ activate_a20:
 	// inb %dl,%al
     // or $0x2,%al
     // out %al,%dl
-loadGDT:
-	lgdt GDT_PTR
+load_gdt:
+	lgdt GDTPTR
 
-setCTRLREGS:
+set_ctrl_regs:
 	xor %eax,%eax
 	mov %cr0,%eax
 	or $0x1,%eax
 	mov %eax,%cr0
-	jmp setSEGREGS
+	jmp set_seg_regs
 
 GDT:
 
@@ -77,7 +73,7 @@ GDT:
 	.byte 0x0
 	.byte 0x0
 
-csSelector:
+CODE_SELECTOR:
 	.word 0x0
 	.word 0x0
 	.byte 0x0
@@ -85,7 +81,7 @@ csSelector:
 	.byte 0xc8
 	.byte 0x0
 
-dataSelector:
+DATA_SELECTOR:
 	.word 0x0
 	.word 0x0
 	.byte 0x0
@@ -93,12 +89,12 @@ dataSelector:
 	.byte 0xc8
 	.byte 0x0
 
-GDT_PTR:
+GDTPTR:
 	.word 23
 	.int GDT
 
 
-setSEGREGS:
+set_seg_regs:
 	xor %ax,%ax
 	mov $0x10,%ax
 	mov %ax,%ds
@@ -108,12 +104,12 @@ setSEGREGS:
 	mov %ax,%ss
 	mov $0x2ffff,%esp
 	mov %esp,%ebp
-	jmp clearPrefetch
+	jmp clear_prefetch
 
 	nop
 	nop
 	nop
-clearPrefetch:
+clear_prefetch:
 
 protected_mode_jump:
 	.byte 0x66
@@ -123,10 +119,3 @@ protected_mode_jump:
 
 
 	.fill 446-(.-_start),1,0
-	
-partitionTable:
-	.include "ptable.s"
-
-	.fill 64-(.-partitionTable),1,0
-	
-BootMagic: .word 0xaa55
