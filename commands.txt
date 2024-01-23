@@ -15,9 +15,9 @@ On GNU/Linux;
 genisoimage -R -J -c impala/ -b mbr.bin  -no-emul-boot -boot-load-size 4 -o boot.iso .
 
 gdb 
-add-symbol-file sym.o 0x10000
+add-symbol-file stage2sym.o 0x80000
 break _start
-target remote | qemu-system-x86_64 -S -gdb stdio -hda ./os.bin
+target remote | qemu-system-i386 -S -gdb stdio -hda ../../disk.img
 
 //Read debug symbols from file
 gdb -x debug_osyanda

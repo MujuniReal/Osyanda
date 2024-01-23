@@ -26,8 +26,6 @@ void crane_main(){
   clears();
   prints("CRANE BOOTLOADER\r\n");
 
- 
-  
   char mbr[MBRSIZE];
   if(diskread((char*)&mbr, 1, 0) == 0){
     prints("Error occured while attempting to read mbr.\r\n");
