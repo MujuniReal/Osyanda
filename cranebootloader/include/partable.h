@@ -5,6 +5,8 @@
 
 #define PART_TABLE_OFFSET 446
 #define MAXTABLENTRIES 4
+#define ENTRY_SIZE 16
+#define MAX_TABLE_SIZE 64
 
 
 struct _partblentry{
