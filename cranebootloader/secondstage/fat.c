@@ -120,12 +120,12 @@ int16 read_file16(char *dest, uint32 fstartClust)
 
   // Because fat16 entry in fat is 2bytes
   // Load Just one sector of the FAT for now
-  uint16 fat[fatSize];
-  uint16 fat2[fatSize];
+  char fat[512];
+  char fat2[512];
 
-  if (load_fat(fat, fat2) == 0)
+  if (load_fat((char *)&fat, (char *)&fat2) == 0)
   {
-    prints("Error reading FAT sector.\r\n");
+    prints("Error reading FAT sector.\n");
     return -1;
   };
 

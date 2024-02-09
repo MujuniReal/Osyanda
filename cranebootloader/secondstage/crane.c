@@ -28,12 +28,12 @@ void crane_main()
   int osyandaPartition = 1;
 
   clears();
-  prints("CRANE BOOTLOADER\r\n");
+  prints("CRANE BOOTLOADER\n");
 
   char mbr[MBRSIZE];
   if (diskread((char *)&mbr, 1, 0) == 0)
   {
-    prints("Error occured while attempting to read mbr.\r\n");
+    prints("Error occured while attempting to read mbr.\n");
     goto hangKernel;
   }
 
@@ -49,7 +49,6 @@ void crane_main()
 
     char mbrPart[MBRSIZE];
     diskread((char *)&mbrPart, 1, osyandaStartSector);
-    asm("nop");
     loadFatDependancies((char *)&mbrPart);
 
     // if (diskread((char *)&mbrPart, 1, osyandaStartSector) == 0)
@@ -70,16 +69,11 @@ void crane_main()
 
   if (fileStartClust == 0)
   {
-    prints("Kernel not found\r\n");
+    prints("Kernel not found\n");
     goto hangKernel;
   }
 
-  prints("READING THE KERNEL\r\n");
-  char charb[1024];
-  toasci10(fileStartClust, (char *)&charb);
-  prints("Kernel starts on: ");
-  prints((char *)&charb);
-  prints("\r\n");
+  prints("READING THE KERNEL\n");
 
   if (readFile((char *)IMPALA_ADDR, fileStartClust) != 0)
   {
@@ -88,7 +82,11 @@ void crane_main()
   }
 
   asm("nop");
-
+  asm("nop");
+  asm("sti");
+  asm("nop");
+  asm("nop");
+  asm("nop");
   start_kernel();
 
 hangKernel:
