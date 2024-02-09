@@ -19,6 +19,8 @@ int16 numberOfPartitions;
 findFileFunc findFile;
 
 readFileFunc readFile;
+extern char *toasci10(int number, char *buff);
+extern void prints(char *s);
 
 int16 readPartitionTable(char *mbr)
 {
@@ -26,18 +28,19 @@ int16 readPartitionTable(char *mbr)
   // diskread((char*)&mbr, 1, 0);
   numberOfPartitions = 0;
 
-  partTableEntry *pt_entry = mbr + PART_TABLE_OFFSET;
+  partTableEntry *pt_entry = (partTableEntry *)(mbr + PART_TABLE_OFFSET);
 
   for (int pt_index = 0; pt_index < MAXTABLENTRIES; pt_index++)
   {
+
     if (pt_entry->sectsInPartition != 0)
     {
       // If there are sectors in the partition means the partition exists
       // Register entry
-      partitionTable[pt_index] = &pt_entry;
+      partitionTable[pt_index] = pt_entry;
       numberOfPartitions += 1;
     }
-    pt_entry = pt_entry + ENTRY_SIZE;
+    pt_entry = &pt_entry + ENTRY_SIZE;
   }
 
   return numberOfPartitions;

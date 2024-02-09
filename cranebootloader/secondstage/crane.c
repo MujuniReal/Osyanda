@@ -13,15 +13,19 @@ extern void detectFs(char *mbr);
 extern char *toasci10(int number, char *buff);
 extern void start_kernel();
 
-// TObe dynamic from setup automatically because it prompts user to select partition at install
-int16 osyandaPartition = 1;
 uint32 osyandaStartSector;
 uint16 sectsPerTrack;
 uint16 totalHeads;
 typedef struct _partblentry partTableEntry;
+typedef struct _fatbpb1216 fatbpb1216;
+extern void loadFatDependancies(fatbpb1216 *);
+extern partTableEntry **partitionTable;
 
 void crane_main()
 {
+
+  // TObe dynamic from setup automatically because it prompts user to select partition at install
+  int osyandaPartition = 1;
 
   clears();
   prints("CRANE BOOTLOADER\r\n");
@@ -38,31 +42,31 @@ void crane_main()
   osyandaStartSector = 0;
   if (numPartitions > 0)
   {
-    partTableEntry *entry = mbr + ((osyandaPartition - 1 * ENTRY_SIZE) + PART_TABLE_OFFSET);
+    // partTableEntry *entry = mbr + ((osyandaPartition - 1 * ENTRY_SIZE) + PART_TABLE_OFFSET);
+    int part_index = osyandaPartition - 1;
+    partTableEntry *entry = (partTableEntry *)&partitionTable[0];
     osyandaStartSector = entry->sectsB4Partion;
 
     char mbrPart[MBRSIZE];
+    diskread((char *)&mbrPart, 1, osyandaStartSector);
+    asm("nop");
+    loadFatDependancies((char *)&mbrPart);
 
-    if (diskread((char *)&mbrPart, 1, osyandaStartSector) == 0)
-    {
-      prints("Failed to read partition bpb\r\n");
-      goto hangKernel;
-    }
-    detectFs((char *)&mbrPart);
+    // if (diskread((char *)&mbrPart, 1, osyandaStartSector) == 0)
+    // {
+    //   prints("Failed to read partition bpb\r\n");
+    //   goto hangKernel;
+    // }
+    // detectFs((char *)&mbrPart);
   }
-  else
-  {
-    detectFs((char *)&mbr);
-  }
+  // else
+  // {
+  //   detectFs((char *)&mbr);
+  // }
 
   char *kernelName = "IMPALA  IMG";
 
   uint32 fileStartClust = (uint32)findFile(kernelName);
-
-  if (fileStartClust == 1343488)
-  {
-    asm("nop");
-  }
 
   if (fileStartClust == 0)
   {
