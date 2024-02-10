@@ -90,7 +90,7 @@ hang:
 	.data
 red_data:	.space 512, 0
 sample_test:	.int 0x00414141
-welcome_str:	.asciz "We are a Revolution\n"
+welcome_str:	.asciz "The Remnant Revolution\n"
 aftr_sleep:	.asciz "After sleeping\n"
-prep_r:	 .asciz "Veridis Quo Dafrt"
+prep_r:	 .asciz "Veridis Quo Daft Punk\n"
 fs_msg:	.asciz "[impala] Initializing filesystem\n"

@@ -73,7 +73,7 @@ void crane_main()
     goto hangKernel;
   }
 
-  prints("READING THE KERNEL\n");
+  prints("LOADING THE KERNEL\n");
 
   if (readFile((char *)IMPALA_ADDR, fileStartClust) != 0)
   {
@@ -81,12 +81,6 @@ void crane_main()
     goto hangKernel;
   }
 
-  asm("nop");
-  asm("nop");
-  asm("sti");
-  asm("nop");
-  asm("nop");
-  asm("nop");
   start_kernel();
 
 hangKernel:

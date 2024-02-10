@@ -93,13 +93,14 @@ uint32 find_file16(char *filename)
   return 0;
 }
 
-uint16 *load_fat(uint16 *fat, uint16 *fat2)
+uint16 *load_fat(char *fat)
 {
 
   uint32 fatStartSect = osyandaStartSector + activeBpb->ResSects;
-  uint32 fat2StartSect = osyandaStartSector + activeBpb->ResSects + activeBpb->SectsPFat;
+  // uint32 fat2StartSect = osyandaStartSector + activeBpb->ResSects + activeBpb->SectsPFat;
+  // && diskread((char *)fat2, 1, fat2StartSect) == 0
 
-  if (diskread((char *)fat, activeBpb->SectsPFat, fatStartSect) == 0 && diskread((char *)fat2, activeBpb->SectsPFat, fat2StartSect) == 0)
+  if (diskread((char *)fat, 1, fatStartSect) == 0)
   {
     uint16 *nullPtr = 0;
     return nullPtr;
@@ -111,6 +112,9 @@ uint16 *load_fat(uint16 *fat, uint16 *fat2)
 int16 read_file16(char *dest, uint32 fstartClust)
 {
 
+  // Cluster below werent fully read maybe because of the LBA investigate this function
+  // diskread(0x00102000, 16, 0xa50);
+
   uint32 fatSize = activeBpb->SectsPFat * activeBpb->ByPSect;
   uint32 rootdirStart = osyandaStartSector + activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
   uint32 rootdirSectors = (activeBpb->NRootDirEs * ROOTDIRENTRYSIZE) / activeBpb->ByPSect;
@@ -120,15 +124,15 @@ int16 read_file16(char *dest, uint32 fstartClust)
 
   // Because fat16 entry in fat is 2bytes
   // Load Just one sector of the FAT for now
-  char fat[512];
-  char fat2[512];
+  char fat_mem[512];
 
-  if (load_fat((char *)&fat, (char *)&fat2) == 0)
+  if (load_fat((char *)&fat_mem) == 0)
   {
     prints("Error reading FAT sector.\n");
     return -1;
   };
 
+  uint16 *fat = (uint16 *)&fat_mem;
   uint32 fileClust = fstartClust;
   char *nextAddr = dest;
   do
@@ -146,10 +150,11 @@ int16 read_file16(char *dest, uint32 fstartClust)
 
     uint32 oldClust = fileClust;
     fileClust = fat[oldClust];
+
     if (fileClust == 0)
     {
       // Unexpected issue with the first FAT table use the second FAT
-      fileClust = fat2[oldClust];
+      fileClust = fat[oldClust];
     }
     nextAddr += ByPClust;
 
