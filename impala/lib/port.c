@@ -1,5 +1,10 @@
 #include <types.h>
 
+static inline void iowait()
+{
+  asm("outb %%al,$0x80" ::"a"(0));
+}
+
 void outportb(uint8 data, uint16 port)
 {
 
