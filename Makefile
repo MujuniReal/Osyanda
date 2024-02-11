@@ -1,6 +1,6 @@
 OSYANDA_ROOT = `pwd`
 
-CRANE_ROOT = $(OSYANDA_ROOT)/cranebootloader/
+CRANE_ROOT = $(OSYANDA_ROOT)/crane/
 CRANE_INCLUDEDIR = $(CRANE_ROOT)/include/
 CRANE_STAGE1DIR = $(CRANE_ROOT)/firststage/
 CRANE_STAGE2DIR =$(CRANE_ROOT)/secondstage/

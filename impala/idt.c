@@ -9,7 +9,7 @@
 
 struct IdtEntry idt[256];
 
-extern struct IDTPTR;
+extern struct IdtPtr IDTPTR;
 
 setup_idt()
 {

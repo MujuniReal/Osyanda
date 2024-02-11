@@ -7,9 +7,31 @@
 #define SECONDARY_PIC_CMD 0xa0
 #define SECONDARY_PIC_DATA 0xa1
 
+extern void irq0();
+extern void irq1();
+extern void irq2();
+extern void irq3();
+extern void irq4();
+extern void irq5();
+extern void irq6();
+extern void irq7();
+extern void irq8();
+extern void irq9();
+extern void irq10();
+extern void irq11();
+extern void irq12();
+extern void irq13();
+extern void irq14();
+extern void irq15();
+
 uint32 interruptHandlers[16];
 
-setmap_PIC()
+static inline void iowait()
+{
+    asm("outb %%al,$0x80" ::"a"(0));
+}
+
+void setmap_PIC()
 {
 
     outportb(0x11, PRIMARY_PIC_CMD);

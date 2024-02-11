@@ -22,7 +22,7 @@ because it is 75% Assembly language which is faster than the C language
 
 #Documentation
 There is various documentation in this repository, find the documentation content in the documentation
-directories/folders found in each subfolder that is cranebootloader/documentation and impala/documentation;
+directories/folders found in each subfolder that is crane/documentation and impala/documentation;
 the documentation of the Cranebootloader and Impala kernel respectively.
 The documentation/index.txt files define what is contained in each documentation file in the involved
 documentation directory.
@@ -66,9 +66,9 @@ example;
 	**``loop22   7:22   0 511.9M  0 loop /mnt``**
 that is an output of the **lsblk** command you can notice that the system identifies our mounted disk image as **loop22**,
 take note of the device name.
-* Next, run (as superuser) ``sudo dd if=cranebootloader/bootdisk.img of=/dev/devicename`` replace ``devicename`` with the previously
+* Next, run (as superuser) ``sudo dd if=crane/bootdisk.img of=/dev/devicename`` replace ``devicename`` with the previously
 noted device name, following the example its ``loop22`` so the command should look like this;
-``sudo dd if=cranebootloader/bootdisk.img of=/dev/loop22``.
+``sudo dd if=crane/bootdisk.img of=/dev/loop22``.
 *Copy the required files; impala.img to the mounted device,(remember our mount directory "/mnt")**, as superuser
 next run command ``sudo cp impala/impala.img /mnt`` next ``sudo cp impala/programs/* /mnt.
 * If all is successful with no errors, unmount the device as super user by running ``sudo umount /mnt``

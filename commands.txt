@@ -7,7 +7,7 @@ On GNU/Linux;
 ``make -C impala/programs
 ``sudo mount osyanda.img /mnt``.
 ``lsblk`` -> ``loop22   7:22   0 511.9M  0 loop /mnt``
-``sudo dd if=cranebootloader/bootdisk.img of=/dev/loop22``
+``sudo dd if=crane/bootdisk.img of=/dev/loop22``
 ``sudo cp impala/impala.img /mnt``.
 ``sudo cp impala/programs/terminal /mnt``
 ``sudo umount /mnt``
