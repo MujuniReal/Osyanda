@@ -1,17 +1,30 @@
 On GNU/Linux;
 ``cd Osyanda``
 ``fallocate -l 512M osyanda.img``
-``mkfs.fat -F 16 -I osyanda.img``
+``sudo fdisk osyanda.img``
+    o, n, p, t, [ENTER], [ENTER], [ENTER], a, w
+``sudo losetup --partscan --find --show osyanda.img`` -> '/dev/loop22'
+``lsblk``
+    loop22       7:27   0   512M  0 loop 
+        └─loop22p1 259:0    0   511M  0 part
+``sudo mkfs.fat -F 16 /dev/loop22p1``
+``cd crane/firststage && make``
+``sudo dd if=./mbr.img of=/dev/loop22``
+``cd ../secondstage && make``
+``sudo dd if=./cranebl.bin of=/dev/loop22 obs=512 seek=1``
+``cd ../../impala && make``
+``sudo mount /dev/loop22p1 /mnt``
+``sudo cp impala.img /mnt``
 ``make config`` 
 ``make`` -> path/to/osyanda.img or path/to/real/disk
 ``make -C impala/programs
-``sudo mount osyanda.img /mnt``.
-``lsblk`` -> ``loop22   7:22   0 511.9M  0 loop /mnt``
-``sudo dd if=crane/bootdisk.img of=/dev/loop22``
-``sudo cp impala/impala.img /mnt``.
 ``sudo cp impala/programs/terminal /mnt``
 ``sudo umount /mnt``
-``bochs -f amOsyandaLinux``
+``cd ..``
+``bochs -f amOsyandaLinux`` or ``qemu-system-i386 -hda osyanda.img``
+
+END
+
 genisoimage -R -J -c impala/ -b mbr.bin  -no-emul-boot -boot-load-size 4 -o boot.iso .
 
 gdb 
