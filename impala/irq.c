@@ -1,6 +1,7 @@
 #include <types.h>
 #include <port.h>
 #include <idt.h>
+#include <ascii.h>
 
 #define PRIMARY_PIC_CMD 0x20
 #define PRIMARY_PIC_DATA 0x21
@@ -87,7 +88,12 @@ install_interrupt_handler(int intrno, uint32 intrAddr)
 
 interrupt_handler(REGISTERS *regs)
 {
+    prints("[impala] Calling interrupt: ");
+    char tt[40];
     int intrIndex = regs->intrno - 32;
+    toasci10(intrIndex, &tt);
+    prints(tt);
+    prints("\n");
 
     if (interruptHandlers[intrIndex] == 0)
     {

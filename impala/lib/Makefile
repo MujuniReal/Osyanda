@@ -10,7 +10,7 @@ endif
 CC = gcc
 AS = as 
 LD = ld -m elf_i386 -r
-objs = iread.o string.o port.o
+objs = iread.o string.o port.o ascii.o
 
 ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
 CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 

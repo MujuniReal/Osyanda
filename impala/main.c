@@ -18,7 +18,7 @@ void run_impala()
     // call install_interrupt_handler
     // add $0x8,%esp
 
-    _initps2();
+    // _initps2();
 
     loader();
 

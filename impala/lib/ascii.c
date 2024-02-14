@@ -1,5 +1,5 @@
-#include "types.h"
-#include "string.h"
+#include <types.h>
+#include <string.h>
 
 char *_toasci10(int number, char *numAsci)
 {
