@@ -14,9 +14,12 @@
 #define CURSORHI 14
 #define CURSORLO 15
 
+extern char *toasci10(uint32, char*);
+extern char *toasci16(uint32, char*);
+
 uint16 cursorLocation;
 
-void setcursor(uint16 newCursorLocation){
+void setcursor(uint16 newCursorLocation) {
 
   cursorLocation = newCursorLocation;
   uint8 hi = cursorLocation >> 8 ;
@@ -33,7 +36,7 @@ void setcursor(uint16 newCursorLocation){
   
 }
 
-void scroll(){
+void scroll() {
 
   uint16 *oldText = (uint16*)VGA;
   uint16 *newArea = (uint16*)(VGA + 160);     /* since we are adding one row down,, it might as well be adding one full line of empty columns,just line a new line */
@@ -47,7 +50,7 @@ void scroll(){
   setcursor(1920);
 }
 
-void clears(void){
+void clears(void) {
 
   //clear screen fills the screen with spaces
   memsetw((uint16*)VGA, ATTRIBSPACE, 2000);
@@ -56,7 +59,7 @@ void clears(void){
   setcursor(0);
 }
 
-void handleSpecialChars(char c){
+void handleSpecialChars(char c) {
   //To cater for the ones that advance you to the next line eg: \n \r
   uint32 yAxis;
 
@@ -74,14 +77,14 @@ void handleSpecialChars(char c){
     return;
   }
 
-  switch(c){
+  switch(c) {
     //TAB
     case '\t':
       prints("    ");                         //4 Spaces
       break;
 
     //Backspace
-    //Takes back cursor, prints a space takes back cursor  
+    //Takes back cursor, printf a space takes back cursor  
     case '\b':
       cursorLocation -= 1;
       setcursor(cursorLocation);
@@ -95,14 +98,14 @@ void handleSpecialChars(char c){
   }
 }
 
-void printc(char c){
+void printc(char c) {
 
-  if(c <= 0x1f){
+  if(c <= 0x1f) {
     handleSpecialChars(c);
     return;
   }
 
-  if(cursorLocation >= TOTALPIXEL){
+  if(cursorLocation >= TOTALPIXEL) {
     //Scroll
     scroll();
   }
@@ -118,10 +121,85 @@ void printc(char c){
   setcursor(cursorLocation);
 }
 
-void prints(char *str){
+void prints(char *str) {
 
   for(int i=0; *(str+i) != '\0' ; i++){
     printc((char) *(str + i));
   }
 }
 
+void printf(char *fmt, ...) {
+    
+    int **argptr;
+    //Locating parsed args on function call
+    asm("mov %%ebp, %0;":"=r"(argptr):);
+
+    // Old ebp, of main
+    // ebp             argptr[0]
+    // eip of caller   argptr[1]
+    // fmt             argptr[2]
+    // arg1 of ...     argptr[3]
+    // arg2 of ...     argptr[4]
+
+    char buff[1024];
+    memset((char*)&buff, '\0', 1024);
+
+    uint32 fmt_i = 0;
+    //Choose the next argument after the *fmt
+    uint32 arg_i = 3;
+    uint32 buff_i = 0;
+    char c = fmt[fmt_i];
+
+    asm("nop");
+    uint32 lastaddr;
+    while(c != '\0'){
+        if (c != '%') {
+            buff[buff_i] = c;
+            fmt_i++;
+            buff_i++;
+        }
+        else {
+            // c = %
+            // c + 1 = 
+            char f = fmt[fmt_i + 1];
+            switch(f) {
+                case 'i':
+                    //Integer, todo: check for negative
+                    lastaddr = (uint32)toasci10(*&argptr[arg_i] ,(char*)&buff[buff_i]);
+                    //calculate address of next position in buff depending on the length of the ascii representation of the converted number
+                    buff_i = lastaddr - (uint32)&buff;
+                    //Next arg
+                    arg_i++;
+                    break;
+                case 'd':
+                    //Decimal base
+                    lastaddr = (uint32)toasci10(argptr[arg_i] ,(char*)&buff[buff_i]);
+                    buff_i = lastaddr - (uint32)&buff;
+                    //Next arg
+                    arg_i++;
+                    break;
+                case 'x':
+                    //Hexadecimal
+                    lastaddr = (uint32)toasci16(argptr[arg_i] ,(char*)&buff[buff_i]);
+                    buff_i = lastaddr - (uint32)&buff;
+                    //Next arg
+                    arg_i++;
+                    break;
+                case 's':
+                    // char*
+                    uint32 len = strlen(argptr[arg_i]);
+                    strncpy(&buff[buff_i], argptr[arg_i], len);
+                    buff_i += len;
+                    arg_i++;
+                    break;
+                default:
+                    break;
+            }
+            fmt_i += 2;
+        }
+        
+        c = fmt[fmt_i];
+    }
+
+    prints((char*)&buff);
+}

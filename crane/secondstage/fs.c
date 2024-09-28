@@ -19,22 +19,18 @@ int16 numberOfPartitions;
 findFileFunc findFile;
 
 readFileFunc readFile;
-extern char *toasci10(int number, char *buff);
-extern void prints(char *s);
 
-int16 readPartitionTable(char *mbr)
-{
+
+int16 readPartitionTable(char *mbr) {
   // Read the first Sector of the disk the mbr
   // diskread((char*)&mbr, 1, 0);
   numberOfPartitions = 0;
 
   partTableEntry *pt_entry = (partTableEntry *)(mbr + PART_TABLE_OFFSET);
 
-  for (int pt_index = 0; pt_index < MAXTABLENTRIES; pt_index++)
-  {
+  for (int pt_index = 0; pt_index < MAXTABLENTRIES; pt_index++) {
 
-    if (pt_entry->sectsInPartition != 0)
-    {
+    if (pt_entry->sectsInPartition != 0) {
       // If there are sectors in the partition means the partition exists
       // Register entry
       partitionTable[pt_index] = pt_entry;
@@ -46,8 +42,7 @@ int16 readPartitionTable(char *mbr)
   return numberOfPartitions;
 }
 
-void detectFs(char *mbr)
-{
+void detectFs(char *mbr) {
 
   // readPartitionTable(mbr);
 
@@ -64,12 +59,10 @@ void detectFs(char *mbr)
   //  }
   // Known file systems FAT first
 
-  if (strncmp(bpb->FSType, "FAT", 3) == 0)
-  {
+  if (strncmp(bpb->FSType, "FAT", 3) == 0) {
     loadFatDependancies(bpb);
   }
-  else
-  {
+  else {
     // not a FAT fs
   }
 }
