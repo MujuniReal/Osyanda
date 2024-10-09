@@ -162,6 +162,7 @@ void printf(char *fmt, ...) {
             // c = %
             // c + 1 = 
             char f = fmt[fmt_i + 1];
+            uint32 len;
             switch(f) {
                 case 'i':
                     //Integer, todo: check for negative
@@ -187,7 +188,7 @@ void printf(char *fmt, ...) {
                     break;
                 case 's':
                     // char*
-                    uint32 len = strlen(argptr[arg_i]);
+                    len = strlen(argptr[arg_i]);
                     strncpy(&buff[buff_i], argptr[arg_i], len);
                     buff_i += len;
                     arg_i++;

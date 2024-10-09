@@ -104,5 +104,8 @@ interrupt_handler(REGISTERS *regs)
         // Locate interrupt function and execute it
         void (*intr_function)(REGISTERS *) = interruptHandlers[intrIndex];
         intr_function(regs);
+
+        //End of Interrupt EOI
+        outportb(0x20, PRIMARY_PIC_CMD);
     }
 }
