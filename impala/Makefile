@@ -24,7 +24,7 @@ AS = as
 CC = gcc 
 
 ASFLAGS =  --32 --gen-debug -I $(IMPALA_INCLUDEDIR)
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c
 LDFLAGS =  -m elf_i386 --oformat binary -T linkscript.ld -Map=System.map
 
 

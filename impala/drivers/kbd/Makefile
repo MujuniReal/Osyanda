@@ -14,7 +14,7 @@ objs = ps2_kbd.o
 #objs = kbdold.o
 CC = gcc
 ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 
 all: $(CONFIGURE) $(objs) kbd.o
 

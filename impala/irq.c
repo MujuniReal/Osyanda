@@ -88,12 +88,9 @@ install_interrupt_handler(int intrno, uint32 intrAddr)
 
 interrupt_handler(REGISTERS *regs)
 {
-    prints("[impala] Calling interrupt: ");
-    char tt[40];
+    
     int intrIndex = regs->intrno - 32;
-    toasci10(intrIndex, &tt);
-    prints(tt);
-    prints("\n");
+    prints("[impala] Calling interrupt: %i\n", intrIndex);
 
     if (interruptHandlers[intrIndex] == 0)
     {

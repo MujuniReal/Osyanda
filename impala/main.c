@@ -9,7 +9,7 @@ extern char read_kybd();
 
 void just()
 {
-    prints("Hello Remnant, the interrupt worked Glory To GOD......\n");
+    printf("Hello Remnant, the interrupt worked Glory To GOD......\n");
 
     // End of Interrupt EOI
     outportb(0x20, PRIMARY_PIC_CMD);    
@@ -29,7 +29,7 @@ void run_impala()
 
     // install_interrupt_handler(1, &just);
 
-    prints("The Remnant Revolution\n");
+    printf("The Remnant Revolution\n");
 
     /* Install the iread syscall interrupt */
     // push $iread

@@ -13,7 +13,7 @@ FILE_SYSTEMS = fat.o
 
 all: fs.o
 CC = gcc
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 
 LD = ld -m elf_i386 -r
 

@@ -13,7 +13,7 @@ LD = ld -m elf_i386 -r
 objs = iread.o string.o port.o ascii.o
 
 ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 
 
 all: $(CONFIGURE) lib.o

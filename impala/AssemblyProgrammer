@@ -17,9 +17,10 @@ printc
 push (char c)
 call printc
 
-prints
-push (void *s)
-call prints
+printf
+push (void *fmt)
+push(...)
+call printf
 
 clears
 call clears
