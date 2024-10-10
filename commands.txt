@@ -2,7 +2,7 @@ On GNU/Linux;
 ``cd Osyanda``
 ``fallocate -l 512M osyanda.img``
 ``sudo fdisk osyanda.img``
-    o, n, p, t, [ENTER], [ENTER], [ENTER], a, w
+    o, n, p, [ENTER], [ENTER], [ENTER], a, w
 ``sudo losetup --partscan --find --show osyanda.img`` -> '/dev/loop22'
 ``lsblk``
     loop22       7:27   0   512M  0 loop 

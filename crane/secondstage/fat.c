@@ -3,68 +3,71 @@
 #include "display.h"
 #include "fat.h"
 #define ROOTDIRENTRYSIZE 32
-#define EOFMAGIC 0xffff
+#define EOFMAGIC 0xffffffff
 
-typedef struct _fatbpb1216 fatbpb1216;
 typedef struct _dirEntry dirEntry;
-typedef uint32 (*findFileFunc)(char *);
-typedef int16 (*readFileFunc)(char *, uint32);
 
 extern uint8 diskread(char *buf, uint8 numSects, uint32 lba);
-extern findFileFunc findFile;
-extern readFileFunc readFile;
-extern uint16 sectsPerTrack;
-extern uint16 totalHeads;
 extern uint32 osyandaStartSector;
 
-uint32 find_file16(char *);
-int16 read_file16(char *, uint32);
-fatbpb1216 *activeBpb;
 
-void loadFatDependancies(char *fatbpb) {
+typedef struct _fatbpb32 fatbpb;
+uint8 bpb[512];
+uint32 fat[512];
 
-  // Detect which FAT is Exactly
-  // Initialize Rootdir
-  // Initialize FAT
-  // Initialize required variables
 
-  activeBpb = (fatbpb1216 *)(fatbpb + FATBPBOFFSET);
-  sectsPerTrack = activeBpb->SectsPTrck;
-  totalHeads = activeBpb->NHeads;
-  findFile = (findFileFunc)find_file16;
-  readFile = (readFileFunc)read_file16;
 
-  // if (strncmp(fatbpb->FSType, "FAT16", 5) == 0)
-  // {
-  //   printf("FAT16 Detected\r\n");
-  //   // Set data from bpb as standard
-  //   sectsPerTrack = fatbpb->SectsPTrck;
-  //   totalHeads = fatbpb->NHeads;
-  //   findFile = (findFileFunc)find_file16;
-  //   readFile = (readFileFunc)read_file16;
-  // }
-  // else
-  // {
-  //   // Handle Other file systems here
-  //   printf("Other FAT is detected\r\n");
-  // }
+int load_fat() {
+  //Load the BPB
+  if ( !diskread((char *)bpb, 1, osyandaStartSector) ){
+    //Failed to read BPB
+    return 0;
+  }
+
+  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
+  uint32 fat_start_sect = osyandaStartSector + _bpb->ResSects;
+  // uint32 fat2StartSect = osyandaStartSector + _bpb->ResSects + _bpb->SectsPFat;
+
+  if ( !diskread((char *)fat, 1, fat_start_sect) ) {
+    // failed to read the FAT
+    return -1;
+  }
+
+  return 1;
 }
 
+
 // Returns 0 if file not found, returns file start Cluster number if file found
-uint32 find_file16(char *filename) {
+uint32 find_file(char *filename) {
+  
+  //Locate BPB and start finding the file
+  int fatstat = !load_fat();
+
+  if( fatstat == 0 ){
+    printf("Failed to read the BPB of the partition.\n");
+    return;
+  }
+
+  if( fatstat == -1 ){
+    printf("Failed to Read the FAT.\n");
+    return;
+  }
 
   char rootdirSect[512];
 
-  uint32 rootdirStart = osyandaStartSector + activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
-  uint32 rootdirSectors = (activeBpb->NRootDirEs * ROOTDIRENTRYSIZE) / activeBpb->ByPSect;
-  uint16 dirEntriesInSect = activeBpb->ByPSect / ROOTDIRENTRYSIZE;
+  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
+
+  uint32 rootdirStart = osyandaStartSector + _bpb->ResSects + (_bpb->SectsPFat * _bpb->FatTabs);
+  uint32 rootdirSectors = (_bpb->NRootDirEs * ROOTDIRENTRYSIZE) / _bpb->ByPSect;
+  uint16 dirEntriesInSect = _bpb->ByPSect / ROOTDIRENTRYSIZE;
   uint16 i = 0;
   for (i; i < rootdirSectors; i++) {
 
     uint32 dirSectLba = rootdirStart + i;
 
-    if (diskread((char *)&rootdirSect, 1, dirSectLba) == 0) {
+    if ( !diskread((char *)&rootdirSect, 1, dirSectLba) ) {
       // Failed to read sector
+      printf("Failed to read Root directory Sector\n");
       break;
     };
 
@@ -82,34 +85,23 @@ uint32 find_file16(char *filename) {
   }
 
   /* File Not Found */
-  printf("File not Found brother!!!!!!!!!!!!!!!!!!\n");
   return 0;
 }
 
-uint16 *load_fat(char *fat) {
 
-  uint32 fatStartSect = osyandaStartSector + activeBpb->ResSects;
-  // uint32 fat2StartSect = osyandaStartSector + activeBpb->ResSects + activeBpb->SectsPFat;
-  // && diskread((char *)fat2, 1, fat2StartSect) == 0
 
-  if (diskread((char *)fat, 1, fatStartSect) == 0) {
-    uint16 *nullPtr = 0;
-    return nullPtr;
-  }
-
-  return fat;
-}
-
-int16 read_file16(char *dest, uint32 fstartClust) {
+int16 read_file(char *dest, uint32 fstartClust) {
 
   // Cluster below werent fully read maybe because of the LBA investigate this function
   // diskread(0x00102000, 16, 0xa50);
 
-  uint32 fatSize = activeBpb->SectsPFat * activeBpb->ByPSect;
-  uint32 rootdirStart = osyandaStartSector + activeBpb->ResSects + (activeBpb->SectsPFat * activeBpb->FatTabs);
-  uint32 rootdirSectors = (activeBpb->NRootDirEs * ROOTDIRENTRYSIZE) / activeBpb->ByPSect;
+  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
+
+  uint32 fatSize = _bpb->SectsPFat * _bpb->ByPSect;
+  uint32 rootdirStart = osyandaStartSector + _bpb->ResSects + (_bpb->SectsPFat * _bpb->FatTabs);
+  uint32 rootdirSectors = (_bpb->NRootDirEs * ROOTDIRENTRYSIZE) / _bpb->ByPSect;
   uint32 firstDataSect = rootdirStart + rootdirSectors;
-  uint32 ByPClust = activeBpb->SectPClust * activeBpb->ByPSect;
+  uint32 ByPClust = _bpb->SectPClust * _bpb->ByPSect;
   uint16 ByPSeg = ByPClust / 16; // Real address / 16 = segment
 
   // Because fat16 entry in fat is 2bytes
@@ -126,9 +118,9 @@ int16 read_file16(char *dest, uint32 fstartClust) {
   char *nextAddr = dest;
   do {
     // Read file cluster into memory
-    uint32 clusterLBA = firstDataSect + ((fileClust - 2) * activeBpb->SectPClust); // Minus 2
+    uint32 clusterLBA = firstDataSect + ((fileClust - 2) * _bpb->SectPClust); // Minus 2
 
-    uint8 readscts = diskread(nextAddr, activeBpb->SectPClust, clusterLBA);
+    uint8 readscts = diskread(nextAddr, _bpb->SectPClust, clusterLBA);
     // asm("popw %es");
 
     if (readscts == 0) {

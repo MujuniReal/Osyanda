@@ -110,6 +110,7 @@ set_seg_regs:
 	nop
 	nop
 clear_prefetch:
+	// jmp clear_prefetch
 
 protected_mode_jump:
 	.byte 0x66

@@ -5,62 +5,44 @@
 #define MBRSIZE 512
 
 extern char *diskread(char *buf, uint8 numSects, uint32 lba);
-extern int16 readPartitionTable(char *mbr);
-extern uint32 (*findFile)(char *filename);
-extern int16 (*readFile)(uint32 *dest, uint32 fstartClust);
-extern void detectFs(char *mbr);
 extern void start_kernel();
 
-uint32 osyandaStartSector;
-uint16 sectsPerTrack;
-uint16 totalHeads;
+//File system specific 
+extern uint32 find_file(char*);
+extern int16 read_file(char*, uint32);
+
 typedef struct _partblentry partTableEntry;
-typedef struct _fatbpb1216 fatbpb1216;
-extern void loadFatDependancies(fatbpb1216 *);
-extern partTableEntry **partitionTable;
+
+uint32 osyandaStartSector;
+
+int16 load_partable(char *mbr);
 
 void crane_main() {
 
-  // TObe dynamic from setup automatically because it prompts user to select partition at install
+  // Tobe dynamic from setup automatically because it prompts user to select partition at install
+  // // Tobe read from a config file to locate partition impala is installed on
   int osyandaPartition = 1;
 
   clears();
   printf("CRANE BOOTLOADER\n");
 
   char mbr[MBRSIZE];
-  if (diskread((char *)&mbr, 1, 0) == 0) {
+  if ( !diskread((char *)&mbr, 1, 0) ) {
     printf("Error occured while attempting to read mbr.\n");
     goto hangKernel;
   }
 
-  // Tobe read from a config file to locate partition impala is installed on
-  int16 numPartitions = readPartitionTable((char *)&mbr);
-  osyandaStartSector = 0;
-  if (numPartitions > 0) {
-    // partTableEntry *entry = mbr + ((osyandaPartition - 1 * ENTRY_SIZE) + PART_TABLE_OFFSET);
-    int part_index = osyandaPartition - 1;
-    partTableEntry *entry = (partTableEntry *)&partitionTable[0];
-    osyandaStartSector = entry->sectsB4Partion;
+  // osypart - 1 = osy_index
+  // osy_index * part_entry_size = part_offset
+  int partition_offset = (osyandaPartition - 1) * ENTRY_SIZE; 
+  partTableEntry *entry = (partTableEntry*)(mbr + PART_TABLE_OFFSET + partition_offset);
+  osyandaStartSector = entry->sectsB4Partion;
 
-    char mbrPart[MBRSIZE];
-    diskread((char *)&mbrPart, 1, osyandaStartSector);
-    loadFatDependancies((char *)&mbrPart);
-
-    // if (diskread((char *)&mbrPart, 1, osyandaStartSector) == 0)
-    // {
-    //   printf("Failed to read partition bpb\r\n");
-    //   goto hangKernel;
-    // }
-    // detectFs((char *)&mbrPart);
-  }
-  // else
-  // {
-  //   detectFs((char *)&mbr);
-  // }
+  printf("Start Sector: %d\n", osyandaStartSector);
 
   char *kernelName = "IMPALA  IMG";
 
-  uint32 fileStartClust = (uint32)findFile(kernelName);
+  uint32 fileStartClust = find_file(kernelName);
 
   if (fileStartClust == 0) {
     printf("Kernel not found\n");
@@ -69,7 +51,7 @@ void crane_main() {
 
   printf("LOADING THE KERNEL\n");
 
-  if (readFile((char *)IMPALA_ADDR, fileStartClust) != 0) {
+  if ( read_file((char *)IMPALA_ADDR, fileStartClust) != 0 ) {
     printf("Error Occured while reading kernel.\r\n");
     goto hangKernel;
   }
