@@ -38,14 +38,12 @@ void crane_main() {
   partTableEntry *entry = (partTableEntry*)(mbr + PART_TABLE_OFFSET + partition_offset);
   osyandaStartSector = entry->sectsB4Partion;
 
-  printf("Start Sector: %d\n", osyandaStartSector);
-
   char *kernelName = "IMPALA  IMG";
 
   uint32 fileStartClust = find_file(kernelName);
 
   if (fileStartClust == 0) {
-    printf("Kernel not found\n");
+    printf("Kernel not found.\n");
     goto hangKernel;
   }
 
@@ -56,6 +54,7 @@ void crane_main() {
     goto hangKernel;
   }
 
+  printf("Starting Kernel\n");
   start_kernel();
 
 hangKernel:
