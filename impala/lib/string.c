@@ -29,6 +29,26 @@ int strcmp(char *s1, char *s2){
 
 }
 
+int16 strncmp(char *s1, char *s2, uint32 size){
+  
+  if (size == 0){  
+    return 0;
+  }
+  
+  else if (*s1 == *s2){
+    return strncmp(s1+1, s2+1, (size-1));
+  }
+  
+  else if (*s1 > *s2){
+    return 1;
+  }
+  
+  else{
+    return -1;
+  }
+
+}
+
 char *strncpy(char *dest, char *src, int size){
 
   for(int i=0; i < size; i++){

@@ -90,11 +90,11 @@ interrupt_handler(REGISTERS *regs)
 {
     
     int intrIndex = regs->intrno - 32;
-    prints("[impala] Calling interrupt: %i\n", intrIndex);
+    // printf("[impala] Calling interrupt: %i\n", intrIndex);
 
     if (interruptHandlers[intrIndex] == 0)
     {
-        prints("[impala] Interrupt not found\n");
+        printf("[impala] Interrupt %i not found\n", intrIndex);
     }
     else
     {
