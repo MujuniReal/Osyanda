@@ -17,12 +17,14 @@ drivers = drivers/drivers.o
 
 LINKSCRIPT = linkscript.ld
 
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c
+
 
 LD = ld
-AS = as --32 -I $(IMPALA_INCLUDEDIR)
+AS = as 
 CC = gcc 
 
+ASFLAGS =  --32 --gen-debug -I $(IMPALA_INCLUDEDIR)
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c
 LDFLAGS =  -m elf_i386 --oformat binary -T linkscript.ld -Map=System.map
 
 
@@ -42,7 +44,7 @@ $(drivers):
 	$(MAKE) -C $(IMPALA_DRIVERDIR)
 
 %.o: %.s
-	$(AS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@

@@ -7,10 +7,11 @@ IMPALA_ROOT = $(IMPALA_DRIVERDIR)/../
 IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include
 endif
 
-AS = as --32 -I $(IMPALA_INCLUDEDIR)
+AS = as 
 CC = gcc
 LD = ld -m elf_i386 -r
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
+ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 objs = monitor.o ps2.o kbd/kbd.o hd/hd.o fs/fs.o
 
 all: $(CONFIGURE) drivers.o
@@ -19,7 +20,7 @@ drivers.o: $(objs)
 	$(LD) $^ -o $@
 
 %.o: %.s
-	$(AS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@

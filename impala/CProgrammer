@@ -3,7 +3,7 @@ void install_isr()
 void install_irqs()
 
 printc(char c);
-prints(char *c);
+printf(char *fmt, ...);
 clears();
 
 void init_keyboard()

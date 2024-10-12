@@ -50,8 +50,7 @@ efficient memory to hold the contents of the sections
   uint32 startClust = find_file_startcluster(fname);
 
   if(startClust == 0){
-    char *fNotFound = "File Not found.\n";
-    prints(fNotFound);
+    printf("File Not found.\n");
     return -1;
   }
  
@@ -73,8 +72,7 @@ efficient memory to hold the contents of the sections
   }
 
   if(i == GDTMAX){
-    char *noFreeEntry = "GDT at Limit, Program loading Failed.\n";
-    prints(noFreeEntry);
+    printf("GDT at Limit, Program loading Failed.\n");
     return 1;
   }
 

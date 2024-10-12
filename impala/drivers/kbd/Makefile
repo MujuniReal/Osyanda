@@ -8,18 +8,19 @@ IMPALA_INCLUDEDIR = $(IMPALA_ROOT)/include/
 IMPALA_DRIVERDIR = $(IMPALA_ROOT)/drivers/
 endif
 
-AS = as --32 -I $(IMPALA_INCLUDEDIR)
+AS = as 
 LD = ld -m elf_i386 -r
 objs = ps2_kbd.o
 #objs = kbdold.o
 CC = gcc
-CFLAGS = -nostdinc -nostdlib -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -c 
+ASFLAGS = --32 --gen-debug -I $(IMPALA_INCLUDEDIR) 
+CFLAGS = -fno-builtin -nostartfiles -nostdinc -nostdlib -nolibc -nodefaultlibs -m32 -I $(IMPALA_INCLUDEDIR) -fno-PIC -ggdb -c 
 
 all: $(CONFIGURE) $(objs) kbd.o
 
 
 %.o: %.s
-	$(AS) $< -o $@
+	$(AS) $(ASFLAGS) $< -o $@
 
 %.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@

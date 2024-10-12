@@ -80,8 +80,6 @@ void init_keyboard(){
   //Wait for Acknowledgement
   wait_kybd_stat(KYBDDATA, CMDACK);
 
-  char *succStr = "[impala] Keyboard Sucessfully Initialized\n";
-
-  prints(succStr);
+  printf("[impala] Keyboard Sucessfully Initialized\n");
   
 }

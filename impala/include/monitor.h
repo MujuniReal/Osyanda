@@ -4,6 +4,6 @@
 
 extern void clears(void);
 extern void printc(char c);
-extern void prints(char *str);
+extern void printf(char *fmt, ...);
 
 #endif

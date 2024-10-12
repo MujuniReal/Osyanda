@@ -4,13 +4,13 @@ programs = terminal
 
 all: $(objs) $(programs)
 
-AS = as --32 
+AS = as --32 --gen-debug
 
 %.o: %.s
 	$(AS) $^ -o $@
 
 %.o: %.c
-	gcc -m32 -nostdinc -nostdlib -e terminal -fno-PIC -c $^ -o $@
+	gcc -m32 -nostdinc -nostdlib -nolibc -e terminal -fno-PIC -ggdb -c $^ -o $@
 %: %.o
 	ld -m elf_i386 --oformat binary -T linkscript.ld $^ -o $@
 clean:

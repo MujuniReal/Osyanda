@@ -9,17 +9,19 @@ endif
 
 CC = gcc
 LD = ld
-objs = stage2.o crane.o printer.o string.o printer.o readsect.o idt.o gdt.o a20.o fs.o fat.o ascii.o
+objs = start_crane.o crane.o start_kernel.o string.o diskread.o fat.o display.o ascii.o port.o
 SFILES = ptable.s fatbpb.s
-CFLAGS = -m16 -Wno-builtin-declaration-mismatch -nostdinc -nostdlib -I $(CRANE_INCLUDEDIR) -fno-PIC -c
+CFLAGS = -m32 -Wno-builtin-declaration-mismatch -fno-builtin -nostartfiles -nostdlib -nolibc -nodefaultlibs -nostdinc -nostartfiles -I $(CRANE_INCLUDEDIR) -fno-PIC -ggdb -c
 LDFLAGS = -m elf_i386 --oformat binary -nostdlib  -T linkscript.ld -Map=Map.map
+AS = as --32 --gen-debug
 
 all: cranebl.bin
 
 cranebl.bin: $(objs)
 	$(LD) $(LDFLAGS) $^ -o $@
 
-AS = as --32 
+debug: $(objs)
+	$(LD) -m elf_i386 -r -nostdlib  -T linkscript.ld -Map=Map.map $^ -o stage2sym.o
 
 stage2.o: stage2.s
 	$(AS) $^ -o $@

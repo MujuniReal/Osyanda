@@ -1,8 +1,8 @@
 	.code32
 	.text
 
-	.global idtp
 	.global load_idt
+	.global IDTPTR
 
 	.global isr0
 	.global isr1
@@ -40,7 +40,11 @@
 
 
 load_idt:
-	lidt idtp          /* This function loads the IDT into memory the idt that's in the kernel's runtime */
+	// push %ebp
+    // mov %esp, %ebp
+
+	lidt IDTPTR          /* This function loads the IDT into memory the idt that's in the kernel's runtime */
+	// pop %ebp
 	ret
 
 /* these functions below are to handle interrupt exceptions */
@@ -119,6 +123,5 @@ prepregs_isr:
 	add $0x8,%esp       /* Clear the pushed error code and interrupt handler number*/
 	iret                /* pop cs, eip, ss, esp */
 
-
 	.data
-idtp: .byte 0,0,0,0,0,0
+IDTPTR: .byte 0,0,0,0,0,0
