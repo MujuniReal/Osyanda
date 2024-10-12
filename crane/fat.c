@@ -61,7 +61,7 @@ int createFat1216BpbSrc(fatbpb1216 *fatbpb){
   fprintf(Fathdrfile,"SectPClust:\t.byte 0x%x\n",bpb->SectPClust);
   fprintf(Fathdrfile,"ResSects:\t.word 0x%x\n",bpb->ResSects);
   fprintf(Fathdrfile,"FatTabs:\t.byte 0x%x\n",bpb->FatTabs);
-  fprintf(Fathdrfile,"NRootDirEs:\t.word 0x%x\n",bpb->NRootDirEs);
+  fprintf(Fathdrfile,"reserved1:\t.word 0x%x\n",bpb->reserved1);
   fprintf(Fathdrfile,"TotSects:\t.word 0x%x\n",bpb->TotSects);
   fprintf(Fathdrfile,"MedDescr:\t.byte 0x%x\n",bpb->MedDescr);
   fprintf(Fathdrfile,"SectsPFat:\t.word 0x%x\n",bpb->SectsPFat); 

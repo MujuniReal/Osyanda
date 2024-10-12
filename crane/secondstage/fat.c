@@ -14,12 +14,15 @@ extern uint32 osyandaStartSector;
 
 typedef struct _fatbpb32 fatbpb;
 uint8 bpb[512];
-//1024 Sectors in one FAT 1024 / 4 = 256
-uint32 fat[256];
-//16 dir entries 16 * 32 = 512
-dirEntry rootdirSect[16];
+//1024 Sectors in one FAT (1024 * 512) / 4 (32bit int) = 131072 FAT 32bit entries
+uint32 fat[131072];
+//This disk; 1 cluster = 8 sectors
+//128 dir entries in one clust (8 * 512) / 32 = 128
+dirEntry rootdirClust[128];
 
+fatbpb *_bpb;
 uint32 dataSectLba;
+uint32 bytesPClust;
 
 int load_fat() {
   //Load the BPB
@@ -28,18 +31,26 @@ int load_fat() {
     return 0;
   }
 
-  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
-  uint32 fat_start_sect = osyandaStartSector + _bpb->ResSects;
-  // uint32 fat2StartSect = osyandaStartSector + _bpb->ResSects + _bpb->SectsPFat;
+  _bpb = (fatbpb*)(bpb + FATBPBOFFSET);
+  uint32 fatStartSect = osyandaStartSector + _bpb->ResSects;
+  bytesPClust = _bpb->SectPClust * _bpb->ByPSect;
+  //sizeof(uint32) = 4
+  uint32 fatEntriesClust = bytesPClust / 4;
+  uint32 fatClusts = _bpb->SectsPFat / _bpb->SectPClust;
+
+  uint32 *fatPtr = (uint32*)&fat;
 
   //Load the Whole FAT
-  // !diskread((char *)fat, _bpb->SectsPFat, fat_start_sect)
-  // For now lets load 1 FAT Sector but this is to be changed in the future
-  if ( !diskread((char *)fat, 1, fat_start_sect) ) {
+  for ( uint32 fc = 0; fc < fatClusts; fc += _bpb->SectPClust) {
+
+    if ( !diskread((char *)fatPtr, _bpb->SectPClust, (fatStartSect + fc)) ) {
     // failed to read the FAT
     return -1;
-  }
+    }
 
+   fatPtr += fatEntriesClust; 
+  }
+  
   return 1;
 }
 
@@ -60,29 +71,27 @@ uint32 find_file(char *filename) {
     return;
   }
 
-  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
-
   dataSectLba = osyandaStartSector + _bpb->ResSects + (_bpb->SectsPFat * _bpb->FatTabs);
   uint32 rootDirClust = _bpb->firstRootDirClust;
-
 
   while( rootDirClust != EOFMAGIC && rootDirClust != EOFMAGIC_2 ){
 
     uint32 dirSectLba = dataSectLba + ( (rootDirClust - 2) * _bpb->SectPClust );
 
-    if ( !diskread((char *)rootdirSect, 1, dirSectLba) ) {
+    //Read the whole Root dir cluster into memory
+    if ( !diskread((char *)rootdirClust, _bpb->SectPClust, dirSectLba) ) {
       // Failed to read sector
       printf("Failed to read Root directory Sector\n");
       break;
     };
 
-    int totalEntrySect = _bpb->ByPSect / ROOTDIRENTRYSIZE;
+    int totalEntrySect = bytesPClust / ROOTDIRENTRYSIZE;
 
     for ( int i = 0; i < totalEntrySect; i++ ){
       // Find file in Root directory
-      if( strncmp((char *)rootdirSect[i].dirName, filename, 11) == 0 ){
+      if( strncmp((char *)rootdirClust[i].dirName, filename, 11) == 0 ){
         /* File Found */
-        uint32 filestartCluster = rootdirSect[i].dirFirstClustHi << 16 | rootdirSect[i].dirFirstClustLo;
+        uint32 filestartCluster = rootdirClust[i].dirFirstClustHi << 16 | rootdirClust[i].dirFirstClustLo;
         return filestartCluster;
       }
     }
@@ -99,11 +108,15 @@ int16 read_file(char *dest, uint32 fstartClust) {
 
   //Might Need to load another sector of FAT in memory in case the kernel file is too large
 
-  fatbpb *_bpb = (fatbpb*)(bpb + FATBPBOFFSET);
+  if( _bpb == 0 ){
+    if( load_fat() != 1 ){
+      printf("Failed to Read the FAT.\n");
+      return;
+    }
+  }
 
   uint32 dataClust = fstartClust;
   char *nextAddr = dest;
-  uint32 bytesPClust =  _bpb->ByPSect * _bpb->SectPClust;
 
   int fat_i = 0;
 

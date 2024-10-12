@@ -42,6 +42,8 @@ void crane_main() {
 
   uint32 fileStartClust = find_file(kernelName);
 
+  goto hangKernel;
+
   if (fileStartClust == 0) {
     printf("Kernel not found.\n");
     goto hangKernel;
